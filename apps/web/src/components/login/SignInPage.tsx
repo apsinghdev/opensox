@@ -1,7 +1,7 @@
 "use client";
 import { signIn } from "next-auth/react";
 import PrimaryButton from "../ui/custom-button";
-import { Google } from "../icons/icons";
+import { Google, Github } from "../icons/icons";
 import Image from "next/image";
 import Overlay from "../ui/overlay";
 
@@ -31,6 +31,12 @@ const SignInPage = () => {
           <Google />
         </div>
         Continue with Google
+      </PrimaryButton>
+       <PrimaryButton onClick={() => signIn("github", { callbackUrl: "/dashboard/home" })} classname="w-full max-w-[380px] z-20 ">
+        <div className="w-6">
+          <Github />
+        </div>
+        Continue with GitHub
       </PrimaryButton>
     </div>
   );
