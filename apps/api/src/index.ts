@@ -10,6 +10,8 @@ import type { CorsOptions as CorsOptionsType } from "cors";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import ipBlocker from "./middleware/ipBlock.js";
+import hpp from "hpp";
+import { sanitizeMiddleware } from "./middleware/sanitizeMiddleware.js";
 
 dotenv.config();
 
@@ -55,6 +57,8 @@ const apiLimiter = rateLimit({
 // Request size limits
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ limit: "10kb", extended: true }));
+app.use(hpp());
+app.use(sanitizeMiddleware);
 
 // CORS configuration
 const corsOptions: CorsOptionsType = {
