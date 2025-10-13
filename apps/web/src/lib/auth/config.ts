@@ -15,12 +15,19 @@ export const authConfig: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, profile }) {
+    async signIn({ user, profile, account }) {
       try {
+        if (!user.email) {
+          console.error("Sign-in error: Email is required");
+          return false;
+        }
+
+        const authMethod = account?.provider === "github" ? "github" : "google";
+        
         await serverTrpc.auth.googleAuth.mutate({
-          email: user.email!,
-          firstName: profile?.name,
-          authMethod: "google",
+          email: user.email,
+          firstName: profile?.name || user.name || undefined,
+          authMethod: authMethod,
         });
 
         return true;
@@ -41,10 +48,17 @@ export const authConfig: NextAuthOptions = {
     async jwt({ token, account, user }) {
       if (account && user) {
         try {
+          if (!user.email) {
+            console.error("JWT token error: Email is required");
+            return token;
+          }
+
+          const authMethod = account.provider === "github" ? "github" : "google";
+          
           const data = await serverTrpc.auth.googleAuth.mutate({
-            email: user.email!,
-            firstName: user.name ?? undefined,
-            authMethod: "google",
+            email: user.email,
+            firstName: user.name || undefined,
+            authMethod: authMethod,
           });
 
           token.jwtToken = data.token;

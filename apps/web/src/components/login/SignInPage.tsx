@@ -32,7 +32,7 @@ const SignInPage = () => {
         </div>
         Continue with Google
       </PrimaryButton>
-       <PrimaryButton onClick={() => signIn("github", { callbackUrl: "/dashboard/home" })} classname="w-full max-w-[380px] z-20 ">
+      <PrimaryButton onClick={() => signIn("github", { callbackUrl: "/dashboard/home" })} classname="w-full max-w-[380px] z-20 ">
         <div className="w-6">
           <Github />
         </div>
@@ -43,4 +43,5 @@ const SignInPage = () => {
 };
 
 export default SignInPage;
+
 
