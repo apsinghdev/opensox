@@ -5,7 +5,7 @@ import { projectService } from "../services/project.service.js";
 import { queryService } from "../services/query.service.js";
 
 const filterPropsSchema = z.object({
-  language: z.string().optional(),
+  language: z.union([z.string(), z.array(z.string())]).optional(),
   stars: z
     .object({
       min: z.string().optional(),
