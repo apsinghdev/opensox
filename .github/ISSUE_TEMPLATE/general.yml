@@ -1,0 +1,25 @@
+---
+name: General Issue
+description: For general questions, discussions, or other issues
+title: "[GENERAL] "
+labels: []
+assignees: []
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your issue or question.
+      placeholder: What is your question or issue?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide any additional context or details.
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any other information that might be helpful.
