@@ -49,9 +49,9 @@ export const projectsOfTheWeek = [
     avatarUrl: "https://avatars.githubusercontent.com/u/71456708?s=48&v=4",
     totalIssueCount: 4,
     primaryLanguage: "Go",
-    popularity: "Lowest",
+    popularity: "High",
     stage: "Very early",
-    competition: "Very low",
+    competition: "Very Low",
     activity: "Normal",
   },
   {
@@ -62,9 +62,9 @@ export const projectsOfTheWeek = [
     avatarUrl: "https://avatars.githubusercontent.com/u/165773289?s=48&v=4",
     totalIssueCount: 11,
     primaryLanguage: "Typescript",
-    popularity: "Very low",
+    popularity: "Very Low",
     stage: "Very early",
-    competition: "Very low",
+    competition: "Very Low",
     activity: "High",
   },
   {
@@ -78,7 +78,7 @@ export const projectsOfTheWeek = [
     primaryLanguage: "Typescript",
     popularity: "Low",
     stage: "Very early",
-    competition: "Very low",
+    competition: "Very Low",
     activity: "Low",
   },
   {
@@ -92,7 +92,7 @@ export const projectsOfTheWeek = [
     primaryLanguage: "Rust",
     popularity: "Lowest",
     stage: "Early",
-    competition: "Very low",
+    competition: "Very Low",
     activity: "Highest",
   },
   {
@@ -118,7 +118,7 @@ export const projectsOfTheWeek = [
     primaryLanguage: "Go",
     popularity: "Moderate",
     stage: "Emerging",
-    competition: "Very low",
+    competition: "Very Low",
     activity: "Highest",
   },
   {
@@ -144,9 +144,9 @@ export const projectsOfTheWeek = [
     avatarUrl: "https://avatars.githubusercontent.com/u/133607167?s=48&v=4",
     totalIssueCount: 120,
     primaryLanguage: "Rust",
-    popularity: "Very low",
+    popularity: "Very Low",
     stage: "Very early",
-    competition: "Very low",
+    competition: "Very Low",
     activity: "Highest",
   },
 ];
