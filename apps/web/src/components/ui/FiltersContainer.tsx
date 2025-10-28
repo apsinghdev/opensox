@@ -132,7 +132,7 @@ export default function FiltersContainer() {
 
         <div className="h-8 lg:h-[10%] border-t border-ox-gray flex items-center px-4 justify-end">
           <Button
-            className="font-semibold text-white bg-ox-purple text-[14px] h-6 lg:h-6 w-18 lg:w-12 hover:bg-white-500"
+            className="font-semibold text-white bg-ox-purple text-[14px] h-6 hover:bg-white hover:text-ox-purple"
             onClick={handleSearchProjects}
           >
             Search

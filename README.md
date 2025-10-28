@@ -167,7 +167,7 @@ Congrats! Your frontend is running on `localhost:3000`.
 3. `cd` into `opensox/apps/api` and install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 Now run the server:
