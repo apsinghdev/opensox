@@ -8,7 +8,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 export const generateToken = (email: string): string => {
-  return jwt.sign({ email }, JWT_SECRET, { expiresIn: "48h" });
+  return jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" });
 };
 
 export const verifyToken = async (token: string) => {

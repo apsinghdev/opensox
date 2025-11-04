@@ -3,6 +3,7 @@ import { queryRouter } from "./queries.js";
 import { userRouter } from "./user.js";
 import { projectRouter } from "./projects.js";
 import { authRouter } from "./auth.js";
+import { paymentRouter } from "./payment.js";
 import { z } from "zod";
 import { newsletterRouter } from "./newsletter.js";
 

@@ -34,6 +34,9 @@
     "express-rate-limit": "^7.5.0",
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "razorpay": "^2.9.6",
+    "superjson": "^2.2.5",
+    "zeptomail": "^6.2.1",
     "zod": "^4.1.9"
   }
 }

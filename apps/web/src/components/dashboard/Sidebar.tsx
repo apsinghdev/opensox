@@ -36,8 +36,8 @@ export default function Sidebar() {
     window.open("https://discord.gg/37ke8rYnRM", "_blank");
   };
 
-  const supportClickHandler = () => {
-    window.open("https://pages.razorpay.com/pl_R6WHnm15Fm98fI/view", "_blank");
+  const premiumClickHandler = () => {
+    window.location.href = "/pricing";
   };
   const shareProjectHandler = () => {
     const msg: string =
@@ -55,8 +55,8 @@ export default function Sidebar() {
   };
 
   const handleLogout = () => {
-    signOut({callbackUrl: "/"});
-  }
+    signOut({ callbackUrl: "/" });
+  };
 
   return (
     <div
@@ -91,7 +91,7 @@ export default function Sidebar() {
         ></SidebarItem>
         <SidebarItem
           itemName="Opensox premium"
-          onclick={supportClickHandler}
+          onclick={premiumClickHandler}
         ></SidebarItem>
         <SidebarItem
           itemName="Share the love"
@@ -101,10 +101,7 @@ export default function Sidebar() {
           itemName="Contact"
           onclick={handleEmailClick}
         ></SidebarItem>
-        <SidebarItem
-          itemName="Logout"
-          onclick={handleLogout}
-        ></SidebarItem>
+        <SidebarItem itemName="Logout" onclick={handleLogout}></SidebarItem>
         <SidebarItem
           itemName="Twitter"
           onclick={() => {

@@ -12,48 +12,92 @@ model QueryCount {
   total_queries BigInt
 }
 
+enum PaymentStatus {
+  created
+  authorized
+  captured
+  refunded
+  failed
+}
+
+enum SubscriptionStatus {
+  created
+  authenticated
+  active
+  pending
+  halted
+  cancelled
+  completed
+  expired
+}
+
 model User {
-  id String @id @default(cuid())
-
-  email String @unique
-
-  firstName String
-
-  authMethod String
-
-  createdAt DateTime @default(now())
-
-  lastLogin DateTime @updatedAt
-
-  accounts Account[]
+  id            String         @id @default(cuid())
+  email         String         @unique
+  firstName     String
+  authMethod    String
+  createdAt     DateTime       @default(now())
+  lastLogin     DateTime       @updatedAt
+  accounts      Account[]
+  payments      Payment[]
+  subscriptions Subscription[]
 }
 
 model Account {
-  id String @id @default(cuid())
-
-  userId String // Foreign key to User
-
-  type String // "oauth", "email", etc.
-
-  provider String // "google", "github", etc.
-
-  providerAccountId String // ID from the provider
-
-  refresh_token String?
-
-  access_token String?
-
-  expires_at Int?
-
-  token_type String?
-
-  scope String?
-
-  id_token String?
-
-  session_state String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  userId            String
+  subscriptionId    String?
+  razorpayPaymentId String        @unique
+  razorpayOrderId   String
+  amount            Int           // Amount in paise (smallest currency unit)
+  currency          String        @default("INR")
+  status            PaymentStatus
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  userId    String
+  planId    String
+  status    SubscriptionStatus
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  autoRenew Boolean   @default(true)
+  payments  Payment[]
+  plan      Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Plan {
+  id            String         @id @default(cuid())
+  name          String
+  interval      String
+  price         Int
+  currency      String         @default("INR")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
 }

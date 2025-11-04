@@ -24,6 +24,13 @@ export const authConfig: NextAuthOptions = {
           email: user.email!,
           firstName: user.name ?? (profile as any)?.name,
           authMethod: account?.provider ?? "google",
+          providerAccountId: account?.providerAccountId,
+          access_token: account?.access_token,
+          refresh_token: account?.refresh_token,
+          id_token: account?.id_token,
+          expires_at: account?.expires_at,
+          token_type: account?.token_type,
+          scope: account?.scope,
         });
 
         return true;
@@ -44,10 +51,8 @@ export const authConfig: NextAuthOptions = {
     async jwt({ token, account, user }) {
       if (account && user) {
         try {
-          const data = await serverTrpc.auth.googleAuth.mutate({
+          const data = await serverTrpc.auth.generateJWT.mutate({
             email: user.email!,
-            firstName: user.name ?? undefined,
-            authMethod: account.provider ?? "google",
           });
 
           token.jwtToken = data.token;

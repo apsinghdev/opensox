@@ -1,4 +1,4 @@
-import CheckoutConfirmation from "@/components/checkout/checkout-confirmation";
+import CheckoutWrapper from "@/components/checkout/CheckoutWrapper";
 import Image from "next/image";
 
 export default function Checkout() {
@@ -12,7 +12,7 @@ export default function Checkout() {
         priority
       />
       <div className=" z-10">
-        <CheckoutConfirmation></CheckoutConfirmation>
+        <CheckoutWrapper />
       </div>
     </div>
   );

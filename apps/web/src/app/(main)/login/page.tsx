@@ -1,10 +1,13 @@
+import { Suspense } from "react";
 import SignInPage from "@/components/login/SignInPage";
 
 export default function Home() {
   return (
     <div className="flex flex-col h-screen w-full justify-center items-center relative bg-[#101010]">
       <div className=" z-10">
-        <SignInPage></SignInPage>
+        <Suspense fallback={<div>Loading...</div>}>
+          <SignInPage></SignInPage>
+        </Suspense>
       </div>
     </div>
   );

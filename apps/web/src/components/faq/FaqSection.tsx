@@ -9,7 +9,7 @@ import { faqs } from "./faqData";
 
 export function FaqSection() {
   return (
-    <div className="flex flex-col border-b border-[#252525]">
+    <div className="flex flex-col border-b border-[#252525]" id="faq">
       <Header title="Frequently Asked Questions" />
       <div className="w-full px-[30px] lg:px-[50px] py-8 lg:py-12 relative">
         <div

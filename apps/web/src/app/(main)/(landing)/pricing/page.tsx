@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import PrimaryButton from "@/components/ui/custom-button";
+import PaymentFlow from "@/components/payment/PaymentFlow";
 const opensoxFeatures = [
   {
     id: 1,
@@ -341,6 +342,10 @@ const PricingCard = () => {
 };
 
 const SecondaryPricingCard = () => {
+  const premiumPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
+  const planIdOk =
+    typeof premiumPlanId === "string" && premiumPlanId.length > 0;
+
   return (
     <div className="py-2">
       <div className=" border-border-primary w-full mx-auto flex h-full">
@@ -370,15 +375,15 @@ const SecondaryPricingCard = () => {
               </h2>
             </div>
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 ">
-              <Link
-                target="_blanko"
-                href="https://pages.razorpay.com/pl_R6WHnm15Fm98fI/view"
-                className="cursor-pointer z-30"
-              >
-                <PrimaryButton classname="w-full max-w-[500px] mx-auto font-semibold">
-                  Invest
-                </PrimaryButton>
-              </Link>
+              <PaymentFlow
+                planId={planIdOk ? premiumPlanId : ""}
+                planName="Opensox Premium"
+                description="Annual Subscription"
+                buttonText={planIdOk ? "Invest" : "Unavailable"}
+                buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${
+                  planIdOk ? "" : "opacity-60 cursor-not-allowed"
+                }`}
+              />
             </div>
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4 flex-1">
               <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">

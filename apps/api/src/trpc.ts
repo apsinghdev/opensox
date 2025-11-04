@@ -1,8 +1,11 @@
 import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
 import type { Context } from "./context.js";
 import { verifyToken } from "./utils/auth.js";
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create({
+  transformer: superjson,
+});
 
 const isAuthed = t.middleware(async ({ ctx, next }) => {
   const authHeader = ctx.req.headers.authorization;
