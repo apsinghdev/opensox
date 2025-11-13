@@ -12,7 +12,7 @@ const Navbar = () => {
   const { scrollYProgress } = useScroll();
   const pathname = usePathname();
   const isPricingPage = pathname === "/pricing";
-  const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
+  const [showNavbar, setShowNavbar] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
 
   React.useEffect(() => {
@@ -29,7 +29,8 @@ const Navbar = () => {
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!isPricingPage) {
-      setShowNavbar(latest > 0);
+      // Keep navbar visible, no hiding logic
+      setShowNavbar(true);
     }
   });
 
@@ -45,14 +46,14 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      initial={{ opacity: 0 }}
-      animate={showNavbar ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className={cn(
-        " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
+        "flex items-center justify-between px-4 py-3 bg-black/20 backdrop-blur-md border border-white/10 rounded-3xl",
         isPricingPage
-          ? "relative h-max md:w-full top-0 border-b"
-          : "fixed rounded-3xl top-4 border w-[94%] md:w-[80%] mx-auto left-1/2 -translate-x-1/2"
+          ? "relative h-max md:w-full border-b"
+          : "w-full"
       )}
     >
       <div className="flex items-center gap-3">
@@ -64,7 +65,7 @@ const Navbar = () => {
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
-        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
+        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2 text-white">
           <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
             <Image
               src="/assets/logo.svg"
@@ -76,7 +77,7 @@ const Navbar = () => {
           <span>Opensox AI</span>
         </div>
       </div>
-      <div className="hidden md:flex items-center gap-5 tracking-tight text-lg font-light text-[#d1d1d1]">
+      <div className="hidden md:flex items-center gap-5 tracking-tight text-lg font-light text-white/90">
         {links.map((link, index) => {
           const isActive = pathname === link.href;
           return (
@@ -84,7 +85,7 @@ const Navbar = () => {
               key={index}
               href={link.href}
               className={cn(
-                "cursor-pointer hover:text-white",
+                "cursor-pointer hover:text-white transition-colors",
                 isActive && "text-white"
               )}
             >
