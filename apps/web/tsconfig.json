@@ -41,6 +41,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "types/**/*"
-  ],
+, "src/app/(main)/dashboard/newsletters/[slug]"  ],
   "exclude": ["node_modules", "../api/node_modules"]
 }

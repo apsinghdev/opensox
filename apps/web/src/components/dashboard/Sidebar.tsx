@@ -17,6 +17,7 @@ import {
   StarIcon,
   HeartIcon,
   EnvelopeIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut } from "next-auth/react";
@@ -138,6 +139,16 @@ export default function Sidebar() {
           icon={<SparklesIcon className="size-5" />}
           collapsed={isCollapsed}
         />
+        <Link
+          href="newsletters"
+          className={getSidebarLinkClassName(pathname, "/newsletters")}
+        >
+          <SidebarItem
+            itemName="Newsletters"
+            icon={<NewspaperIcon className="size-5" />}
+            collapsed={isCollapsed}
+          />
+        </Link>
         <SidebarItem
           itemName="Opensox premium"
           onclick={premiumClickHandler}

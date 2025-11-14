@@ -6,8 +6,13 @@ const nextConfig = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+        pathname: "/**", // optional but recommended
+      },
     ],
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
