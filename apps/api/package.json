@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx src/index.ts",
     "build": "prisma generate && tsc",
-    "postinstall": "[ -f prisma/schema.prisma ] && prisma generate || true"
+    "postinstall": "node -e \"try { if (require('fs').existsSync('prisma/schema.prisma')) require('child_process').execSync('prisma generate', {stdio: 'inherit'}); } catch(e) {}\""
   },
   "keywords": [],
   "author": "Ajeet Pratpa Singh",

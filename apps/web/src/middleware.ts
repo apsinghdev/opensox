@@ -2,6 +2,10 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
+  // TEMPORARILY DISABLED FOR UI DEVELOPMENT - REMOVE THIS COMMENT AND UNCOMMENT BELOW WHEN DONE
+  return NextResponse.next();
+  
+  /* ORIGINAL AUTH CODE - UNCOMMENT WHEN DONE WITH UI WORK
   const adaptedReq = {
     headers: req.headers,
     cookies: req.cookies,
@@ -18,4 +22,5 @@ export async function middleware(req: NextRequest) {
     }
   }
   return NextResponse.next();
+  */
 }

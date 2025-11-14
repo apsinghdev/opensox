@@ -13,15 +13,31 @@ const filterTags: BlogTag[] = [
   "misc",
 ];
 
-export default function BlogsPage() {
-  const [selectedTag, setSelectedTag] = useState<BlogTag>("all");
+type UnifiedPost = 
+  | { type: "blog"; date: string; linkText: string; link: string; tag: BlogTag };
 
-  const filteredBlogs = useMemo(() => {
-    let result = blogs;
+export default function BlogsPage() {
+  const [selectedTag, setSelectedTag] = useState<BlogTag | "all">("all");
+
+  const allPosts = useMemo(() => {
+    const posts: UnifiedPost[] = [
+      ...blogs.map((blog) => ({
+        type: "blog" as const,
+        date: blog.date,
+        linkText: blog.linkText,
+        link: blog.link,
+        tag: blog.tag,
+      })),
+    ];
+
+    // Filter by tag
+    let filtered = posts;
     if (selectedTag !== "all") {
-      result = blogs.filter((blog) => blog.tag === selectedTag);
+      filtered = posts.filter((post) => post.tag === selectedTag);
     }
-    return result.sort((a, b) => {
+
+    // Sort by date
+    return filtered.sort((a, b) => {
       const parseDate = (dateStr: string) => {
         const [day, month, year] = dateStr.split("-").map(Number);
         return new Date(2000 + year, month - 1, day);
@@ -57,24 +73,24 @@ export default function BlogsPage() {
           {/* Blog list */}
           <div className="flex-1 max-w-2xl">
             <div className="flex flex-col gap-3">
-              {filteredBlogs.length === 0 ? (
-                <p className="text-gray-400">No blog posts found.</p>
+              {allPosts.length === 0 ? (
+                <p className="text-gray-400">No posts found.</p>
               ) : (
-                filteredBlogs.map((blog, index) => (
+                allPosts.map((post, index) => (
                   <div
-                    key={`${blog.date}-${blog.linkText}-${index}`}
+                    key={`${post.type}-${post.date}-${post.linkText}-${index}`}
                     className="flex gap-4 items-center whitespace-nowrap"
                   >
                     <span className="text-white w-20 flex-shrink-0 font-DMfont font-mono text-right">
-                      {blog.date}
+                      {post.date}
                     </span>
                     <Link
-                      href={blog.link}
+                      href={post.link}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#9455f4] hover:text-white underline transition-colors"
                     >
-                      {blog.linkText}
+                      {post.linkText}
                     </Link>
                   </div>
                 ))

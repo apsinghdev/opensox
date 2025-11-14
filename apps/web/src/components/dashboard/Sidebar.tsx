@@ -17,12 +17,14 @@ import {
   StarIcon,
   HeartIcon,
   EnvelopeIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut } from "next-auth/react";
 import { Twitter } from "../icons/icons";
 import { ProfilePic } from "./ProfilePic";
 import { useFilterStore } from "@/store/useFilterStore";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const SIDEBAR_ROUTES = [
   {
@@ -34,6 +36,11 @@ const SIDEBAR_ROUTES = [
     path: "/dashboard/projects",
     label: "Projects",
     icon: <FolderIcon className="size-5" />,
+  },
+  {
+    path: "/dashboard/newsletters",
+    label: "Newsletters",
+    icon: <NewspaperIcon className="size-5" />,
   },
 ];
 
@@ -47,6 +54,7 @@ export default function Sidebar() {
     useShowSidebar();
   const pathname = usePathname();
   const { setShowFilters } = useFilterStore();
+  const { isPaidUser } = useSubscription();
 
   const reqFeatureHandler = () => {
     window.open("https://discord.gg/37ke8rYnRM", "_blank");
@@ -115,7 +123,8 @@ export default function Sidebar() {
         {/* Find projects entry */}
 
         {SIDEBAR_ROUTES.map((route) => {
-          const activeClass = getSidebarLinkClassName(pathname, route.path);
+          const isActive = pathname === route.path || pathname.startsWith(`${route.path}/`);
+          const activeClass = isActive ? "text-ox-purple" : "text-ox-white";
           return (
             <Link href={route.path} className={activeClass} key={route.path}>
               <SidebarItem
