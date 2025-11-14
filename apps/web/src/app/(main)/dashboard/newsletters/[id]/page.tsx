@@ -10,11 +10,26 @@ import Image from "next/image";
 import { NewsletterContentItem } from "@/types/newsletter";
 import { GeistSans } from "geist/font/sans";
 import { formatNewsletterDate } from "../utils/newsletter.utils";
+import { useSubscription } from "@/hooks/useSubscription";
+import NewsletterPremiumGate from "../components/NewsletterPremiumGate";
 
 export default function NewsletterPage() {
   const params = useParams();
+  const { isPaidUser, isLoading } = useSubscription();
   const id = params.id as string;
   const newsletter = newsletters.find((n) => n.id === id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isPaidUser) {
+    return <NewsletterPremiumGate />;
+  }
 
   if (!newsletter) {
     return (

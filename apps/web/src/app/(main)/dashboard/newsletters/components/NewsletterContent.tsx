@@ -97,6 +97,55 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
               </ul>
             );
 
+          case "code":
+            return (
+              <pre
+                key={index}
+                className="my-4 p-4 bg-muted rounded-lg overflow-x-auto"
+              >
+                <code className="text-sm font-mono text-foreground">
+                  {item.content}
+                </code>
+              </pre>
+            );
+
+          case "table":
+            return (
+              <div key={index} className="my-4 overflow-x-auto">
+                <table className="min-w-full border-collapse border border-border">
+                  <thead>
+                    <tr className="bg-muted">
+                      {item.headers.map((header, headerIndex) => (
+                        <th
+                          key={headerIndex}
+                          className="border border-border px-4 py-2 text-left font-semibold text-foreground"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {item.rows.map((row, rowIndex) => (
+                      <tr
+                        key={rowIndex}
+                        className={rowIndex % 2 === 0 ? "bg-background" : "bg-muted/50"}
+                      >
+                        {row.map((cell, cellIndex) => (
+                          <td
+                            key={cellIndex}
+                            className="border border-border px-4 py-2 text-foreground/90"
+                          >
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+
           default:
             return null;
         }

@@ -28,6 +28,16 @@ export type NewsletterContentItem =
       type: "list";
       items: string[];
       align?: "left" | "right";
+    }
+  | {
+      type: "code";
+      language?: string;
+      content: string;
+    }
+  | {
+      type: "table";
+      headers: string[];
+      rows: string[][];
     };
 
 export interface Newsletter {
