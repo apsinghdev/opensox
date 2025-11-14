@@ -59,11 +59,13 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
 
           case "image":
             return (
-              <div key={index} className="my-8">
-                <img
+              <div key={index} className="my-8 relative w-full aspect-video">
+                <Image
                   src={item.src}
                   alt={item.alt || ""}
-                  className="w-full rounded-lg"
+                  fill
+                  className="object-contain rounded-lg"
+                  unoptimized={typeof item.src === "string" && item.src.startsWith("http")}
                 />
               </div>
             );

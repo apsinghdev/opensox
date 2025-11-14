@@ -67,17 +67,19 @@ export default function NewsletterPage() {
           {newsletter.coverImage && (
             <div className="relative h-[400px] w-full overflow-hidden rounded-lg mb-8 bg-muted">
               {typeof newsletter.coverImage === "string" ? (
-                <img
+                <Image
                   src={newsletter.coverImage}
                   alt={newsletter.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-contain"
+                  unoptimized
                 />
               ) : (
                 <Image
                   src={newsletter.coverImage}
                   alt={newsletter.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
               )}
             </div>

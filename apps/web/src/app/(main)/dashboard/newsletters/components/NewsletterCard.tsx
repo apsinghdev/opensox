@@ -19,17 +19,19 @@ export default function NewsletterCard({ newsletter }: NewsletterCardProps) {
         {newsletter.coverImage && (
           <div className="relative h-48 w-full overflow-hidden bg-muted">
             {typeof newsletter.coverImage === "string" ? (
-              <img
+              <Image
                 src={newsletter.coverImage}
                 alt={newsletter.title}
-                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105 "
+                fill
+                className="object-contain transition-transform duration-300 hover:scale-105"
+                unoptimized
               />
             ) : (
               <Image
                 src={newsletter.coverImage}
                 alt={newsletter.title}
                 fill
-                className="object-cover transition-transform duration-300 hover:scale-105 hover:opacity-80"
+                className="object-contain transition-transform duration-300 hover:scale-105 hover:opacity-80"
               />
             )}
           </div>
