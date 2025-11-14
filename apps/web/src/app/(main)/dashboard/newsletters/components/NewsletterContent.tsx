@@ -9,14 +9,35 @@ interface NewsletterContentProps {
 }
 
 export default function NewsletterContent({ content }: NewsletterContentProps) {
+  // Regex to detect URLs in text
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  
   return (
     <div className="space-y-6 font-sans">
       {content.map((item, index) => {
         switch (item.type) {
           case "paragraph":
+            // Convert URLs in text to clickable links
+            const parts = item.content.split(urlRegex);
+            
             return (
               <p key={index} className="text-foreground/90 leading-relaxed">
-                {item.content}
+                {parts.map((part, partIndex) => {
+                  if (part.match(urlRegex)) {
+                    return (
+                      <Link
+                        key={partIndex}
+                        href={part}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-600 hover:underline font-medium"
+                      >
+                        {part}
+                      </Link>
+                    );
+                  }
+                  return <span key={partIndex}>{part}</span>;
+                })}
               </p>
             );
 
@@ -50,7 +71,7 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline font-medium"
+                  className="text-blue-500 hover:text-blue-600 hover:underline font-medium"
                 >
                   {item.text}
                 </Link>
@@ -71,7 +92,27 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
             );
 
           case "list":
-            const isRightAligned = item.align === "left";
+            const isRightAligned = item.align === "right";
+            
+            const renderListItem = (listItem: string, itemIndex: number) => {
+              const parts = listItem.split(urlRegex);
+              return parts.map((part, partIndex) => {
+                if (part.match(urlRegex)) {
+                  return (
+                    <Link
+                      key={partIndex}
+                      href={part}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-600 hover:underline font-medium"
+                    >
+                      {part}
+                    </Link>
+                  );
+                }
+                return <span key={partIndex}>{part}</span>;
+              });
+            };
             
             if (isRightAligned) {
               return (
@@ -81,7 +122,7 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
                       key={itemIndex}
                       className="text-foreground/90 flex items-center justify-end gap-2"
                     >
-                      <span>{listItem}</span>
+                      <span>{renderListItem(listItem, itemIndex)}</span>
                       <span className="text-foreground/60">•</span>
                     </li>
                   ))}
@@ -93,7 +134,7 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
               <ul key={index} className="my-4 space-y-2 list-disc list-inside">
                 {item.items.map((listItem, itemIndex) => (
                   <li key={itemIndex} className="text-foreground/90">
-                    {listItem}
+                    {renderListItem(listItem, itemIndex)}
                   </li>
                 ))}
               </ul>

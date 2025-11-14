@@ -29,7 +29,7 @@ export const newsletters = [
       },
       {
         type: "paragraph",
-        content: "our ai engine is now 3x faster with improved accuracy. you'll notice significantly better results across all tasks, from content generation to data analysis."
+        content: "our ai engine is now 3x faster with improved accuracy. you'll notice significantly better results across all tasks, from content generation to data analysis. learn more about our ai capabilities at https://opensox.ai/ai-features"
       },
       {
         type: "bold",
@@ -60,7 +60,7 @@ export const newsletters = [
       },
       {
         type: "paragraph",
-        content: "page load times are down by 40% across the platform. we've optimized our infrastructure to ensure you get the fastest possible experience."
+        content: "page load times are down by 40% across the platform. we've optimized our infrastructure to ensure you get the fastest possible experience. check out our performance metrics at https://opensox.ai/performance and read our technical blog post at https://blog.opensox.ai/performance-optimization"
       },
       {
         type: "paragraph",
@@ -96,7 +96,7 @@ export const newsletters = [
       },
       {
         type: "paragraph",
-        content: "a fintech startup used opensox to automate their customer onboarding process, reducing processing time from 2 hours to just 5 minutes. incredible work!"
+        content: "a fintech startup used opensox to automate their customer onboarding process, reducing processing time from 2 hours to just 5 minutes. incredible work! read the full case study at https://opensox.ai/case-studies/fintech-automation"
       },
       {
         type: "heading",
@@ -110,11 +110,11 @@ export const newsletters = [
       {
         type: "list",
         items: [
-          "use custom templates to save time on repetitive tasks",
-          "leverage batch processing for handling large datasets",
-          "set up webhooks for real-time integrations"
+          "use custom templates to save time on repetitive tasks - browse templates at https://opensox.ai/templates",
+          "leverage batch processing for handling large datasets - see docs at https://docs.opensox.ai/batch-processing",
+          "set up webhooks for real-time integrations - guide available at https://docs.opensox.ai/webhooks"
         ],
-        align: "left"
+        align: "right"
       },
       {
         type: "heading",
@@ -172,8 +172,14 @@ export const newsletters = [
         content: "getting started in 5 minutes"
       },
       {
-        type: "paragraph",
-        content: "step 1: complete your profile and verify your email\nstep 2: explore the dashboard and familiarize yourself with key features\nstep 3: try your first api call or use our web interface\nstep 4: check out our documentation for advanced features"
+        type: "list",
+        items: [
+          "complete your profile at https://opensox.ai/profile and verify your email",
+          "explore the dashboard at https://opensox.ai/dashboard and familiarize yourself with key features",
+          "try your first api call at https://opensox.ai/playground or use our web interface",
+          "check out our documentation at https://docs.opensox.ai for advanced features"
+        ],
+        align: "left"
       },
       {
         type: "link",
@@ -186,8 +192,14 @@ export const newsletters = [
         content: "pro tips for success"
       },
       {
-        type: "paragraph",
-        content: "1. start with our templates to save time\n2. use the playground to test before implementing\n3. monitor your usage dashboard to optimize costs\n4. join our slack community for quick help"
+        type: "list",
+        items: [
+          "start with our templates at https://opensox.ai/templates to save time",
+          "use the playground at https://opensox.ai/playground to test before implementing",
+          "monitor your usage dashboard at https://opensox.ai/usage to optimize costs",
+          "join our slack community at https://slack.opensox.ai for quick help"
+        ],
+        align: "left"
       },
       {
         type: "heading",
