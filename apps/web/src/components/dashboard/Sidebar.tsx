@@ -23,6 +23,7 @@ import { signOut } from "next-auth/react";
 import { Twitter } from "../icons/icons";
 import { ProfilePic } from "./ProfilePic";
 import { useFilterStore } from "@/store/useFilterStore";
+import { NewspaperIcon } from "lucide-react"; 
 
 const SIDEBAR_ROUTES = [
   {
@@ -34,6 +35,11 @@ const SIDEBAR_ROUTES = [
     path: "/dashboard/projects",
     label: "Projects",
     icon: <FolderIcon className="size-5" />,
+  },
+  {
+    path: "/dashboard/newsletters",
+    label: "News letters",
+    icon: <NewspaperIcon className="size-5" />,
   },
 ];
 
