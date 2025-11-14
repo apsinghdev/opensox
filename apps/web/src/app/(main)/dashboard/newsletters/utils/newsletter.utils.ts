@@ -1,10 +1,19 @@
 import { Newsletter } from "@/types/newsletter";
 
+/**
+ * Groups newsletters by month and year
+ * @param newslettersList - Array of newsletters to group
+ * @returns Object with month-year keys and arrays of newsletters
+ */
 export const groupByMonth = (newslettersList: Newsletter[]) => {
   const groups: { [key: string]: Newsletter[] } = {};
 
   newslettersList.forEach((newsletter) => {
     const date = new Date(newsletter.date);
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid date for newsletter ${newsletter.id}: ${newsletter.date}`);
+      return;
+    }
     const monthYear = date.toLocaleDateString("en-US", {
       month: "long",
       year: "numeric",
@@ -25,6 +34,12 @@ export const groupByMonth = (newslettersList: Newsletter[]) => {
   return groups;
 };
 
+/**
+ * Sorts month keys by date (newest first)
+ * Uses reliable date parsing by splitting month and year components
+ * @param keys - Array of month-year strings (e.g., "November 2024")
+ * @returns Sorted array of month-year strings
+ */
 export const sortMonthKeys = (keys: string[]): string[] => {
   return keys.sort((a, b) => {
     // Parse month and year separately for reliable date parsing
@@ -37,6 +52,11 @@ export const sortMonthKeys = (keys: string[]): string[] => {
 };
 
 
+/**
+ * Gets unique months from newsletters array
+ * @param newsletters - Array of newsletters
+ * @returns Sorted array of unique month-year strings
+ */
 export const getAvailableMonths = (newsletters: Newsletter[]): string[] => {
   const months = newsletters.map((n) => {
     const date = new Date(n.date);
@@ -51,6 +71,11 @@ export const getAvailableMonths = (newsletters: Newsletter[]): string[] => {
 };
 
 
+/**
+ * Formats a date string to a readable format
+ * @param dateString - Date string in YYYY-MM-DD format
+ * @returns Formatted date string (e.g., "November 15, 2024")
+ */
 export const formatNewsletterDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString("en-US", {
     month: "long",

@@ -1,5 +1,11 @@
 import { Newsletter, NewsletterContentItem } from "@/types/newsletter";
 
+/**
+ * Checks if a newsletter matches the search query
+ * @param newsletter - Newsletter to check
+ * @param query - Search query (lowercase)
+ * @returns True if newsletter matches the query
+ */
 const matchesSearchQuery = (newsletter: Newsletter, query: string): boolean => {
   const matchesBasicFields =
     newsletter.title.toLowerCase().includes(query) ||
@@ -22,6 +28,12 @@ const matchesSearchQuery = (newsletter: Newsletter, query: string): boolean => {
   return matchesBasicFields || matchesContent || false;
 };
 
+/**
+ * Checks if a newsletter matches the selected month filter
+ * @param newsletter - Newsletter to check
+ * @param selectedMonth - Selected month-year string or "all"
+ * @returns True if newsletter matches the month filter
+ */
 const matchesMonthFilter = (
   newsletter: Newsletter,
   selectedMonth: string
@@ -37,6 +49,13 @@ const matchesMonthFilter = (
 };
 
 
+/**
+ * Filters newsletters based on search query and month
+ * @param newsletters - Array of newsletters to filter
+ * @param searchQuery - Search query string
+ * @param selectedMonth - Selected month filter ("all" or month-year string)
+ * @returns Filtered array of newsletters
+ */
 export const filterNewsletters = (
   newsletters: Newsletter[],
   searchQuery: string,

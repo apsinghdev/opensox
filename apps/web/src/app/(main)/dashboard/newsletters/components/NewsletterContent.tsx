@@ -70,39 +70,31 @@ export default function NewsletterContent({ content }: NewsletterContentProps) {
 
           case "list":
             const isRightAligned = item.align === "left";
-            return (
-              <div
-                key={index}
-                className={`my-4 ${
-                  isRightAligned ? "flex justify-end" : ""
-                }`}
-              >
-                <ul
-                  className={`space-y-2 ${
-                    isRightAligned
-                      ? "list-none text-right"
-                      : "list-disc list-inside"
-                  }`}
-                >
+            
+            if (isRightAligned) {
+              return (
+                <ul key={index} className="my-4 space-y-2 list-none text-right">
                   {item.items.map((listItem, itemIndex) => (
                     <li
                       key={itemIndex}
-                      className={`text-foreground/90 ${
-                        isRightAligned
-                          ? "flex items-center justify-end gap-2"
-                          : ""
-                      }`}
+                      className="text-foreground/90 flex items-center justify-end gap-2"
                     >
                       <span>{listItem}</span>
-                      {isRightAligned && (
-                        <span className="text-foreground/60 flex-shrink-0">
-                          •
-                        </span>
-                      )}
+                      <span className="text-foreground/60">•</span>
                     </li>
                   ))}
                 </ul>
-              </div>
+              );
+            }
+            
+            return (
+              <ul key={index} className="my-4 space-y-2 list-disc list-inside">
+                {item.items.map((listItem, itemIndex) => (
+                  <li key={itemIndex} className="text-foreground/90">
+                    {listItem}
+                  </li>
+                ))}
+              </ul>
             );
 
           default:
