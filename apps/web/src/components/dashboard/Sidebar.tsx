@@ -17,13 +17,13 @@ import {
   StarIcon,
   HeartIcon,
   EnvelopeIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut } from "next-auth/react";
 import { Twitter } from "../icons/icons";
 import { ProfilePic } from "./ProfilePic";
-import { useFilterStore } from "@/store/useFilterStore";
-import { NewspaperIcon } from "lucide-react"; 
+import { useFilterStore } from "@/store/useFilterStore"; 
 
 const SIDEBAR_ROUTES = [
   {
@@ -38,7 +38,7 @@ const SIDEBAR_ROUTES = [
   },
   {
     path: "/dashboard/newsletters",
-    label: "News letters",
+    label: "Newsletters",
     icon: <NewspaperIcon className="size-5" />,
   },
 ];

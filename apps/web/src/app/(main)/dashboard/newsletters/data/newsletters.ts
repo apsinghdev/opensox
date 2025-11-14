@@ -114,7 +114,7 @@ export const newsletters = [
           "leverage batch processing for handling large datasets",
           "set up webhooks for real-time integrations"
         ],
-        align: "right"
+        align: "left"
       },
       {
         type: "heading",

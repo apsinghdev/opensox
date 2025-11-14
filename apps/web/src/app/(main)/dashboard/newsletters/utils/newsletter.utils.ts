@@ -27,8 +27,11 @@ export const groupByMonth = (newslettersList: Newsletter[]) => {
 
 export const sortMonthKeys = (keys: string[]): string[] => {
   return keys.sort((a, b) => {
-    const dateA = new Date(a);
-    const dateB = new Date(b);
+    // Parse month and year separately for reliable date parsing
+    const [monthA, yearA] = a.split(" ");
+    const [monthB, yearB] = b.split(" ");
+    const dateA = new Date(`${monthA} 1, ${yearA}`);
+    const dateB = new Date(`${monthB} 1, ${yearB}`);
     return dateB.getTime() - dateA.getTime();
   });
 };
