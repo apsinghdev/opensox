@@ -1,34 +1,28 @@
 "use client";
-import Sidebar from "@/components/dashboard/Sidebar";
-import FiltersContainer from "@/components/ui/FiltersContainer";
+import React from "react";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useShowSidebar } from "@/store/useShowSidebar";
-import { IconWrapper } from "@/components/ui/IconWrapper";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import Sidebar from "@/components/dashboard/Sidebar";
+import FiltersContainer from "@/components/ui/FiltersContainer";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { showFilters } = useFilterStore();
-  const { showSidebar, setShowSidebar } = useShowSidebar();
+  const { showSidebar } = useShowSidebar();
+
   return (
-    <div className="flex w-screen h-screen bg-[#0a0a0b] overflow-hidden">
-      {showFilters && <FiltersContainer />}
-      <aside className={`h-full ${!showSidebar && "hidden xl:block"}`}>
-        <Sidebar />
-      </aside>
-      <div className="flex-1 flex flex-col h-full">
-        <div className="xl:hidden flex items-center h-16 px-4 border-b border-[#1a1a1d]">
-          <IconWrapper onClick={() => setShowSidebar(true)}>
-            <Bars3Icon className="size-5 text-ox-purple" />
-          </IconWrapper>
-          <h1 className="ml-4 text-lg font-semibold text-ox-white">Opensox</h1>
-        </div>
-        <main className="flex-1 h-full overflow-auto">
-          {children}
-        </main>
+    <div className="flex flex-col md:gap-3">
+      <div className="flex w-full h-16">
+        <DashboardHeader />
+      </div>
+      <div className="flex flex-row w-full overflow-hidden">
+        {showFilters && <FiltersContainer />}
+        <aside
+          className={`flex-shrink-0 w-48 md:w-[40%] xl:w-[20%] ${showSidebar ? "block relative" : "hidden"} xl:block overflow-y-auto`}
+        >
+          <Sidebar />
+        </aside>
+        <main className="flex-grow overflow-y-auto">{children}</main>
       </div>
     </div>
   );

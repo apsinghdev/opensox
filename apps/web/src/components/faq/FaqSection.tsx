@@ -7,7 +7,7 @@ import {
 import Header from "../ui/header";
 import { faqs } from "./faqData";
 
-export function FaqSection() {
+export default function FaqSection() {
   return (
     <div className="flex flex-col border-b border-[#252525]" id="faq">
       <Header title="Frequently Asked Questions" />

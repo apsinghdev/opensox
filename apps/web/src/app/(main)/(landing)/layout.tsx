@@ -1,13 +1,31 @@
-import Navbar from '@/components/landing-sections/navbar'
-import React from 'react'
+"use client";
+
+import React, { Suspense, lazy } from "react";
+
+import { Skeleton } from "@/components/ui/skeleton";
+
+const Navbar = lazy(() => import("@/components/landing-sections/navbar"));
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <section>
-            <Navbar />
-            {children}
-        </section>
-    )
-}
+  return (
+    <section>
+      <Suspense
+            fallback={
+              <div className="py-20 text-center text-lg text-neutral-400">
+                <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 px-6">
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-4 w-72" />
+                  <Skeleton className="h-4 w-64" />
+                  <Skeleton className="h-4 w-56" />
+                </div>
+              </div>
+            }
+          >
+        <Navbar />
+      </Suspense>
+      {children}
+    </section>
+  );
+};
 
-export default Layout
+export default Layout;
