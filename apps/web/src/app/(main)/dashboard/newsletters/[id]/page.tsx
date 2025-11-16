@@ -3,17 +3,46 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { newsletters } from "../data/newsletters";
-import NewsletterContent from "../components/NewsletterContent";
-import { Calendar, Clock, ArrowLeft } from "lucide-react";
+import { Calendar, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { NewsletterContentItem } from "@/types/newsletter";
 import { GeistSans } from "geist/font/sans";
-import { formatNewsletterDate } from "../utils/newsletter.utils";
 
+/**
+ * Renders content with automatic URL detection and conversion to clickable links
+ * @param content - Text content that may contain URLs
+ * @returns Rendered content with clickable links
+ */
+const renderContent = (content: string) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = content.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <Link
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:text-blue-600 hover:underline font-medium"
+        >
+          {part}
+        </Link>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
+
+/**
+ * Individual newsletter page component
+ * Displays a single newsletter with full content, metadata, and navigation
+ * @returns Newsletter detail page component
+ */
 export default function NewsletterPage() {
   const params = useParams();
-  const id = params.id as string;
+  const id = parseInt(params.id as string);
   const newsletter = newsletters.find((n) => n.id === id);
 
   if (!newsletter) {
@@ -34,8 +63,6 @@ export default function NewsletterPage() {
     );
   }
 
-  const formattedDate = formatNewsletterDate(newsletter.date);
-
   return (
     <div className="min-h-screen bg-background font-sans">
       <div className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
@@ -49,24 +76,15 @@ export default function NewsletterPage() {
 
         {/* newsletter header */}
         <header className="mb-12">
-          {newsletter.coverImage && (
+          {newsletter.image && (
             <div className="relative h-[400px] w-full overflow-hidden rounded-lg mb-8 bg-muted">
-              {typeof newsletter.coverImage === "string" ? (
-                <Image
-                  src={newsletter.coverImage}
-                  alt={newsletter.title}
-                  fill
-                  className="object-contain"
-                  unoptimized
-                />
-              ) : (
-                <Image
-                  src={newsletter.coverImage}
-                  alt={newsletter.title}
-                  fill
-                  className="object-contain"
-                />
-              )}
+              <Image
+                src={newsletter.image}
+                alt={newsletter.title}
+                fill
+                className="object-cover"
+                unoptimized
+              />
             </div>
           )}
 
@@ -77,20 +95,14 @@ export default function NewsletterPage() {
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
             <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
-              <span>{formattedDate}</span>
+              <span>{newsletter.date}</span>
             </div>
-            {newsletter.readTime && (
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                <span>{newsletter.readTime}</span>
-              </div>
-            )}
-            {newsletter.author && <span>by {newsletter.author}</span>}
+            <span>by {newsletter.author}</span>
           </div>
 
-          {newsletter.excerpt && (
+          {newsletter.preview && (
             <p className="text-lg text-muted-foreground leading-relaxed">
-              {newsletter.excerpt}
+              {newsletter.preview}
             </p>
           )}
         </header>
@@ -99,9 +111,56 @@ export default function NewsletterPage() {
         <div className="border-t border-border mb-12" />
 
         {/* newsletter content */}
-        <div className="prose prose-lg max-w-none font-sans">
-          <NewsletterContent content={newsletter.content as NewsletterContentItem[]} />
+        <div className="prose prose-lg max-w-none font-sans mb-12">
+          <div className="text-foreground/90 leading-relaxed space-y-6">
+            {newsletter.content.split('\n\n').map((paragraph, index) => (
+              <div key={index}>
+                <p className="whitespace-pre-line">
+                  {renderContent(paragraph)}
+                </p>
+                {/* Insert images after specific paragraphs */}
+                {newsletter.contentImages && index === 1 && newsletter.contentImages[0] && (
+                  <div className="relative w-full h-[300px] my-8 rounded-lg overflow-hidden bg-muted">
+                    <Image
+                      src={newsletter.contentImages[0]}
+                      alt={`${newsletter.title} - Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
+                {newsletter.contentImages && index === 3 && newsletter.contentImages[1] && (
+                  <div className="relative w-full h-[300px] my-8 rounded-lg overflow-hidden bg-muted">
+                    <Image
+                      src={newsletter.contentImages[1]}
+                      alt={`${newsletter.title} - Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* takeaways */}
+        {newsletter.takeaways && newsletter.takeaways.length > 0 && (
+          <div className="mb-12">
+            <h2 className={`text-2xl font-semibold text-foreground mb-4 ${GeistSans.className}`}>
+              Key Takeaways
+            </h2>
+            <ul className="space-y-2 list-disc list-inside">
+              {newsletter.takeaways.map((takeaway, index) => (
+                <li key={index} className="text-foreground/90">
+                  {takeaway}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* footer */}
         <div className="mt-16 pt-8 border-t border-border">
@@ -116,4 +175,3 @@ export default function NewsletterPage() {
     </div>
   );
 }
-
