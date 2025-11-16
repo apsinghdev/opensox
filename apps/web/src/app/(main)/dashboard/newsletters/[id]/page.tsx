@@ -8,20 +8,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { GeistSans } from "geist/font/sans";
 
-/**
- * Renders content with automatic URL detection and conversion to clickable links
- * @param content - Text content that may contain URLs
- * @returns Rendered content with clickable links
- */
-const renderContent = (content: string) => {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = content.split(urlRegex);
+const renderContent = (text: string) => {
+  const parts = text.split(/(https?:\/\/[^\s]+)/g);
   
-  return parts.map((part, index) => {
-    if (part.match(urlRegex)) {
+  return parts.map((part, i) => {
+    if (part.startsWith('http://') || part.startsWith('https://')) {
       return (
         <Link
-          key={index}
+          key={i}
           href={part}
           target="_blank"
           rel="noopener noreferrer"
@@ -31,15 +25,16 @@ const renderContent = (content: string) => {
         </Link>
       );
     }
-    return <span key={index}>{part}</span>;
+    return <span key={i}>{part}</span>;
   });
 };
 
-/**
- * Individual newsletter page component
- * Displays a single newsletter with full content, metadata, and navigation
- * @returns Newsletter detail page component
- */
+const ContentImage = ({ src, alt }: { src: string; alt: string }) => (
+  <div className="relative w-full h-[300px] my-8 rounded-lg overflow-hidden bg-muted">
+    <Image src={src} alt={alt} fill className="object-cover" unoptimized />
+  </div>
+);
+
 export default function NewsletterPage() {
   const params = useParams();
   const id = parseInt(params.id as string);
@@ -63,10 +58,11 @@ export default function NewsletterPage() {
     );
   }
 
+  const paragraphs = newsletter.content.split('\n\n');
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <div className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {/* back button */}
         <Link href="/dashboard/newsletters">
           <Button variant="ghost" className="mb-8 -ml-2 hover:bg-secondary">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -74,7 +70,6 @@ export default function NewsletterPage() {
           </Button>
         </Link>
 
-        {/* newsletter header */}
         <header className="mb-12">
           {newsletter.image && (
             <div className="relative h-[400px] w-full overflow-hidden rounded-lg mb-8 bg-muted">
@@ -107,46 +102,32 @@ export default function NewsletterPage() {
           )}
         </header>
 
-        {/* divider */}
         <div className="border-t border-border mb-12" />
 
-        {/* newsletter content */}
         <div className="prose prose-lg max-w-none font-sans mb-12">
           <div className="text-foreground/90 leading-relaxed space-y-6">
-            {newsletter.content.split('\n\n').map((paragraph, index) => (
+            {paragraphs.map((paragraph, index) => (
               <div key={index}>
                 <p className="whitespace-pre-line">
                   {renderContent(paragraph)}
                 </p>
-                {/* Insert images after specific paragraphs */}
-                {newsletter.contentImages && index === 1 && newsletter.contentImages[0] && (
-                  <div className="relative w-full h-[300px] my-8 rounded-lg overflow-hidden bg-muted">
-                    <Image
-                      src={newsletter.contentImages[0]}
-                      alt={`${newsletter.title} - Image ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
+                {newsletter.contentImages?.[0] && index === 1 && (
+                  <ContentImage
+                    src={newsletter.contentImages[0]}
+                    alt={`${newsletter.title} - Image 1`}
+                  />
                 )}
-                {newsletter.contentImages && index === 3 && newsletter.contentImages[1] && (
-                  <div className="relative w-full h-[300px] my-8 rounded-lg overflow-hidden bg-muted">
-                    <Image
-                      src={newsletter.contentImages[1]}
-                      alt={`${newsletter.title} - Image ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
+                {newsletter.contentImages?.[1] && index === 3 && (
+                  <ContentImage
+                    src={newsletter.contentImages[1]}
+                    alt={`${newsletter.title} - Image 2`}
+                  />
                 )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* takeaways */}
         {newsletter.takeaways && newsletter.takeaways.length > 0 && (
           <div className="mb-12">
             <h2 className={`text-2xl font-semibold text-foreground mb-4 ${GeistSans.className}`}>
@@ -162,7 +143,6 @@ export default function NewsletterPage() {
           </div>
         )}
 
-        {/* footer */}
         <div className="mt-16 pt-8 border-t border-border">
           <Link href="/dashboard/newsletters">
             <Button variant="outline" className="w-full sm:w-auto">

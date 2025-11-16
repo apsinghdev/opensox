@@ -17,11 +17,6 @@ import {
 import Image from "next/image";
 import { newsletters, Newsletter } from "./data/newsletters";
 
-/**
- * Groups newsletters by month and year
- * @param newslettersList - Array of newsletters to group
- * @returns Object with month-year keys and arrays of newsletters
- */
 const groupByMonth = (newslettersList: Newsletter[]) => {
   const groups: { [key: string]: Newsletter[] } = {};
   newslettersList.forEach((newsletter) => {
@@ -47,11 +42,6 @@ const groupByMonth = (newslettersList: Newsletter[]) => {
   return groups;
 };
 
-/**
- * Sorts month keys by date (newest first)
- * @param keys - Array of month-year strings (e.g., "November 2024")
- * @returns Sorted array of month-year strings
- */
 const sortMonthKeys = (keys: string[]): string[] => {
   return keys.sort((a, b) => {
     const [monthA, yearA] = a.split(" ");
@@ -62,11 +52,6 @@ const sortMonthKeys = (keys: string[]): string[] => {
   });
 };
 
-/**
- * Gets unique months from newsletters array
- * @param newsletters - Array of newsletters
- * @returns Sorted array of unique month-year strings
- */
 const getAvailableMonths = (newsletters: Newsletter[]): string[] => {
   const months = newsletters.map((n) => {
     const date = new Date(n.date);
@@ -79,12 +64,6 @@ const getAvailableMonths = (newsletters: Newsletter[]): string[] => {
   return sortMonthKeys(uniqueMonths);
 };
 
-/**
- * Checks if a newsletter matches the search query
- * @param newsletter - Newsletter to check
- * @param query - Search query (lowercase)
- * @returns True if newsletter matches the query
- */
 const matchesSearchQuery = (newsletter: Newsletter, query: string): boolean => {
   return (
     newsletter.title.toLowerCase().includes(query) ||
@@ -95,12 +74,6 @@ const matchesSearchQuery = (newsletter: Newsletter, query: string): boolean => {
   );
 };
 
-/**
- * Checks if a newsletter matches the selected month filter
- * @param newsletter - Newsletter to check
- * @param selectedMonth - Selected month-year string or "all"
- * @returns True if newsletter matches the month filter
- */
 const matchesMonthFilter = (
   newsletter: Newsletter,
   selectedMonth: string
@@ -114,13 +87,6 @@ const matchesMonthFilter = (
   return monthYear === selectedMonth;
 };
 
-/**
- * Filters newsletters based on search query and month
- * @param newsletters - Array of newsletters to filter
- * @param searchQuery - Search query string
- * @param selectedMonth - Selected month filter ("all" or month-year string)
- * @returns Filtered array of newsletters
- */
 const filterNewsletters = (
   newsletters: Newsletter[],
   searchQuery: string,
@@ -139,11 +105,6 @@ const filterNewsletters = (
   return filtered;
 };
 
-/**
- * Newsletter card component for displaying newsletter preview
- * @param newsletter - Newsletter object to display
- * @returns Newsletter card component
- */
 const NewsletterCard = ({ newsletter }: { newsletter: Newsletter }) => {
   return (
     <Link href={`/dashboard/newsletters/${newsletter.id}`}>
@@ -179,11 +140,6 @@ const NewsletterCard = ({ newsletter }: { newsletter: Newsletter }) => {
   );
 };
 
-/**
- * Main newsletters listing page with search and filter functionality
- * Displays newsletters grouped by month with search and filtering capabilities
- * @returns Newsletters page component
- */
 export default function NewslettersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
@@ -212,7 +168,6 @@ export default function NewslettersPage() {
   return (
     <div className="min-h-screen bg-background font-sans">
       <div className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8 text-center">
           <h1
             className={`text-4xl font-bold text-foreground mb-4 ${GeistSans.className}`}
@@ -225,7 +180,6 @@ export default function NewslettersPage() {
           </p>
         </div>
 
-        {/* Filters */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
@@ -271,7 +225,6 @@ export default function NewslettersPage() {
           )}
         </div>
 
-        {/* Newsletter List or Empty State */}
         {filteredNewsletters.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">
