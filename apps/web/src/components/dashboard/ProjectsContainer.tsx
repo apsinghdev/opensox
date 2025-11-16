@@ -15,7 +15,8 @@ import { DashboardProjectsProps } from "@/types";
 import Image from "next/image";
 import { useFilterStore } from "@/store/useFilterStore";
 import { usePathname } from "next/navigation";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { useState, useMemo } from "react";
 
 type ProjectsContainerProps = { projects: DashboardProjectsProps[] };
 
@@ -58,6 +59,33 @@ export default function ProjectsContainer({
   const { projectTitle } = useProjectTitleStore();
   const { setShowFilters } = useFilterStore();
   const isProjectsPage = pathname === "/dashboard/projects";
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Client-side filtering of projects based on search query
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return projects;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return projects.filter((project) => {
+      const nameMatch = project.name.toLowerCase().includes(query);
+      const languageMatch = project.primaryLanguage?.toLowerCase().includes(query);
+      const stageMatch = project.stage?.toLowerCase().includes(query);
+      const popularityMatch = project.popularity?.toLowerCase().includes(query);
+      const competitionMatch = project.competition?.toLowerCase().includes(query);
+      const activityMatch = project.activity?.toLowerCase().includes(query);
+
+      return (
+        nameMatch ||
+        languageMatch ||
+        stageMatch ||
+        popularityMatch ||
+        competitionMatch ||
+        activityMatch
+      );
+    });
+  }, [projects, searchQuery]);
 
   return (
     <div className="w-full p-6 sm:p-6">
@@ -67,13 +95,57 @@ export default function ProjectsContainer({
         </h2>
         {isProjectsPage && (
           <Button
-            className="font-semibold text-white bg-ox-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-white-500 rounded-md"
+            className="font-semibold text-white bg-ox-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-ox-purple/90 rounded-md flex items-center gap-2"
             onClick={() => setShowFilters(true)}
           >
-            Find projects
+            <FunnelIcon className="size-4 sm:size-5" />
+            <span className="hidden sm:inline">Filter Projects</span>
+            <span className="sm:hidden">Filter</span>
           </Button>
         )}
       </div>
+
+      {/* Search Input for Quick Filtering */}
+      {isProjectsPage && projects && projects.length > 0 && (
+        <div className="mb-4">
+          <div className="relative max-w-md">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 size-5 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Search projects by name, language, stage, popularity..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-[#15161a] border border-[#1a1a1d] rounded-md text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-ox-purple focus:border-transparent transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                aria-label="Clear search"
+              >
+                <svg
+                  className="size-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="mt-2 text-xs text-zinc-400">
+              Showing {filteredProjects.length} of {projects.length} projects
+            </p>
+          )}
+        </div>
+      )}
 
       {projects && projects.length > 0 ? (
         <div
@@ -109,7 +181,8 @@ export default function ProjectsContainer({
             </TableHeader>
 
             <TableBody>
-              {projects.map((p) => (
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((p) => (
                 <TableRow
                   key={p.id}
                   className="border-y border-ox-gray cursor-pointer hover:bg-white/5 transition-colors"
@@ -158,7 +231,29 @@ export default function ProjectsContainer({
                     {p.activity}
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={tableColumns.length}
+                    className="text-center py-12 text-zinc-400"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <MagnifyingGlassIcon className="size-12 text-ox-purple/50" />
+                      <p className="text-base font-medium">No projects found</p>
+                      <p className="text-sm">
+                        Try adjusting your search query or{" "}
+                        <button
+                          onClick={() => setSearchQuery("")}
+                          className="text-ox-purple hover:underline"
+                        >
+                          clear the search
+                        </button>
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
@@ -169,7 +264,7 @@ export default function ProjectsContainer({
             <p className="text-xl font-medium">Find Your Next Project</p>
           </div>
           <p className="text-base text-center max-w-md">
-            Click the &apos;Find projects&apos; button above to discover open
+            Click the &apos;Filter Projects&apos; button above to discover open
             source projects that match your interests
           </p>
         </div>
