@@ -62,22 +62,42 @@ export default function ProjectsContainer({
   const [searchQuery, setSearchQuery] = useState("");
 
   // Client-side filtering of projects based on search query
+  // Memoized for performance optimization
   const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return projects;
+    // Return all projects if no search query or empty projects array
+    if (!searchQuery.trim() || !projects || projects.length === 0) {
+      return projects || [];
     }
 
     const query = searchQuery.toLowerCase().trim();
+    
+    // Filter projects by checking all searchable fields
     return projects.filter((project) => {
-      const nameMatch = project.name.toLowerCase().includes(query);
-      const languageMatch = project.primaryLanguage?.toLowerCase().includes(query);
-      const stageMatch = project.stage?.toLowerCase().includes(query);
-      const popularityMatch = project.popularity?.toLowerCase().includes(query);
-      const competitionMatch = project.competition?.toLowerCase().includes(query);
-      const activityMatch = project.activity?.toLowerCase().includes(query);
+      // Search in project name
+      const nameMatch = project.name?.toLowerCase().includes(query) ?? false;
+      
+      // Search in description
+      const descriptionMatch = project.description?.toLowerCase().includes(query) ?? false;
+      
+      // Search in primary language
+      const languageMatch = project.primaryLanguage?.toLowerCase().includes(query) ?? false;
+      
+      // Search in stage
+      const stageMatch = project.stage?.toLowerCase().includes(query) ?? false;
+      
+      // Search in popularity
+      const popularityMatch = project.popularity?.toLowerCase().includes(query) ?? false;
+      
+      // Search in competition level
+      const competitionMatch = project.competition?.toLowerCase().includes(query) ?? false;
+      
+      // Search in activity level
+      const activityMatch = project.activity?.toLowerCase().includes(query) ?? false;
 
+      // Return true if any field matches the query
       return (
         nameMatch ||
+        descriptionMatch ||
         languageMatch ||
         stageMatch ||
         popularityMatch ||
@@ -112,15 +132,17 @@ export default function ProjectsContainer({
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 size-5 text-zinc-400" />
             <input
               type="text"
-              placeholder="Search projects by name, language, stage, popularity..."
+              placeholder="Search projects by name, description, language, stage, popularity..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-[#15161a] border border-[#1a1a1d] rounded-md text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-ox-purple focus:border-transparent transition-all"
+              aria-label="Search projects"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-ox-purple focus:ring-offset-2 focus:ring-offset-[#15161a] rounded"
                 aria-label="Clear search"
               >
                 <svg
@@ -128,6 +150,7 @@ export default function ProjectsContainer({
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -139,9 +162,9 @@ export default function ProjectsContainer({
               </button>
             )}
           </div>
-          {searchQuery && (
+          {searchQuery && filteredProjects !== undefined && (
             <p className="mt-2 text-xs text-zinc-400">
-              Showing {filteredProjects.length} of {projects.length} projects
+              Showing {filteredProjects.length} of {projects.length} project{projects.length !== 1 ? 's' : ''}
             </p>
           )}
         </div>
@@ -181,7 +204,7 @@ export default function ProjectsContainer({
             </TableHeader>
 
             <TableBody>
-              {filteredProjects.length > 0 ? (
+              {filteredProjects && filteredProjects.length > 0 ? (
                 filteredProjects.map((p) => (
                 <TableRow
                   key={p.id}
@@ -245,7 +268,9 @@ export default function ProjectsContainer({
                         Try adjusting your search query or{" "}
                         <button
                           onClick={() => setSearchQuery("")}
-                          className="text-ox-purple hover:underline"
+                          type="button"
+                          className="text-ox-purple hover:underline focus:outline-none focus:ring-2 focus:ring-ox-purple focus:ring-offset-2 focus:ring-offset-transparent rounded px-1"
+                          aria-label="Clear search"
                         >
                           clear the search
                         </button>
