@@ -59,7 +59,7 @@ export default function TermsOfServicePage() {
                 opportunities
               </li>
               <li>
-                <strong>Premium Features:</strong> Access to personalized
+                <strong>Pro Features:</strong> Access to personalized
                 mentoring, exclusive newsletter, open-source jobs and internship
                 opportunities, and our 30-day contribution challenge
               </li>
@@ -136,10 +136,10 @@ export default function TermsOfServicePage() {
           {/* Section 4 */}
           <section>
             <h2 className="text-2xl lg:text-3xl font-semibold mb-4">
-              4. Premium Subscription Services
+              4. Pro Subscription Services
             </h2>
             <p className="mb-4">
-              Opensox.ai offers premium subscription plans with enhanced
+              Opensox.ai offers Pro subscription plans with enhanced
               features including:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -161,7 +161,7 @@ export default function TermsOfServicePage() {
               </li>
             </ul>
             <p className="mt-4">
-              <strong>Payment Terms:</strong> Premium subscriptions are billed
+              <strong>Payment Terms:</strong> Pro subscriptions are billed
               in advance on a monthly or annual basis. All fees are
               non-refundable except as required by law. You may cancel your
               subscription at any time, and cancellation will take effect at the
@@ -170,7 +170,7 @@ export default function TermsOfServicePage() {
             <p className="mt-4">
               <strong>Price Changes:</strong> We reserve the right to modify
               subscription pricing with at least 30 days' notice. Continued use
-              of premium services after a price change constitutes acceptance of
+              of Pro services after a price change constitutes acceptance of
               the new pricing.
             </p>
           </section>
@@ -262,7 +262,7 @@ export default function TermsOfServicePage() {
               8. Mentoring Services
             </h2>
             <p className="mb-4">
-              Premium subscribers may access personalized mentoring services.
+              Pro subscribers may access personalized mentoring services.
               Please note:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">

@@ -35,8 +35,8 @@ export const faqs: FAQ[] = [
       "Absolutely! We welcome feedback and feature suggestions. You can reach out to us through our contact form or GitHub repository.",
   },
   {
-    question: "What is Opensox premium?",
+    question: "What is Opensox Pro?",
     answer:
-      "Opensox premium provides you human feedback + advanced tools so that you can start rocking Open Source faster. For more details, check this: opensox.ai/pricing",
+      "Opensox Pro provides you human feedback + advanced tools so that you can start rocking Open Source faster. For more details, check this: opensox.ai/pricing",
   },
 ];

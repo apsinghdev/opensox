@@ -57,6 +57,9 @@ const config: Config = {
         "ox-white": "text-slate-400",
         "ox-black-1": "#0E0E10",
         "ox-black-2": "#15161A",
+        "ox-sidebar": "#262626",
+        "ox-content": "#1E1E1E",
+        "ox-header": "#363636",
       },
       borderRadius: {
         lg: "var(--radius)",

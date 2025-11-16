@@ -75,12 +75,12 @@ const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
         <div className="text-center space-y-6">
           <p className="text-lg lg:text-xl text-white/90 leading-relaxed font-light max-w-3xl mx-auto">
             Hell yeah, you&apos;ve made it! Congratulations on becoming the
-            premium member of Opensox AI. Very soon you&apos;ll receive an email
+            Pro member of Opensox AI. Very soon you&apos;ll receive an email
             with the next steps from our side.
           </p>
 
           <p className="text-lg lg:text-xl text-white/90 leading-relaxed font-light max-w-3xl mx-auto">
-            Click on &quot;Join&quot; button below to join the Opensox premium
+            Click on &quot;Join&quot; button below to join the Opensox Pro
             community.
           </p>
 

@@ -351,7 +351,7 @@ export default function PrivacyPolicyPage() {
                     Sending emails and other communications according to your
                     preferences or that display content that we think will
                     interest you, including our newsletter about open-source
-                    trends, jobs, and internships (for premium subscribers).
+                    trends, jobs, and internships (for Pro subscribers).
                   </li>
                 </ul>
               </div>

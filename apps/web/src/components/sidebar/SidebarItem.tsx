@@ -7,9 +7,10 @@ type SidebarItemProps = {
   onclick?: () => void;
   icon?: React.ReactNode;
   collapsed?: boolean;
+  badge?: React.ReactNode;
 };
 
-export default function SidebarItem({ itemName, onclick, icon, collapsed = false }: SidebarItemProps) {
+export default function SidebarItem({ itemName, onclick, icon, collapsed = false, badge }: SidebarItemProps) {
   return (
     <div
       className={`w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 ${
@@ -19,9 +20,12 @@ export default function SidebarItem({ itemName, onclick, icon, collapsed = false
     >
       {icon && <span className="shrink-0 text-[#eaeaea]">{icon}</span>}
       {!collapsed && (
+        <div className="flex items-center gap-1.5">
         <h1 className="text-xs font-medium text-[#c8c8c8] group-hover:text-ox-purple">
           {itemName}
         </h1>
+          {badge}
+        </div>
       )}
     </div>
   );

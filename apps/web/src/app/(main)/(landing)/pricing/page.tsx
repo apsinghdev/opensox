@@ -61,7 +61,7 @@ const opensoxFeatures = [
 const whySub = [
   {
     content:
-      "Currently, Opensox 2.0 is in progress (70% done) so till the launch, we are offering premium plan at a discounted price - $49 for the whole year",
+      "Currently, Opensox 2.0 is in progress (70% done) so till the launch, we are offering Pro plan at a discounted price - $49 for the whole year",
   },
   {
     content:
@@ -69,7 +69,7 @@ const whySub = [
   },
   {
     content:
-      "After the launch, this $49 offer be removed and Opensox premium will be around ~ $120 for whole year ($10/mo.)",
+      "After the launch, this $49 offer be removed and Opensox Pro will be around ~ $120 for whole year ($10/mo.)",
   },
   {
     content: "The price of the dollar is constantly increasing.",
@@ -93,17 +93,17 @@ const premiumPlanCard = {
     "1:1 session on finding remote jobs and internships in open-source companies.",
     "Quick doubts resolution.",
     "Personalized guidance for GSoC, LFX, Outreachy, etc",
-    "Access to premium Slack where you can ask anything anytime.",
+    "Access to Pro Slack where you can ask anything anytime.",
     "Support to enhance skills for open source",
     "GSOC proposal, resume reviews, etc.",
-    "Upcoming premium features",
+    "Upcoming Pro features",
   ],
   whatYouGetAfterLaunch: [
     "Everything mentioned above",
-    "Advanced tool with premium filters to find open source projects",
-    "Premium newsletter",
+    "Advanced tool with Pro filters to find open source projects",
+    "Pro newsletter",
     "30 days opensox challenge sheet",
-    "Upcoming premium features.",
+    "Upcoming Pro features.",
   ],
 };
 
@@ -202,7 +202,7 @@ const Pricing = () => {
                 }}
                 className="text-center text-3xl tracking-tight font-medium"
               >
-                Why should you subscribe to Opensox premium now?
+                Why should you subscribe to Opensox Pro now?
               </motion.h2>
             </div>
             <div className="w-full border-b border-[#252525]">
@@ -377,7 +377,7 @@ const SecondaryPricingCard = () => {
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 ">
               <PaymentFlow
                 planId={planIdOk ? premiumPlanId : ""}
-                planName="Opensox Premium"
+                planName="Opensox Pro"
                 description="Annual Subscription"
                 buttonText={planIdOk ? "Invest" : "Unavailable"}
                 buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${
@@ -432,7 +432,7 @@ const PremiumTestimonialCard = ({
       <p className="text-xl">{username}</p>
       {showPremium && (
         <div className="bg-gradient-to-b from-[#ad84e7] via-[#986cd6] to-[#432d8e] bg-clip-text text-transparent">
-          <p className="">Opensox Premium</p>
+          <p className="">Opensox Pro</p>
         </div>
       )}
     </div>
@@ -445,14 +445,14 @@ const TestimonialsSection = () => {
       id: 1,
       username: "Tarun Parmar",
       content:
-        "Getting the Opensox Premium Subscription has been such a game-changer for me. I really like the personal touch in the way the team guides you-it feels like someone is genuinely there to help you navigate. It gave me the initial push I needed and made it so much easier to cut through all the chaos and focus on the right and simple steps. The best part is, it helps you start your open source journey quickly and I know I can reach out to the team anytime. Honestly, it's been an awesome experience so far!",
+        "Getting the Opensox Pro Subscription has been such a game-changer for me. I really like the personal touch in the way the team guides you-it feels like someone is genuinely there to help you navigate. It gave me the initial push I needed and made it so much easier to cut through all the chaos and focus on the right and simple steps. The best part is, it helps you start your open source journey quickly and I know I can reach out to the team anytime. Honestly, it's been an awesome experience so far!",
       column: 1,
     },
     {
       id: 2,
       username: "Daksh Yadav",
       content:
-        "My experience with your guidance and opensox has been great. Your tips have really helped in doing my tasks quicker and better. And I would definitely recommend others to opt for opensox premium.",
+        "My experience with your guidance and opensox has been great. Your tips have really helped in doing my tasks quicker and better. And I would definitely recommend others to opt for opensox Pro.",
       column: 1,
     },
     {
@@ -462,7 +462,7 @@ const TestimonialsSection = () => {
         <div className="space-y-3 text-pretty">
           <p>
             Okay so there are a few things I genuinely value about OpenSox
-            Premium, and I&apos;ll focus on the core points because everything
+            Pro, and I&apos;ll focus on the core points because everything
             else is just a natural extension of these.
           </p>
           <ul className="list-disc space-y-3 pl-6">
@@ -496,7 +496,7 @@ const TestimonialsSection = () => {
               right direction.
             </li>
             <li>
-              Overall, I&apos;d absolutely recommend OpenSox Premium to anyone
+              Overall, I&apos;d absolutely recommend OpenSox Pro to anyone
               serious about open source. The personalized guidance is exactly
               what most of us hope for, since everyone is at a different stage
               of their journey.
@@ -534,7 +534,7 @@ const TestimonialsSection = () => {
 
   return (
     <div className=" text-white ">
-      <Header title="What our Premium customers say about us" />
+      <Header title="What our Pro customers say about us" />
       <div className="border-b  border-[#252525] w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
         <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">
           {groupedTestimonials[1].map((testimonial) => (

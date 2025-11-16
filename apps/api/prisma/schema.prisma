@@ -32,15 +32,16 @@ enum SubscriptionStatus {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  firstName     String
-  authMethod    String
-  createdAt     DateTime       @default(now())
-  lastLogin     DateTime       @updatedAt
-  accounts      Account[]
-  payments      Payment[]
-  subscriptions Subscription[]
+  id             String         @id @default(cuid())
+  email          String         @unique
+  firstName      String
+  authMethod     String
+  createdAt      DateTime       @default(now())
+  lastLogin      DateTime       @updatedAt
+  completedSteps Json?
+  accounts       Account[]
+  payments       Payment[]
+  subscriptions  Subscription[]
 }
 
 model Account {
