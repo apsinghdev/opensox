@@ -1,4 +1,4 @@
-import { rz_instance } from "../clients/razorpay.js";
+import { getRazorpayInstance } from "../clients/razorpay.js";
 import crypto from "crypto";
 import prismaModule from "../prisma.js";
 import {
@@ -74,6 +74,7 @@ export const paymentService = {
     const { amount, currency, receipt, notes } = input;
 
     try {
+      const rz_instance = getRazorpayInstance();
       const order = await rz_instance.orders.create({
         amount,
         currency,
