@@ -93,7 +93,7 @@ const Navbar = () => {
           );
         })}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="hidden lg:flex items-center gap-3">
         <Link
           href="https://github.com/apsinghdev/opensox"
           target="_blank"

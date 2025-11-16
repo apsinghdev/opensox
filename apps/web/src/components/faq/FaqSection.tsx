@@ -50,7 +50,7 @@ export function FaqSection() {
           <div className="absolute h-full w-full bg-gradient-to-r from-[#101010]/75 via-transparent to-[#101010]/75 top-0 left-1/2 -translate-x-1/2"></div>
         </div>
         <div className="max-w-4xl mx-auto relative">
-          <Accordion type="single" collapsible className="w-full space-y-4">
+          <Accordion type="single" collapsible className="w-full space-y-4 px-2">
             {faqs.map((faq, index) => (
               <AccordionItem
                 value={`item-${index}`}
