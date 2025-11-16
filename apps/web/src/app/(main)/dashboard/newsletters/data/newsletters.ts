@@ -1,14 +1,4 @@
-export interface Newsletter {
-  id: number;
-  title: string;
-  date: string;
-  author: string;
-  preview: string;
-  content: string;
-  image: string;
-  contentImages?: string[];
-  takeaways: string[];
-}
+import type { Newsletter } from "@/types/newsletter";
 
 export const newsletters: Newsletter[] = [
   {

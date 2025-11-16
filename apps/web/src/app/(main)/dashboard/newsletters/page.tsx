@@ -15,7 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { newsletters, Newsletter } from "./data/newsletters";
+import { newsletters } from "./data/newsletters";
+import type { Newsletter } from "@/types/newsletter";
 
 const groupByMonth = (newslettersList: Newsletter[]) => {
   const groups: { [key: string]: Newsletter[] } = {};
@@ -53,13 +54,12 @@ const sortMonthKeys = (keys: string[]): string[] => {
 };
 
 const getAvailableMonths = (newsletters: Newsletter[]): string[] => {
-  const months = newsletters.map((n) => {
-    const date = new Date(n.date);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
-  });
+  const months = newsletters
+    .map((n) => new Date(n.date))
+    .filter((d) => !isNaN(d.getTime()))
+    .map((date) =>
+      date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    );
   const uniqueMonths = Array.from(new Set(months));
   return sortMonthKeys(uniqueMonths);
 };
@@ -80,6 +80,7 @@ const matchesMonthFilter = (
 ): boolean => {
   if (selectedMonth === "all") return true;
   const date = new Date(newsletter.date);
+  if (isNaN(date.getTime())) return false;
   const monthYear = date.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
