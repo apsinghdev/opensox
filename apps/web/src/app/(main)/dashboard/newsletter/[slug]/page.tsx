@@ -1,0 +1,76 @@
+"use client";
+
+import React from "react";
+import { use } from "react";
+import Link from "next/link";
+import { getNewsletterBySlug, formatDate } from "@/data/newsletters";
+import { MarkdownRenderer } from "@/components/newsletter/MarkdownRenderer";
+import { ArrowLeftIcon, CalendarIcon } from "@heroicons/react/24/outline";
+
+interface NewsletterDetailPageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+export default function NewsletterDetailPage({
+  params,
+}: NewsletterDetailPageProps) {
+  const { slug } = use(params);
+  const newsletter = getNewsletterBySlug(slug);
+
+  if (!newsletter) {
+    return (
+      <div className="w-full max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold text-ox-white mb-4">
+            Newsletter not found
+          </h1>
+          <Link
+            href="/dashboard/newsletter"
+            className="text-ox-purple hover:underline"
+          >
+            Back to newsletters
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-4xl mx-auto px-4 py-8">
+      <Link
+        href="/dashboard/newsletter"
+        className="inline-flex items-center gap-2 text-ox-gray hover:text-ox-purple transition-colors mb-6"
+      >
+        <ArrowLeftIcon className="size-4" />
+        <span>Back to newsletters</span>
+      </Link>
+
+      <article className="prose prose-invert max-w-none">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold text-ox-white mb-4">
+            {newsletter.title}
+          </h1>
+          <div className="flex items-center gap-4 text-sm text-ox-gray">
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="size-4" />
+              <span>{formatDate(newsletter.publishedAt)}</span>
+            </div>
+            {newsletter.author && (
+              <>
+                <span>•</span>
+                <span>by {newsletter.author}</span>
+              </>
+            )}
+          </div>
+        </header>
+
+        <div className="newsletter-content">
+          <MarkdownRenderer content={newsletter.content} />
+        </div>
+      </article>
+    </div>
+  );
+}
+

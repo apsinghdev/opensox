@@ -17,6 +17,7 @@ import {
   StarIcon,
   HeartIcon,
   EnvelopeIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut } from "next-auth/react";
@@ -34,6 +35,11 @@ const SIDEBAR_ROUTES = [
     path: "/dashboard/projects",
     label: "Projects",
     icon: <FolderIcon className="size-5" />,
+  },
+  {
+    path: "/dashboard/newsletter",
+    label: "Newsletter",
+    icon: <DocumentTextIcon className="size-5" />,
   },
 ];
 
