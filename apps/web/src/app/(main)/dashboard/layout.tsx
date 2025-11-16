@@ -1,5 +1,6 @@
 "use client";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { AnimatePresence } from "framer-motion";
 import FiltersContainer from "@/components/ui/FiltersContainer";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useShowSidebar } from "@/store/useShowSidebar";
@@ -17,9 +18,16 @@ export default function DashboardLayout({
   return (
     <div className="flex w-screen h-screen bg-ox-content overflow-hidden">
       {showFilters && <FiltersContainer />}
-      <aside className={`h-full ${!showSidebar && "hidden xl:block"}`}>
+      <aside className="hidden xl:block h-full">
         <Sidebar />
       </aside>
+      <AnimatePresence>
+        {showSidebar && (
+          <div className="xl:hidden h-full">
+            <Sidebar overlay />
+          </div>
+        )}
+      </AnimatePresence>
       <div className="flex-1 flex flex-col h-full bg-ox-content">
         <div className="xl:hidden flex items-center h-16 px-4 border-b border-ox-header bg-ox-content">
           <IconWrapper onClick={() => setShowSidebar(true)}>
