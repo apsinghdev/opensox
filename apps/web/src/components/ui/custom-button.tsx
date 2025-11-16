@@ -28,4 +28,20 @@ const PrimaryButton = ({ children, animate = true, classname, onClick }: { child
     )
 }
 
+export const SecondaryButton = ({ children, animate = true, classname, onClick }: { children: React.ReactNode, animate?: boolean, classname?: string, onClick?: () => void }) => {
+    const transition = {
+        duration: 0.1,
+        ease: "easeInOut",
+    }
+    return (
+        <motion.button
+            onClick={onClick}
+            className={cn("flex gap-2  border-[#eaeaea] items-center justify-center  px-5 py-3 rounded-[16px] relative [box-shadow:0px_0px_13px_0px_#eaeaea90_inset] hover:[box-shadow:0px_0px_13px_0px_#eaeaeaaa_inset] transition-all duration-100 text-white font-medium", classname)}
+            transition={animate ? transition : undefined}
+        >
+            {children}
+        </motion.button>
+    )
+}
+
 export default PrimaryButton
