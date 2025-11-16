@@ -188,6 +188,7 @@ export default function NewslettersPage() {
               <Input
                 type="text"
                 placeholder="Search newsletters..."
+                aria-label="Search newsletters"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-card border-border"
