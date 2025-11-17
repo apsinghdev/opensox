@@ -48,7 +48,7 @@ export type ProjectProps = {
 };
 
 export type UserInputFilterProps = {
-  "Tech stack"?: string;
+  "Tech stack"?: string | string[];
   Popularity?: string;
   Competition?: string;
   Stage?: string;

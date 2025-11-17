@@ -100,6 +100,7 @@ export default function FiltersContainer() {
                 "Html",
                 "Elixir",
               ]}
+              allowMultiple={true}
             />
             <Filter
               filterName="Popularity"
