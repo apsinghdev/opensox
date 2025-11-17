@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsletter CMS - Opensox Team Only</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+
+    const { useState, useEffect } = React;
+    const NewsletterCMS = () => {
+    const [newsletters, setNewsletters] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [editingId, setEditingId] = useState(null);
+    const [showNewForm, setShowNewForm] = useState(false);
+    const [formData, setFormData] = useState({
+        title: '',
+        content: '',
+        status: 'draft'
+    });
+
+    useEffect(() => {
+        loadNewsletters();
+    }, []);
+
+    const loadNewsletters = async () => {
+        try {
+        const result = await window.storage.list('newsletter:');
+        if (result && result.keys) {
+            const newsletterPromises = result.keys.map(async (key) => {
+            const data = await window.storage.get(key);
+            return data ? { id: key, ...JSON.parse(data.value) } : null;
+            });
+            const loadedNewsletters = (await Promise.all(newsletterPromises)).filter(Boolean);
+            setNewsletters(loadedNewsletters.sort((a, b) => b.createdAt - a.createdAt));
+        }
+        } catch (error) {
+        console.log('No newsletters found or error loading:', error);
+        setNewsletters([]);
+        } finally {
+        setIsLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+        const newsletterData = {
+            ...formData,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+
+        if (editingId) {
+            await window.storage.set(editingId, JSON.stringify(newsletterData));
+        } else {
+            const id = `newsletter:${Date.now()}`;
+            await window.storage.set(id, JSON.stringify(newsletterData));
+        }
+
+        setFormData({ title: '', content: '', status: 'draft' });
+        setEditingId(null);
+        setShowNewForm(false);
+        await loadNewsletters();
+        } catch (error) {
+        console.error('Error saving newsletter:', error);
+        alert('Failed to save newsletter');
+        }
+    };
+
+    const handleEdit = (newsletter) => {
+        setFormData({
+        title: newsletter.title,
+        content: newsletter.content,
+        status: newsletter.status
+        });
+        setEditingId(newsletter.id);
+        setShowNewForm(true);
+    };
+
+    const handleDelete = async (id) => {
+        if (confirm('Are you sure you want to delete this newsletter?')) {
+        try {
+            await window.storage.delete(id);
+            await loadNewsletters();
+        } catch (error) {
+            console.error('Error deleting newsletter:', error);
+            alert('Failed to delete newsletter');
+        }
+        }
+    };
+
+    const handleCancel = () => {
+        setFormData({ title: '', content: '', status: 'draft' });
+        setEditingId(null);
+        setShowNewForm(false);
+    };
+
+    if (isLoading) {
+        return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-gray-600">Loading newsletters...</div>
+        </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold text-gray-800">Newsletter CMS</h1>
+                {!showNewForm && (
+                <button
+                    onClick={() => setShowNewForm(true)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                >
+                    Create New Newsletter
+                </button>
+                )}
+            </div>
+
+            {showNewForm && (
+                <form onSubmit={handleSubmit} className="mb-8 p-6 bg-gray-50 rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">
+                    {editingId ? 'Edit Newsletter' : 'New Newsletter'}
+                </h2>
+                <div className="space-y-4">
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Title
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Content
+                    </label>
+                    <textarea
+                        value={formData.content}
+                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-48"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Status
+                    </label>
+                    <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                    </select>
+                    </div>
+                    <div className="flex gap-2">
+                    <button
+                        type="submit"
+                        className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+                    >
+                        {editingId ? 'Update' : 'Create'} Newsletter
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 transition"
+                    >
+                        Cancel
+                    </button>
+                    </div>
+                </div>
+                </form>
+            )}
+
+            <div className="space-y-4">
+                {newsletters.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">
+                    No newsletters yet. Create your first one!
+                </p>
+                ) : (
+                newsletters.map((newsletter) => (
+                    <div
+                    key={newsletter.id}
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                    >
+                    <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-xl font-semibold text-gray-800">
+                        {newsletter.title}
+                        </h3>
+                        <span
+                        className={`px-3 py-1 rounded-full text-sm ${
+                            newsletter.status === 'published'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                        >
+                        {newsletter.status}
+                        </span>
+                    </div>
+                    <p className="text-gray-600 mb-4 whitespace-pre-wrap">
+                        {newsletter.content}
+                    </p>
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                        {new Date(newsletter.createdAt).toLocaleDateString()}
+                        </span>
+                        <div className="flex gap-2">
+                        <button
+                            onClick={() => handleEdit(newsletter)}
+                            className="text-blue-600 hover:text-blue-800 px-3 py-1 rounded-md hover:bg-blue-50 transition"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            onClick={() => handleDelete(newsletter.id)}
+                            className="text-red-600 hover:text-red-800 px-3 py-1 rounded-md hover:bg-red-50 transition"
+                        >
+                            Delete
+                        </button>
+                        </div>
+                    </div>
+                    </div>
+                ))
+                )}
+            </div>
+            </div>
+        </div>
+        </div>
+    );
+    };
+
+// Render the component
+ReactDOM.render(<NewsletterCMS />, document.getElementById('root'));
+    
+    ReactDOM.render(<NewsletterCMS />, document.getElementById('root'));
+  </script>
+</body>
+</html>

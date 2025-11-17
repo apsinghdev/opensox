@@ -267,6 +267,35 @@ Then run:
 docker-compose up -d
 ```
 
+# Newsletter Management
+
+## Quick Start
+
+1. Visit `/admin/newsletter` (team members only)
+2. Fill in the newsletter form
+3. Click "Generate Code" and "Copy Code"
+4. Open `data/newsletters.ts`
+5. Paste the code at the start of the `newsletters` array
+6. Save and deploy
+
+That's it! ✨
+
+## Example
+
+The admin form generates this:
+```typescript
+{
+  id: "18",
+  slug: "january-2025-updates",
+  title: "January 2025 Updates",
+  content: `...`,
+  publishedAt: new Date("2025-01-17"),
+  author: "opensox.ai team",
+},
+```
+
+Just paste it into the newsletters array!
+
 ## Our contributors
 
 <a href="https://github.com/apsinghdev/opensox/graphs/contributors">
