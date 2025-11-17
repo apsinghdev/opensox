@@ -47,6 +47,7 @@ const Navbar = () => {
     <motion.nav
       initial={{ opacity: 0, pointerEvents: "none" }}
       animate={showNavbar ? { opacity: 1, pointerEvents: "auto" } : { opacity: 0, pointerEvents: "none" }}
+      aria-hidden={!showNavbar}
       transition={{ duration: 0.3 }}
       className={cn(
         " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
