@@ -67,4 +67,10 @@ export const blogs: BlogPost[] = [
     link: "https://x.com/ajeetunc/status/1983389367327699032?s=20",
     tag: "misc",
   },
+  {
+    date: "16-11-25",
+    linkText: "snapshot of my life so far",
+    link: "https://x.com/ajeetunc/status/1989355142081065468?s=20",
+    tag: "misc",
+  },
 ];

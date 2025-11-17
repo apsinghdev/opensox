@@ -35,7 +35,7 @@ interface RazorpayButtonProps {
  *   orderId="order_123"
  *   amount={50000}
  *   currency="INR"
- *   name="Opensox Premium"
+ *   name="Opensox Pro"
  *   description="Annual Subscription"
  *   prefill={{
  *     name: "John Doe",

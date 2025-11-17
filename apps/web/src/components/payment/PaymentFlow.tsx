@@ -29,7 +29,7 @@ interface PaymentFlowProps {
  * ```tsx
  * <PaymentFlow
  *   planId="plan_xyz123" // Required: Plan ID from database
- *   planName="Opensox Premium"
+ *   planName="Opensox Pro"
  *   description="Annual Subscription"
  *   buttonText="Subscribe Now"
  * />
@@ -37,7 +37,7 @@ interface PaymentFlowProps {
  */
 const PaymentFlow: React.FC<PaymentFlowProps> = ({
   planId,
-  planName = "Opensox Premium",
+  planName = "Opensox Pro",
   description = "Payment",
   buttonText = "Invest",
   buttonClassName,

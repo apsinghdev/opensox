@@ -6,10 +6,13 @@ import { IconWrapper } from "../ui/IconWrapper";
 import { ProfilePic } from "./ProfilePic";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useShowSidebar } from "@/store/useShowSidebar";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 export const DashboardHeader = () => {
   const { setShowFilters } = useFilterStore();
   const { setShowSidebar } = useShowSidebar();
+  const { data: session } = useSession();
   const startHandler = () => {
     setShowFilters(true);
   };
@@ -26,7 +29,9 @@ export const DashboardHeader = () => {
         <IconWrapper className="block xl:hidden" onClick={menuClickHander}>
           <Bars3Icon className="size-4 text-ox-purple"></Bars3Icon>
         </IconWrapper>
-        <h1 className="text-lg md:text-2xl font-medium">Opensox</h1>
+        <Link href="/" className="text-lg md:text-2xl font-medium hover:text-ox-purple transition-colors">
+          Opensox
+        </Link>
       </div>
       <div
         id="header-right-container"
@@ -38,7 +43,7 @@ export const DashboardHeader = () => {
         >
           Find projects
         </Button>
-        <ProfilePic></ProfilePic>
+        <ProfilePic imageUrl={session?.user?.image || null} />
       </div>
     </div>
   );

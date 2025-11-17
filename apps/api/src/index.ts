@@ -50,10 +50,14 @@ const authLimiter = rateLimit({
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 30,
+  max: 100,
   message: "Too many requests from this IP",
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    console.log(`[RATE LIMIT] IP ${req.ip} hit API rate limit`);
+    res.status(429).json({ error: "Too many requests from this IP" });
+  }
 });
 
 // Request size limits (except for webhook - needs raw body)
