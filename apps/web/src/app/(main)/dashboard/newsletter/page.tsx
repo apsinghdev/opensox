@@ -82,18 +82,19 @@ export default function Newsletter() {
     }, [newsletterposts]);
 
     useEffect(() => {
-        if (!searchval.length) {
+        if (!searchval) {
             setNewsletterItems(newsletterposts);
+            setLoading(false);
             return;
         }
         setLoading(true);
         let timeoutId = setTimeout(() => {
-            const updatedItems = newsletteritems.filter(item => item.title.toLowerCase().includes(searchval.toLocaleLowerCase()));
+            const updatedItems = newsletterposts.filter(item => item.title.toLowerCase().startsWith(searchval.toLowerCase()));
             setNewsletterItems(updatedItems);
             setLoading(false);
-        }, 2000);
+        }, 1500);
         return (() => clearTimeout(timeoutId))
-    }, [searchval]);
+    }, [searchval, newsletterposts]);
 
     useEffect(() => {
         let filteredItem = [...newsletterposts];
@@ -146,6 +147,7 @@ export default function Newsletter() {
         <div className=" p-8">
             <input type="text"
                 placeholder="Search newsletter..."
+                autoComplete="off"
                 name="searchNewsletter"
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setsearchval(event.target?.value.trim())}
                 className="w-full px-4 py-2 border border-2 border-ox-header rounded-lg focus:outline-none focus:ring-2 focus:ring-ox-purple mb-6 bg-ox-content text-foreground" />
