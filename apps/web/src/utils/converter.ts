@@ -1,3 +1,4 @@
+import { NewsletterItem } from "@/data/newsletter";
 import { UserInputFilterProps, DashboardProjectsProps } from "@/types";
 import { FilterProps, RepositoryProps } from "@opensox/shared/types";
 
@@ -156,3 +157,17 @@ export const convertApiOutputToUserOutput = (
   }));
   return data;
 };
+
+export const getMonthYearOptions = (data: NewsletterItem[]):{ month: string[], year: number[] } => {
+  const monthset = new Set<string>();
+  const yearset = new Set<number>();
+  data.forEach(item => {
+    const date = new Date(item.date);
+    monthset.add(date.toLocaleString('default', { month: 'long' }));
+    yearset.add(date.getFullYear());
+  });
+  return {
+    month: Array.from(monthset),
+    year: Array.from(yearset)
+  }
+}

@@ -15,6 +15,7 @@ import {
   StarIcon,
   DocumentTextIcon,
   Cog6ToothIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -38,6 +39,12 @@ const SIDEBAR_ROUTES = [
     path: "/dashboard/sheet",
     label: "OSS Sheet",
     icon: <DocumentTextIcon className="size-5" />,
+  },
+  {
+    path: "/dashboard/newsletter",
+    label: "NewsLetter",
+    icon: <NewspaperIcon className="size-5" />,
+    isProFeature: true,
   },
 ];
 
@@ -146,8 +153,8 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
             itemName="Opensox Pro"
             onclick={proClickHandler}
             icon={<StarIcon className="size-5" />}
-          collapsed={isCollapsed}
-        />
+            collapsed={isCollapsed}
+          />
         )}
       </div>
 

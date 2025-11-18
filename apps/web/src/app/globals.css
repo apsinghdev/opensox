@@ -74,3 +74,41 @@
 html {
   scroll-behavior: smooth;
 }
+
+@layer utilities {
+  .rich-text h1 {
+    @apply text-3xl font-bold text-primary mb-4;
+  }
+
+  .rich-text h2 {
+    @apply text-2xl font-semibold text-primary mb-3;
+  }
+
+  .rich-text h3 {
+    @apply text-xl font-semibold text-foreground mb-2;
+  }
+
+  .rich-text p {
+    @apply text-muted-foreground leading-relaxed mb-4;
+  }
+
+  .rich-text ul {
+    @apply list-disc pl-6 text-muted-foreground mb-4;
+  }
+
+  .rich-text li {
+    @apply mb-1;
+  }
+
+  .rich-text strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .rich-text img {
+    @apply rounded-lg border border-border-primary w-full my-4;
+  }
+
+  .rich-text a {
+    @apply text-ox-purple underline hover:opacity-80;
+  }
+}
