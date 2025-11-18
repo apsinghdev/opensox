@@ -5,77 +5,86 @@ import React from "react";
 import PrimaryButtom from "../ui/custom-button";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Navbar from "./navbar";
 
 const Hero = () => {
   return (
-    <div className="w-full min-h-[50dvh] lg:h-[69dvh] relative overflow-hidden z-10 p-4 lg:p-[60px] flex flex-col items-center justify-center gap-6 ">
-      <Image
-        src="/assets/bgmain.svg"
-        alt="background"
-        fill
-        className="object-cover max-md:object-top w-full h-full absolute -z-10 opacity-90"
-        priority
-      />
-      <div className="w-full lg:max-w-3xl space-y-3 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1, ease: "easeOut", type: "spring" }}
-          className="flex items-center justify-center gap-2 mb-4"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-black/40 backdrop-blur-sm border border-[#252525]">
-            <span className="text-[#e1e1e1] text-sm font-medium">Backed by</span>
-            <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 bg-gradient-to-br from-[#FF6154] to-[#FF8C00] rounded flex items-center justify-center">
-                <span className="text-white text-xs font-bold">U</span>
+    <>
+      {/* Fixed Floating Navbar */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 w-[96%] md:w-[90%] lg:w-[85%] xl:w-[80%] z-50">
+        <Navbar /> 
+      </div>
+
+      <div className="w-full min-h-[50dvh] lg:h-[69dvh] relative overflow-hidden z-10 px-4 lg:px-[60px] pb-4 lg:pb-[60px] flex flex-col items-center justify-center gap-6 pt-32 sm:pt-36 md:pt-44 lg:pt-36">
+        <Image
+          src="/assets/bgmain.svg"
+          alt="background"
+          fill
+          className="object-cover max-md:object-top w-full h-full absolute -z-10 opacity-90"
+          priority
+        />
+        
+        <div className="w-full lg:max-w-3xl space-y-3 text-center relative z-10 mt-6 sm:mt-8 md:mt-12 lg:mt-0">
+          <motion.div
+            initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, ease: "easeOut", type: "spring" }}
+            className="flex items-center justify-center gap-2 mb-4"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-black/40 backdrop-blur-sm border border-[#252525]">
+              <span className="text-[#e1e1e1] text-sm font-medium">Backed by</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 bg-gradient-to-br from-[#FF6154] to-[#FF8C00] rounded flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">U</span>
+                </div>
+                <span className="text-white text-sm font-medium">sers</span>
               </div>
-              <span className="text-white text-sm font-medium">sers</span>
             </div>
-          </div>
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1.2, ease: "easeOut", type: "spring" }}
-          className="text-5xl text-[2.8rem] lg:text-7xl lg:text-[6rem] font-medium tracking-tighter"
-        >
-          Find your perfect Open-Source Repo
-        </motion.h1>
-        <motion.p
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.2, ease: "easeOut", type: "spring" }}
+            className="text-5xl text-[2.8rem] lg:text-7xl lg:text-[6rem] font-medium tracking-tighter"
+          >
+            Find your perfect Open-Source Repo
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{
+              duration: 1.2,
+              ease: "easeOut",
+              type: "spring",
+              delay: 0.1,
+            }}
+            className="w-full lg:text-2xl tracking-tight font-light sm:max-w-lg mx-auto lg:max-w-4xl lg:text-balance text-[#e1e1e1]"
+          >
+            Find top open-source repos in seconds. Filter by your language,
+            framework, or niche. Start contributing in seconds, not hours.
+          </motion.p>
+        </div>
+        <motion.div
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{
             duration: 1.2,
             ease: "easeOut",
             type: "spring",
-            delay: 0.1,
+            delay: 0.2,
           }}
-          className="w-full lg:text-2xl tracking-tight font-light sm:max-w-lg mx-auto lg:max-w-4xl lg:text-balance text-[#e1e1e1]"
+          className="cursor-pointer relative z-10 mt-4"
         >
-          Find top open-source repos in seconds. Filter by your language,
-          framework, or niche. Start contributing in seconds, not hours.
-        </motion.p>
+          <Link href="/dashboard/home" className="block">
+            <PrimaryButtom>
+              <Terminal />
+              Get Started
+            </PrimaryButtom>
+          </Link>
+        </motion.div>
+        <div className="absolute h-[50%] w-full bg-gradient-to-t from-[#101010] via-transparent to-transparent bottom-0 left-1/2 -translate-x-1/2"></div>
       </div>
-      <motion.div
-        initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{
-          duration: 1.2,
-          ease: "easeOut",
-          type: "spring",
-          delay: 0.2,
-        }}
-        className="cursor-pointer z-30"
-      >
-        <Link href="/dashboard/home" className="block">
-          <PrimaryButtom>
-            <Terminal />
-            Get Started
-          </PrimaryButtom>
-        </Link>
-      </motion.div>
-      <div className="absolute h-[50%] w-full bg-gradient-to-t from-[#101010] via-transparent to-transparent bottom-0 left-1/2 -translate-x-1/2"></div>
-    </div>
+    </>
   );
 };
 

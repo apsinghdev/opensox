@@ -15,7 +15,7 @@ import { FaqSection } from '@/components/faq/FaqSection'
 const Landing = () => {
     return (
         <main className='min-h-screen w-full bg-[#101010] text-white font-sans overflow-hidden relative'>
-            <Navbar />
+            {/* <Navbar />  */}
             <div className="min-h-screen w-full max-w-[2000px] mx-auto border-x border-[#252525] overflow-hidden">
                 <Hero />
                 <Bento />
