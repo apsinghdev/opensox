@@ -11,21 +11,92 @@ import { SessionWrapper } from "./SessionWrapper";
 import { TRPCProvider } from "@/providers/trpc-provider";
 import { GeistSans } from "geist/font/sans";
 
-const dmReg = localFont({
-  src: "./fonts/DMMono-Regular.ttf",
-  variable: "--font-dm-mono-req",
+// DM Mono - Used for code, terminal, and monospace text
+const dmMono = localFont({
+  src: [
+    {
+      path: "./fonts/DMMono-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/DMMono-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+  ],
+  variable: "--font-dm-mono",
+  display: "swap",
 });
 
-const dmMed = localFont({
-  src: "./fonts/DMMono-Medium.ttf",
-  variable: "--font-dm-mono-med",
-});
+// Geist Sans - Primary font for body text and UI
+const geistSans = GeistSans;
 
 export const metadata: Metadata = {
   title: "Opensox",
   description: "Find the perfect open source project to contribute",
   icons: {
     icon: "/images/os-image.ico",
+  },
+  keywords: [
+    "opensox",
+    "Opensox",
+    "Opensox AI",
+    "Open Source Projects",
+    "Search Open Source Projects",
+    "Gsoc Organizations",
+    "Open source Startups",
+    "trpc",
+    "nextjs",
+    "open source",
+    "Tailwind CSS",
+    "TypeScript",
+    "React",
+    "GSOC mentorship",
+    "GSOC proposal",
+    "LFX Mentorship",
+    "Outreachy",
+  ],
+  metadataBase: new URL("https://opensox.ai"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: new URL("https://opensox.ai"),
+    siteName: "Opensox",
+    title: "Opensox | find the perfect open source project to contribute",
+    description:
+      "Discover curated open source projects in seconds, Filter by stack, personalized recommendations, and more.",
+    images: [
+      {
+        url: "/images/opensox_og.webp",
+        width: 1200,
+        height: 630,
+        alt: "Opensox product preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@opensox",
+    title: "Opensox | find the perfect open source project to contribute",
+    description:
+      "Discover curated open source projects in seconds, Filter by stack, personalized recommendations, and more.",
+    images: ["/images/opensox_og.webp"],
+    creator: "@ajeetunc",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -39,7 +110,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${GeistSans.className} ${dmMed.variable} ${dmReg.variable} antialiased bg-background`}
+        className={`${geistSans.className} ${dmMono.variable} antialiased bg-background`}
       >
         <PostHogProvider>
           <ThemeProvider

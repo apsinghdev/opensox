@@ -16,14 +16,14 @@ export function ProgressBar({ completed, total, className }: ProgressBarProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-between bg-ox-content rounded-lg px-4 py-3 border border-ox-header",
+        "flex items-center justify-between bg-dash-surface rounded-lg px-4 py-3 border border-dash-border",
         className
       )}
     >
       {/* Left side - Text and numbers */}
       <div className="flex flex-col gap-0.5">
-        <p className="text-white text-sm font-medium">Total Progress</p>
-        <p className="text-white text-xl font-bold">
+        <p className="text-text-primary text-sm font-medium">Total Progress</p>
+        <p className="text-text-primary text-xl font-bold">
           {completed} / {total}
         </p>
       </div>
@@ -36,30 +36,32 @@ export function ProgressBar({ completed, total, className }: ProgressBarProps) {
             cx="32"
             cy="32"
             r="28"
-            stroke="rgb(38 38 38)"
-            strokeWidth="6"
+            stroke="currentColor"
+            strokeWidth="8"
             fill="none"
+            className="text-dash-base"
           />
           {/* Progress circle */}
           <circle
             cx="32"
             cy="32"
             r="28"
-            stroke="#9455f4"
-            strokeWidth="6"
+            stroke="currentColor"
+            strokeWidth="8"
             fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className="transition-all duration-500 ease-in-out"
+            className="transition-all duration-500 ease-in-out text-brand-purple"
           />
         </svg>
         {/* Percentage text in center */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-sm font-bold">{percentage}%</span>
+          <span className="text-text-primary text-sm font-bold">
+            {percentage}%
+          </span>
         </div>
       </div>
     </div>
   );
 }
-

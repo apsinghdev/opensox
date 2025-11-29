@@ -1,0 +1,195 @@
+/* Newsletter / markdown content styling */
+.newsletter-content {
+    @apply break-words text-sm sm:text-base text-zinc-300 leading-relaxed;
+}
+
+.newsletter-content h1 {
+    @apply text-2xl sm:text-3xl font-bold text-white mt-6 sm:mt-8 mb-3 sm:mb-4 break-words;
+}
+
+.newsletter-content h2 {
+    @apply text-xl sm:text-2xl font-semibold text-white mt-5 sm:mt-6 mb-2 sm:mb-3 break-words;
+}
+
+.newsletter-content h3 {
+    @apply text-lg sm:text-xl font-semibold text-zinc-200 mt-4 mb-2 break-words;
+}
+
+.newsletter-content h4 {
+    @apply text-base sm:text-lg font-semibold text-zinc-200 mt-3 mb-2 break-words;
+}
+
+.newsletter-content p {
+    @apply mb-4 break-words;
+}
+
+.newsletter-content strong {
+    @apply text-white font-semibold;
+}
+
+.newsletter-content em {
+    @apply italic;
+}
+
+.newsletter-content ul,
+.newsletter-content ol {
+    @apply mb-4 ml-4 sm:ml-6 space-y-2 text-zinc-300;
+}
+
+.newsletter-content ul {
+    list-style-type: disc;
+}
+
+.newsletter-content ol {
+    list-style-type: decimal;
+}
+
+.newsletter-content li {
+    @apply break-words;
+}
+
+.newsletter-content a {
+    @apply text-ox-purple hover:text-purple-400 underline transition-colors break-all;
+}
+
+/* Make long URLs not break layout */
+.newsletter-content p>a,
+.newsletter-content li>a {
+    @apply inline-block max-w-full;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.newsletter-content img {
+    @apply rounded-lg my-4 sm:my-6 w-full h-auto max-w-full object-contain;
+    max-height: 500px;
+}
+
+/* GIFs behave like images */
+.newsletter-content img[src*=".gif"],
+.newsletter-content img[alt*="gif"] {
+    @apply object-cover;
+}
+
+.newsletter-content blockquote {
+    @apply border-l-4 border-ox-purple pl-3 sm:pl-4 italic text-sm sm:text-base text-zinc-400 my-4 break-words;
+}
+
+.newsletter-content hr {
+    @apply border-[#1a1a1d] my-6 sm:my-8;
+}
+
+.newsletter-content code {
+    @apply bg-[#121214] text-ox-purple px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs sm:text-sm break-all;
+}
+
+/* Code blocks */
+.newsletter-content pre {
+    @apply bg-[#121214] p-3 sm:p-4 rounded-lg overflow-x-auto my-4 text-xs sm:text-sm;
+}
+
+.newsletter-content pre code {
+    @apply bg-transparent p-0 text-xs sm:text-sm;
+}
+
+/* Tables */
+.newsletter-content table {
+    @apply w-full border-collapse my-4 text-sm sm:text-base;
+}
+
+.newsletter-content thead {
+    @apply bg-[#121214];
+}
+
+.newsletter-content th,
+.newsletter-content td {
+    @apply border border-[#1a1a1d] px-3 py-2 align-top;
+}
+
+.newsletter-content th {
+    @apply font-semibold text-white;
+}
+
+.newsletter-content tbody tr:nth-child(even) {
+    @apply bg-[#0f0f11];
+}
+
+/* Enhanced Newsletter Content Styles */
+.newsletter-content-wrapper {
+  position: relative;
+  background: linear-gradient(to bottom, transparent 0%, rgba(139, 92, 246, 0.02) 50%, transparent 100%);
+  padding: 2rem 0;
+  margin: 0 -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .newsletter-content-wrapper {
+    margin: 0 -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Minimal Newsletter Content Styles */
+.newsletter-content h2 {
+  position: relative;
+  
+}
+
+.newsletter-content img {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.newsletter-content ul,
+.newsletter-content ol {
+  margin-left: 1.25rem;
+}
+
+.newsletter-content li::marker {
+  color: rgb(139, 92, 246);
+}
+
+.newsletter-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.newsletter-content th,
+.newsletter-content td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.newsletter-content th {
+  background: rgba(139, 92, 246, 0.1);
+  color: white;
+  font-weight: 500;
+}
+
+.newsletter-content td {
+  color: rgb(212, 212, 216);
+}
+
+/* Smooth reading experience */
+.newsletter-article {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

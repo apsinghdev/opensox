@@ -1,2 +1,2 @@
-export type { SheetModule } from "./sheet";
-export { sheetModules } from "./sheet";
+export type { SheetModule } from "./types";
+export { getSheetModules } from "./sheet";

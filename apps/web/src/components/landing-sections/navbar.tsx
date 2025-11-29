@@ -46,7 +46,7 @@ const Navbar = () => {
   return (
     <motion.nav
       initial={{ opacity: 0 }}
-      animate={showNavbar ? { opacity: 1 } : { opacity: 0 }}
+      animate={showNavbar ? { opacity: 1 } : { opacity: 0, display: 'none' }}
       transition={{ duration: 0.3 }}
       className={cn(
         " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",

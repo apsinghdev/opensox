@@ -62,12 +62,12 @@ export default function ProjectsContainer({
   return (
     <div className="w-full p-6 sm:p-6">
       <div className="flex items-center justify-between pb-6">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white tracking-tight">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-text-primary tracking-tight">
           {projectTitle}
         </h2>
         {isProjectsPage && (
           <Button
-            className="font-semibold text-white bg-ox-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-white-500 rounded-md"
+            className="font-semibold text-text-primary bg-ox-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-white-500 rounded-md"
             onClick={() => setShowFilters(true)}
           >
             Find projects
@@ -78,27 +78,27 @@ export default function ProjectsContainer({
       {projects && projects.length > 0 ? (
         <div
           className="
-            w-full bg-[#15161a] border border-[#1a1a1d] rounded-lg
+            w-full bg-ox-content border border-dash-border rounded-lg
             h-[80vh] overflow-y-auto overflow-x-auto relative
             [&::-webkit-scrollbar]:w-2
       
             [&::-webkit-scrollbar]:h-1
             [&::-webkit-scrollbar-track]:bg-transparent
-            [&::-webkit-scrollbar-thumb]:bg-ox-purple/30
+            [&::-webkit-scrollbar-thumb]:bg-brand-purple/30
             [&::-webkit-scrollbar-thumb]:rounded-full
-            [&::-webkit-scrollbar-thumb]:hover:bg-ox-purple/50
+            [&::-webkit-scrollbar-thumb]:hover:bg-brand-purple/50
           "
         >
           <Table className="w-full min-w-[820px] table-fixed">
             {/* Sticky header row */}
             <TableHeader>
-              <TableRow className="border-b border-[#1a1a1d]">
+              <TableRow className="border-b border-dash-border">
                 {tableColumns.map((name, i) => (
                   <TableHead
                     key={name}
                     className={[
-                      "px-3 py-3 font-semibold text-ox-purple text-[12px] sm:text-sm whitespace-nowrap",
-                      "sticky top-0 z-30 bg-[#15161a]", // <- stick
+                      "px-3 py-3 font-semibold text-brand-purple text-[12px] sm:text-sm whitespace-nowrap",
+                      "sticky top-0 z-30 bg-ox-content", // <- stick
                       i === 0 ? "text-left" : "text-center",
                     ].join(" ")}
                   >
@@ -126,13 +126,13 @@ export default function ProjectsContainer({
                           height={24}
                         />
                       </div>
-                      <span className="text-white text-[10px] sm:text-xs font-semibold">
+                      <span className="text-text-primary text-[10px] sm:text-xs font-semibold">
                         {p.name}
                       </span>
                     </div>
                   </TableCell>
 
-                  <TableCell className="text-white text-[10px] sm:text-xs text-center p-1 sm:p-2 whitespace-nowrap">
+                  <TableCell className="text-text-primary text-[10px] sm:text-xs text-center p-1 sm:p-2 whitespace-nowrap">
                     {p.totalIssueCount}
                   </TableCell>
 
@@ -145,16 +145,16 @@ export default function ProjectsContainer({
                     </Badge>
                   </TableCell>
 
-                  <TableCell className="text-white text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
+                  <TableCell className="text-text-primary text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
                     {p.popularity}
                   </TableCell>
-                  <TableCell className="text-white text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
+                  <TableCell className="text-text-primary text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
                     {p.stage}
                   </TableCell>
-                  <TableCell className="text-white text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
+                  <TableCell className="text-text-primary text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
                     {p.competition}
                   </TableCell>
-                  <TableCell className="text-white text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
+                  <TableCell className="text-text-primary text-[10px] sm:text-xs text-center font-semibold p-1 sm:p-2 whitespace-nowrap">
                     {p.activity}
                   </TableCell>
                 </TableRow>
@@ -163,9 +163,9 @@ export default function ProjectsContainer({
           </Table>
         </div>
       ) : isProjectsPage ? (
-        <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-zinc-400 space-y-6">
+        <div className="flex flex-col justify-center items-center h-[calc(100vh-200px)] text-text-muted space-y-6">
           <div className="flex flex-col items-center gap-2">
-            <MagnifyingGlassIcon className="size-12 text-ox-purple animate-pulse" />
+            <MagnifyingGlassIcon className="size-12 text-brand-purple animate-pulse" />
             <p className="text-xl font-medium">Find Your Next Project</p>
           </div>
           <p className="text-base text-center max-w-md">

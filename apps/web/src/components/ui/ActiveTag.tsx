@@ -11,9 +11,9 @@ export function ActiveTag({ className, text = "active" }: ActiveTagProps) {
       className={cn(
         "inline-flex items-center justify-center",
         "px-2 py-0.5 rounded-lg",
-        "bg-[#002d21] text-[#00bd7c]",
+        "bg-success-bg text-success-text",
         "text-xs font-sm",
-        "border border-[#00bd7c]",
+        "border border-success-border",
         className
       )}
     >

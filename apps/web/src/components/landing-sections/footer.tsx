@@ -87,6 +87,12 @@ const Footer = () => {
               </h3>
               <div className="flex flex-col gap-2">
                 <Link
+                  href="/contact"
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
+                >
+                  Contact
+                </Link>
+                <Link
                   href="/legal/privacy"
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
                 >
@@ -96,7 +102,19 @@ const Footer = () => {
                   href="/legal/terms"
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
                 >
-                  Terms of Service
+                  Terms and Conditions
+                </Link>
+                <Link
+                  href="/legal/cancellation-and-refund"
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
+                >
+                  Cancellation and Refunds
+                </Link>
+                <Link
+                  href="/legal/shipping-and-exchange"
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
+                >
+                  Shipping and Exchange
                 </Link>
               </div>
             </div>

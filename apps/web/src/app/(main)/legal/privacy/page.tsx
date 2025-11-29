@@ -3,16 +3,16 @@ import React from "react";
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-[#101010] text-white">
+    <div className="min-h-screen bg-surface-primary text-white">
       <div className="max-w-4xl mx-auto px-4 py-16 lg:py-24">
         {/* Header */}
         <h1 className="text-4xl lg:text-6xl font-bold mb-4">Privacy Policy</h1>
-        <p className="text-[#b1b1b1] text-lg mb-12">
+        <p className="text-white text-lg mb-12">
           Effective date: January 8, 2024
         </p>
 
         {/* Content */}
-        <div className="space-y-8 text-[#e1e1e1] leading-relaxed">
+        <div className="space-y-8 text-white leading-relaxed">
           {/* Introduction */}
           <section>
             <p className="text-lg">
@@ -28,13 +28,13 @@ export default function PrivacyPolicyPage() {
               subject to our{" "}
               <a
                 href="/legal/terms"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
-                Terms of Service
+                Terms and Conditions
               </a>
               , which incorporates this Privacy Policy. Any terms we use in this
               Policy without defining them have the definitions given to them in
-              the Terms of Service.
+              the Terms and Conditions.
             </p>
           </section>
 
@@ -70,16 +70,16 @@ export default function PrivacyPolicyPage() {
             </p>
 
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-[#252525] text-sm">
+              <table className="w-full border-collapse border border text-sm">
                 <thead>
-                  <tr className="bg-[#1a1a1a]">
-                    <th className="border border-[#252525] p-3 text-left">
+                  <tr className="bg-surface-tertiary">
+                    <th className="border border p-3 text-left">
                       Category of Personal Data
                     </th>
-                    <th className="border border-[#252525] p-3 text-left">
+                    <th className="border border p-3 text-left">
                       Examples of Personal Data We Collect
                     </th>
-                    <th className="border border-[#252525] p-3 text-left">
+                    <th className="border border p-3 text-left">
                       Categories of Third Parties With Whom We Share this
                       Personal Data
                     </th>
@@ -87,17 +87,17 @@ export default function PrivacyPolicyPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Profile or Contact Data
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       First and last name
                       <br />
                       Email
                       <br />
                       Unique identifiers such as passwords
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Service Providers
                       <br />
                       Business Partners
@@ -106,25 +106,19 @@ export default function PrivacyPolicyPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="border border-[#252525] p-3">
-                      Payment Data
-                    </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">Payment Data</td>
+                    <td className="border border p-3">
                       Payment card type
                       <br />
                       Last 4 digits of payment card
                       <br />
                       Billing address, phone number, and email
                     </td>
-                    <td className="border border-[#252525] p-3">
-                      Payment Processors
-                    </td>
+                    <td className="border border p-3">Payment Processors</td>
                   </tr>
                   <tr>
-                    <td className="border border-[#252525] p-3">
-                      Search & Filter Data
-                    </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">Search & Filter Data</td>
+                    <td className="border border p-3">
                       Programming languages searched
                       <br />
                       Tech stack preferences
@@ -133,33 +127,29 @@ export default function PrivacyPolicyPage() {
                       <br />
                       Niche area interests (AI, Web3, etc.)
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Service Providers
                       <br />
                       Analytics Partners
                     </td>
                   </tr>
                   <tr>
-                    <td className="border border-[#252525] p-3">
-                      Device/IP Data
-                    </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">Device/IP Data</td>
+                    <td className="border border p-3">
                       IP address
                       <br />
                       Type of device/operating system/browser used to access the
                       Services
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Service Providers
                       <br />
                       Analytics Partners
                     </td>
                   </tr>
                   <tr>
-                    <td className="border border-[#252525] p-3">
-                      Web Analytics
-                    </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">Web Analytics</td>
+                    <td className="border border p-3">
                       Referring webpage/source through which you accessed the
                       Services
                       <br />
@@ -168,22 +158,20 @@ export default function PrivacyPolicyPage() {
                       Statistics associated with the interaction between device
                       or browser and the Services
                     </td>
-                    <td className="border border-[#252525] p-3">
-                      Analytics Partners
-                    </td>
+                    <td className="border border p-3">Analytics Partners</td>
                   </tr>
                   <tr>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Third Party Platform Data
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       GitHub username and profile information
                       <br />
                       GitHub Bio, URLs, and public profile details
                       <br />
                       Email from authentication providers
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Service Providers
                       <br />
                       Analytics Partners
@@ -194,13 +182,11 @@ export default function PrivacyPolicyPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="border border-[#252525] p-3">
-                      Geolocation Data
-                    </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">Geolocation Data</td>
+                    <td className="border border p-3">
                       IP-address-based location information
                     </td>
-                    <td className="border border-[#252525] p-3">
+                    <td className="border border p-3">
                       Service Providers
                       <br />
                       Analytics Partners
@@ -381,7 +367,7 @@ export default function PrivacyPolicyPage() {
               </div>
             </div>
 
-            <p className="mt-4 text-[#b1b1b1] italic">
+            <p className="mt-4 text-light italic">
               We will not collect additional categories of Personal Data or use
               the Personal Data we collected for materially different, unrelated
               or incompatible purposes without providing you notice.
@@ -419,7 +405,7 @@ export default function PrivacyPolicyPage() {
                       href="https://razorpay.com/privacy/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                      className="text-link hover:text-link-hover transition-colors"
                     >
                       Razorpay's privacy policy
                     </a>{" "}
@@ -591,7 +577,7 @@ export default function PrivacyPolicyPage() {
                     href="https://www.google.com/privacy_ads.html"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                    className="text-link hover:text-link-hover transition-colors"
                   >
                     www.google.com/privacy_ads.html
                   </a>{" "}
@@ -600,7 +586,7 @@ export default function PrivacyPolicyPage() {
                     href="https://tools.google.com/dlpage/gaoptout/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                    className="text-link hover:text-link-hover transition-colors"
                   >
                     https://tools.google.com/dlpage/gaoptout/
                   </a>
@@ -630,7 +616,7 @@ export default function PrivacyPolicyPage() {
                 href="http://www.allaboutcookies.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 http://www.allaboutcookies.org/
               </a>{" "}
@@ -639,7 +625,7 @@ export default function PrivacyPolicyPage() {
                 href="https://ico.org.uk/for-the-public/online/cookies/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 https://ico.org.uk/for-the-public/online/cookies/
               </a>{" "}
@@ -684,17 +670,17 @@ export default function PrivacyPolicyPage() {
               Personal Data of Children
             </h2>
             <p>
-              As noted in the Terms of Service, we do not knowingly collect or
-              solicit Personal Data about children under 13 years of age; if you
-              are a child under the age of 13, please do not attempt to register
-              for or otherwise use the Services or send us any Personal Data. If
-              we learn we have collected Personal Data from a child under 13
-              years of age, we will delete that information as quickly as
-              possible. If you believe that a child under 13 years of age may
+              As noted in the Terms and Conditions, we do not knowingly collect
+              or solicit Personal Data about children under 13 years of age; if
+              you are a child under the age of 13, please do not attempt to
+              register for or otherwise use the Services or send us any Personal
+              Data. If we learn we have collected Personal Data from a child
+              under 13 years of age, we will delete that information as quickly
+              as possible. If you believe that a child under 13 years of age may
               have provided Personal Data to us, please contact us at{" "}
               <a
                 href="mailto:hi@opensox.ai"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 hi@opensox.ai
               </a>
@@ -719,7 +705,7 @@ export default function PrivacyPolicyPage() {
               contact us at{" "}
               <a
                 href="mailto:hi@opensox.ai"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 hi@opensox.ai
               </a>
@@ -736,7 +722,7 @@ export default function PrivacyPolicyPage() {
               contacting us at{" "}
               <a
                 href="mailto:hi@opensox.ai"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 hi@opensox.ai
               </a>{" "}
@@ -785,11 +771,11 @@ export default function PrivacyPolicyPage() {
                 <p>
                   We process some Personal Data as a matter of "contractual
                   necessity", meaning that we need to process the data to
-                  perform under our Terms of Service with you, which enables us
-                  to provide you with the Services. When we process data due to
-                  contractual necessity, failure to provide such Personal Data
-                  will result in your inability to use some or all portions of
-                  the Services that require such data.
+                  perform under our Terms and Conditions with you, which enables
+                  us to provide you with the Services. When we process data due
+                  to contractual necessity, failure to provide such Personal
+                  Data will result in your inability to use some or all portions
+                  of the Services that require such data.
                 </p>
               </div>
 
@@ -843,7 +829,7 @@ export default function PrivacyPolicyPage() {
               rights, or to submit a request, please email us at{" "}
               <a
                 href="mailto:hi@opensox.ai"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 hi@opensox.ai
               </a>
@@ -911,7 +897,7 @@ export default function PrivacyPolicyPage() {
                   href="https://edpb.europa.eu/about-edpb/board/members_en"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-link hover:text-link-hover transition-colors"
                 >
                   https://edpb.europa.eu/about-edpb/board/members_en
                 </a>
@@ -958,7 +944,7 @@ export default function PrivacyPolicyPage() {
                 <strong>Email:</strong>{" "}
                 <a
                   href="mailto:hi@opensox.ai"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-link hover:text-link-hover transition-colors"
                 >
                   hi@opensox.ai
                 </a>
@@ -967,7 +953,7 @@ export default function PrivacyPolicyPage() {
                 <strong>Platform:</strong>{" "}
                 <a
                   href="https://opensox.ai"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-link hover:text-link-hover transition-colors"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -979,7 +965,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-[#252525] text-center text-[#b1b1b1]">
+        <div className="mt-16 pt-8 border-t border-light text-center text-light">
           <p className="text-sm">
             © {new Date().getFullYear()} Opensox AI. All rights reserved.
           </p>

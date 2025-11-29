@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { colors } from "./src/lib/design-tokens";
 
 const config: Config = {
   darkMode: ["class"],
@@ -10,8 +11,75 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#101010",
-        foreground: "#ffffff",
+        // Base colors
+        background: colors.background.primary,
+        foreground: colors.text.primary,
+
+        // Brand colors
+        brand: {
+          purple: {
+            DEFAULT: colors.brand.purple.DEFAULT,
+            light: colors.brand.purple.light,
+            dark: colors.brand.purple.dark,
+          },
+        },
+
+        // Surface colors - more semantic naming
+        surface: {
+          primary: colors.background.primary,
+          secondary: colors.background.secondary,
+          tertiary: colors.background.tertiary,
+          elevated: colors.background.elevated,
+          hover: colors.background.hover,
+          card: colors.background.card,
+        },
+
+        // Dashboard-specific backgrounds
+        dash: {
+          base: colors.backgroundDash.base,
+          surface: colors.backgroundDash.surface,
+          raised: colors.backgroundDash.raised,
+          hover: colors.backgroundDash.hover,
+          border: colors.backgroundDash.border,
+        },
+
+        // Border colors
+        border: {
+          DEFAULT: colors.border.DEFAULT,
+          light: colors.border.light,
+          dark: colors.border.dark,
+          focus: colors.border.focus,
+        },
+
+        // Text colors
+        text: {
+          primary: colors.text.primary,
+          secondary: colors.text.secondary,
+          tertiary: colors.text.tertiary,
+          muted: colors.text.muted,
+          light: colors.text.light,
+        },
+
+        // Link colors
+        link: {
+          DEFAULT: colors.link.DEFAULT,
+          hover: colors.link.hover,
+        },
+
+        // Status colors
+        success: colors.status.success,
+        error: colors.status.error,
+        warning: colors.status.warning,
+        info: colors.status.info,
+
+        // Legacy ox-* colors (for gradual migration) - will be deprecated
+        "ox-purple": colors.brand.purple.DEFAULT,
+        "ox-purple-2": colors.brand.purple.dark,
+        "ox-gray": "rgb(75 85 99)",
+        "ox-sidebar": colors.background.secondary,
+        "ox-profile-card": colors.background.elevated,
+        "ox-content": colors.background.tertiary,
+        "ox-header": colors.border.light,
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -40,8 +108,6 @@ const config: Config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
-        border: "hsl(var(--border))",
-        "border-primary": "#252525",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
@@ -51,16 +117,6 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        "ox-purple": "#9455f4",
-        "ox-purple-2": "#7A45C3",
-        "ox-gray": "rgb(75 85 99)",
-        "ox-white": "text-slate-400",
-        "ox-black-1": "#0E0E10",
-        "ox-black-2": "#15161A",
-        "ox-sidebar": "#141414",
-        "ox-profile-card": "#1E1E1E",
-        "ox-content": "#1A1A1A",
-        "ox-header": "#363636",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -118,8 +174,15 @@ const config: Config = {
         shine: "shine var(--duration) infinite linear",
       },
       fontFamily: {
-        DMfont: ["var(--font-dm-mono-med)", "var(--font-dm-mono-req)"],
-        MonaSans: ["var(--font-mona-sans-med)", "var(--font-mona-sans-req)"],
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: [
+          "var(--font-dm-mono)",
+          "Menlo",
+          "Monaco",
+          "Courier New",
+          "monospace",
+        ],
+        DMfont: ["var(--font-dm-mono)", "monospace"],
       },
     },
   },

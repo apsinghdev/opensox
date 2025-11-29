@@ -3,23 +3,23 @@ import React from "react";
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-[#101010] text-white">
+    <div className="min-h-screen bg-surface-primary text-white">
       <div className="max-w-4xl mx-auto px-4 py-16 lg:py-24">
         {/* Header */}
         <h1 className="text-4xl lg:text-6xl font-bold mb-4">
-          Terms of Service
+          Terms and Conditions
         </h1>
-        <p className="text-[#b1b1b1] text-lg mb-12">
+        <p className="text-white text-lg mb-12">
           Effective date: January 8, 2024
         </p>
 
         {/* Content */}
-        <div className="space-y-8 text-[#e1e1e1] leading-relaxed">
+        <div className="space-y-8 text-white leading-relaxed">
           {/* Introduction */}
           <section>
             <p className="text-lg">
               Welcome to Opensox.ai ("Opensox," "we," "us," or "our"). Please
-              read these Terms of Service ("Terms") carefully as they govern
+              read these Terms and Conditions ("Terms") carefully as they govern
               your use of our platform, website, and services. By accessing or
               using Opensox.ai, you agree to be bound by these Terms. If you do
               not agree to these Terms, please do not use our Services.
@@ -29,7 +29,7 @@ export default function TermsOfServicePage() {
               at:{" "}
               <a
                 href="mailto:hi@opensox.ai"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-link hover:text-link-hover transition-colors"
               >
                 hi@opensox.ai
               </a>
@@ -59,8 +59,8 @@ export default function TermsOfServicePage() {
                 opportunities
               </li>
               <li>
-                <strong>Pro Features:</strong> Access to personalized
-                mentoring, exclusive newsletter, open-source jobs and internship
+                <strong>Pro Features:</strong> Access to personalized mentoring,
+                exclusive newsletter, open-source jobs and internship
                 opportunities, and our 30-day contribution challenge
               </li>
             </ul>
@@ -139,8 +139,8 @@ export default function TermsOfServicePage() {
               4. Pro Subscription Services
             </h2>
             <p className="mb-4">
-              Opensox.ai offers Pro subscription plans with enhanced
-              features including:
+              Opensox.ai offers Pro subscription plans with enhanced features
+              including:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
@@ -161,17 +161,17 @@ export default function TermsOfServicePage() {
               </li>
             </ul>
             <p className="mt-4">
-              <strong>Payment Terms:</strong> Pro subscriptions are billed
-              in advance on a monthly or annual basis. All fees are
-              non-refundable except as required by law. You may cancel your
-              subscription at any time, and cancellation will take effect at the
-              end of your current billing period.
+              <strong>Payment Terms:</strong> Pro subscriptions are billed in
+              advance on a monthly or annual basis. All fees are non-refundable
+              except as required by law. You may cancel your subscription at any
+              time, and cancellation will take effect at the end of your current
+              billing period.
             </p>
             <p className="mt-4">
               <strong>Price Changes:</strong> We reserve the right to modify
               subscription pricing with at least 30 days' notice. Continued use
-              of Pro services after a price change constitutes acceptance of
-              the new pricing.
+              of Pro services after a price change constitutes acceptance of the
+              new pricing.
             </p>
           </section>
 
@@ -262,8 +262,8 @@ export default function TermsOfServicePage() {
               8. Mentoring Services
             </h2>
             <p className="mb-4">
-              Pro subscribers may access personalized mentoring services.
-              Please note:
+              Pro subscribers may access personalized mentoring services. Please
+              note:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
@@ -500,15 +500,15 @@ export default function TermsOfServicePage() {
               18. Contact Information
             </h2>
             <p>
-              For questions, concerns, or feedback regarding these Terms of
-              Service, please contact us:
+              For questions, concerns, or feedback regarding these Terms and
+              Conditions, please contact us:
             </p>
             <div className="mt-4 space-y-2">
               <p>
                 <strong>Email:</strong>{" "}
                 <a
                   href="mailto:hi@opensox.ai"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-link hover:text-link-hover transition-colors"
                 >
                   hi@opensox.ai
                 </a>
@@ -517,7 +517,7 @@ export default function TermsOfServicePage() {
                 <strong>Platform:</strong>{" "}
                 <a
                   href="https://opensox.ai"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-link hover:text-link-hover transition-colors"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -528,16 +528,16 @@ export default function TermsOfServicePage() {
           </section>
 
           {/* Acknowledgment */}
-          <section className="border-t border-[#252525] pt-8">
-            <p className="text-base italic text-[#b1b1b1]">
+          <section className="border-t border-light pt-8">
+            <p className="text-white italic">
               By using Opensox.ai, you acknowledge that you have read,
-              understood, and agree to be bound by these Terms of Service.
+              understood, and agree to be bound by these Terms and Conditions.
             </p>
           </section>
         </div>
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-[#252525] text-center text-[#b1b1b1]">
+        <div className="mt-16 pt-8 border-t border-light text-center text-light">
           <p className="text-sm">
             © {new Date().getFullYear()} Opensox AI. All rights reserved.
           </p>

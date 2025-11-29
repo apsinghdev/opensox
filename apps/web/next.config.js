@@ -10,12 +10,15 @@ const nextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+      },
     ],
   },
   experimental: {
     optimizePackageImports: ['lucide-react', '@heroicons/react'],
   },
-  swcMinify: true,
 };
 
 module.exports = nextConfig; 
