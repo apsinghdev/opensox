@@ -9,6 +9,7 @@ import Link from "next/link";
 import React from "react";
 import PrimaryButton from "@/components/ui/custom-button";
 import PaymentFlow from "@/components/payment/PaymentFlow";
+import { ActiveTag } from "@/components/ui/ActiveTag";
 const opensoxFeatures = [
   {
     id: 1,
@@ -146,13 +147,18 @@ const Pricing = () => {
                       className="flex flex-col gap-4 w-full flex-1 "
                     >
                       <div className="flex flex-col gap-2 w-full">
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 items-center">
                           <div className="text-6xl font-mono font-semibold text-transparent bg-clip-text bg-gradient-to-b from-[#a472ea] to-[#341e7b]">
                             {index + 1}
                           </div>
-                          <h3 className="text-2xl font-medium">
-                            {feature.title}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-2xl font-medium">
+                              {feature.title}
+                            </h3>
+                            {feature.title === "OX Newsletter" && (
+                              <ActiveTag text="completed" />
+                            )}
+                          </div>
                         </div>
                         {Array.isArray(feature.description) ? (
                           <div className="font-medium">
@@ -382,7 +388,7 @@ const SecondaryPricingCard = () => {
               <div className="flex items-center gap-3 mt-3 flex-wrap">
                 <p className="text-lg text-white-400">(~ ₹4,351 INR)</p>
                 <span className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-full text-green-400 text-sm font-medium">
-                  Discounted till 30 November
+                  Discounted till 10 December
                 </span>
               </div>
             </div>
@@ -419,9 +425,10 @@ const SecondaryPricingCard = () => {
               <div className="space-y-3 [&>p]:flex [&>p]:items-center [&>p]:gap-2 [&>p]:font-medium">
                 {premiumPlanCard.whatYouGetAfterLaunch.map((item, index) => {
                   return (
-                    <p key={index}>
+                    <p key={index} className="flex items-center gap-2">
                       <Check className="w-5 flex-shrink-0" strokeWidth={4} />{" "}
-                      {item}
+                      <span>{item}</span>
+                      {item === "Pro newsletter" && <ActiveTag text="done" />}
                     </p>
                   );
                 })}

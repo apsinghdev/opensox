@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "@/lib/trpc";
-import { sheetModules } from "@/data/sheet";
 import type { SheetModule } from "@/data/sheet";
 import {
   Table,
@@ -22,6 +21,7 @@ import { OpensoxProBadge } from "@/components/sheet/OpensoxProBadge";
 import { ProgressBar } from "@/components/sheet/ProgressBar";
 import { ActiveTag } from "@/components/ui/ActiveTag";
 import { useSubscription } from "@/hooks/useSubscription";
+import { SheetSkeleton } from "@/components/sheet/SheetSkeleton";
 
 const tableColumns = [
   "S.No",
@@ -39,7 +39,7 @@ const SheetTableRow = memo(function SheetTableRow({
   onCheckboxChange,
   isPaidUser,
 }: {
-  module: SheetModule;
+  module: Omit<SheetModule, "docContent">;
   index: number;
   isCompleted: boolean;
   onCheckboxChange: (moduleId: string, checked: boolean) => void;
@@ -129,13 +129,34 @@ const SheetTableRow = memo(function SheetTableRow({
     </TableRow>
   );
 });
-
 export default function SheetPage() {
   const { data: session, status } = useSession();
   const { isPaidUser } = useSubscription();
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [sheetModules, setSheetModules] = useState<
+    Omit<SheetModule, "docContent">[]
+  >([]);
+  const [isLoadingModules, setIsLoadingModules] = useState(true);
   const utils = trpc.useUtils();
+
+  // fetch modules metadata from api
+  useEffect(() => {
+    async function fetchModules() {
+      try {
+        const response = await fetch("/api/sheet/modules");
+        if (response.ok) {
+          const modules = await response.json();
+          setSheetModules(modules);
+        }
+      } catch (error) {
+        console.error("failed to fetch modules:", error);
+      } finally {
+        setIsLoadingModules(false);
+      }
+    }
+    fetchModules();
+  }, []);
 
   // TypeScript has difficulty narrowing TRPC procedure union types.
   // These procedures are correctly typed at runtime (query vs mutation).
@@ -215,7 +236,7 @@ export default function SheetPage() {
   );
 
   // Memoize computed values
-  const totalModules = useMemo(() => sheetModules.length, []);
+  const totalModules = useMemo(() => sheetModules.length, [sheetModules]);
   const completedCount = useMemo(() => completedSteps.length, [completedSteps]);
 
   // Memoize download handler
@@ -299,7 +320,7 @@ export default function SheetPage() {
     setTimeout(() => {
       printWindow.print();
     }, 250);
-  }, [completedCount, totalModules, completedSteps]);
+  }, [completedCount, totalModules, completedSteps, sheetModules]);
 
   // Memoize share handler
   const handleShare = useCallback(async () => {
@@ -313,16 +334,11 @@ export default function SheetPage() {
     }
   }, []);
 
-  // Show loading only if we're actually loading session OR steps
-  const isLoading =
-    (status === "loading" || isLoadingSteps) && !completedSteps.length;
+  // Show loading only if we're actually loading session OR steps OR modules
+  const isLoading = status === "loading" || isLoadingSteps || isLoadingModules;
 
   if (isLoading) {
-    return (
-      <div className="w-full p-6 flex items-center justify-center h-[80vh]">
-        <p className="text-text-muted">Loading...</p>
-      </div>
-    );
+    return <SheetSkeleton />;
   }
 
   return (

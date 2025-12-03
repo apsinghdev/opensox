@@ -1,0 +1,64 @@
+.sheetContent {
+  @apply text-text-secondary leading-7;
+}
+
+.sheetContent p {
+  @apply mb-4 text-text-secondary;
+}
+
+.sheetContent h3 {
+  @apply mt-10 mb-5 text-lg font-semibold text-brand-purple-light;
+}
+
+.sheetContent h2 {
+  @apply mt-8 mb-3 text-xl font-semibold text-text-primary;
+}
+
+.sheetContent h1 {
+  @apply mt-8 mb-4 text-3xl font-bold text-text-primary;
+}
+
+.sheetContent a {
+  @apply text-brand-purple-light underline;
+}
+
+.sheetContent a:hover {
+  @apply text-brand-purple;
+}
+
+.sheetContent strong {
+  @apply font-semibold text-text-primary;
+}
+
+.sheetContent em {
+  @apply italic;
+}
+
+.sheetContent ul,
+.sheetContent ol {
+  @apply pl-6 mb-4 text-text-secondary;
+}
+
+.sheetContent li {
+  @apply mb-2;
+}
+
+.sheetContent img {
+  @apply w-[60%] max-w-[60%] h-auto rounded-lg mx-auto my-5 block;
+}
+
+.sheetContent blockquote {
+  @apply border-l-2 border-brand-purple-light pl-4 italic text-text-tertiary my-4;
+}
+
+.sheetContent code {
+  @apply text-brand-purple-light bg-surface-tertiary px-1.5 py-0.5 rounded text-sm;
+}
+
+.sheetContent pre {
+  @apply bg-surface-tertiary border border-border rounded-lg p-4 overflow-x-auto my-4;
+}
+
+.sheetContent pre code {
+  @apply bg-transparent p-0;
+}

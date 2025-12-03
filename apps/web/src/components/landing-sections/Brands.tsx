@@ -29,12 +29,12 @@ const Brands = () => {
       <div className="border-b border flex items-center w-full">
         <div className="relative [box-shadow:0_0_100px_-10px_#14111C_inset] flex items-center justify-center bg-surface-primary w-full border-r border flex-col p-10 md:text-5xl">
           {queryLoading ? (
-            <span className="md:text-7xl md:text-[76px] text-[clamp(1rem,10vw,6rem)] font-mono tracking-tighter font-medium text-purple-400 animate-pulse">
+            <span className="md:text-8xl md:text-[80px] text-2xl sm:text-5xl text-[clamp(1.5rem,10vw,6rem)] font-mono tracking-tighter font-medium text-purple-400 animate-pulse">
               Loading...
             </span>
           ) : (
             <span
-              className="md:text-7xl md:text-[76px] relative pointer-events-none text-center bg-gradient-to-b from-brand-purple to-[#341e7b] to-80% bg-clip-text text-transparent text-[clamp(1rem,10vw,6rem)] overflow-hidden font-mono tracking-tighter font-medium"
+              className="md:text-8xl md:text-[80px] text-2xl sm:text-5xl relative pointer-events-none text-center bg-gradient-to-b from-brand-purple to-[#341e7b] to-80% bg-clip-text text-transparent text-[clamp(1.5rem,10vw,6rem)] overflow-hidden font-mono tracking-tighter font-medium"
               style={{
                 textShadow: "0 0 40px rgba(145, 89, 226, 0.5)",
               }}
@@ -49,12 +49,12 @@ const Brands = () => {
         </div>
         <div className="relative flex [box-shadow:0_0_0px_-10px_#14111C_inset] items-center justify-center bg-surface-primary w-full border flex-col p-10 md:text-5xl">
           {userLoading ? (
-            <span className="md:text-7xl md:text-[76px] text-[clamp(1rem,10vw,6rem)] font-mono tracking-tighter font-medium text-purple-400 animate-pulse">
+            <span className="md:text-8xl md:text-[80px] text-2xl sm:text-5xl text-[clamp(1.5rem,10vw,6rem)] font-mono tracking-tighter font-medium text-purple-400 animate-pulse">
               Loading...
             </span>
           ) : (
             <span
-              className="md:text-7xl md:text-[76px] relative pointer-events-none text-center bg-gradient-to-b from-brand-purple to-[#341e7b] to-80% bg-clip-text text-transparent text-[clamp(1rem,10vw,6rem)] overflow-hidden font-mono tracking-tighter font-medium"
+              className="md:text-8xl md:text-[80px] text-2xl sm:text-5xl relative pointer-events-none text-center bg-gradient-to-b from-brand-purple to-[#341e7b] to-80% bg-clip-text text-transparent text-[clamp(1.5rem,10vw,6rem)] overflow-hidden font-mono tracking-tighter font-medium"
               style={{
                 textShadow: "0 0 40px rgba(145, 89, 226, 0.5)",
               }}

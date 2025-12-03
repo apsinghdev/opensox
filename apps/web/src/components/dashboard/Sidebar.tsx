@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import SidebarItem from "../sidebar/SidebarItem";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { IconWrapper } from "../ui/IconWrapper";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -15,6 +15,11 @@ import {
   StarIcon,
   DocumentTextIcon,
   Cog6ToothIcon,
+  NewspaperIcon,
+  Squares2X2Icon,
+  ChevronDownIcon,
+  LockClosedIcon,
+  AcademicCapIcon
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -23,7 +28,15 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { OpensoxProBadge } from "../sheet/OpensoxProBadge";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
-const SIDEBAR_ROUTES = [
+type RouteConfig = {
+  path: string;
+  label: string;
+  icon: React.ReactNode;
+  badge?: string; // optional badge text (e.g., "New", "Beta")
+};
+
+// free features only
+const FREE_ROUTES: RouteConfig[] = [
   {
     path: "/dashboard/home",
     label: "Home",
@@ -39,24 +52,60 @@ const SIDEBAR_ROUTES = [
     label: "OSS Sheet",
     icon: <DocumentTextIcon className="size-5" />,
   },
+  {
+    path: "/dashboard/oss-programs",
+    label: "OSS Programs",
+    icon: <AcademicCapIcon className="size-5" />,
+  },
+];
+
+// premium features under Opensox Pro
+const PREMIUM_ROUTES: RouteConfig[] = [
+  {
+    path: "/dashboard/pro/dashboard",
+    label: "Dashboard",
+    icon: <Squares2X2Icon className="size-5" />,
+    badge: "New",
+  },
+  {
+    path: "/dashboard/newsletters",
+    label: "Newsletter",
+    icon: <NewspaperIcon className="size-5" />,
+    badge: "New",
+  },
 ];
 
 export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
   const { setShowSidebar, isCollapsed, toggleCollapsed } = useShowSidebar();
   const router = useRouter();
+  const pathname = usePathname();
   const { isPaidUser } = useSubscription();
+  const [proSectionExpanded, setProSectionExpanded] = useState(true);
+
+  // auto-expand pro section if user is on a premium route
+  useEffect(() => {
+    if (isPaidUser) {
+      const isOnPremiumRoute = PREMIUM_ROUTES.some((route) => {
+        return pathname === route.path || pathname.startsWith(`${route.path}/`);
+      });
+      if (isOnPremiumRoute) {
+        setProSectionExpanded(true);
+      }
+    }
+  }, [pathname, isPaidUser]);
 
   const reqFeatureHandler = () => {
     window.open("https://github.com/apsinghdev/opensox/issues", "_blank");
   };
 
-  const proClickHandler = () => {
+  const handleProSectionClick = () => {
     if (isPaidUser) {
-      router.push("/dashboard/pro/dashboard");
+      setProSectionExpanded(!proSectionExpanded);
     } else {
       router.push("/pricing");
     }
   };
+
   const desktopWidth = isCollapsed ? 80 : 288;
   const mobileWidth = desktopWidth;
 
@@ -110,47 +159,261 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
         </IconWrapper>
       </div>
 
-      <div className="sidebar-body flex-grow flex-col overflow-y-auto px-3 py-4">
-        {SIDEBAR_ROUTES.map((route) => {
+      <div className="sidebar-body flex-grow flex-col overflow-y-auto px-3 py-4 space-y-1">
+        {/* free features section */}
+        {FREE_ROUTES.map((route) => {
+          const isActive =
+            pathname === route.path || pathname.startsWith(`${route.path}/`);
           return (
             <Link href={route.path} key={route.path}>
-              <SidebarItem
-                itemName={route.label}
-                icon={route.icon}
-                collapsed={isCollapsed}
-              />
+              <div
+                className={`w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 pl-3 group ${
+                  isActive
+                    ? "bg-brand-purple/10 border-l-2 border-brand-purple"
+                    : "hover:bg-dash-hover"
+                }`}
+              >
+                <span
+                  className={`shrink-0 transition-colors ${
+                    isActive
+                      ? "text-brand-purple"
+                      : "text-text-secondary group-hover:text-text-primary"
+                  }`}
+                >
+                  {route.icon}
+                </span>
+                {!isCollapsed && (
+                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                    <h1
+                      className={`text-xs font-medium transition-colors ${
+                        isActive
+                          ? "text-text-primary"
+                          : "text-text-tertiary group-hover:text-text-primary"
+                      }`}
+                    >
+                      {route.label}
+                    </h1>
+                    {route.badge && (
+                      <span className="px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider bg-brand-purple/20 text-text-primary rounded border border-brand-purple/30 shrink-0">
+                        {route.badge}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </Link>
           );
         })}
+
+        {/* divider */}
+        {!isCollapsed && (
+          <div className="my-3 px-3">
+            <div className="border-t border-dash-border" />
+          </div>
+        )}
+
+        {/* premium section */}
+        {!isCollapsed ? (
+          <div className="space-y-1">
+            {(() => {
+              const isPremiumRouteActive = PREMIUM_ROUTES.some(
+                (route) =>
+                  pathname === route.path ||
+                  pathname.startsWith(`${route.path}/`)
+              );
+              const newFeaturesCount = PREMIUM_ROUTES.filter(
+                (route) => route.badge
+              ).length;
+              return (
+                <div
+                  onClick={handleProSectionClick}
+                  className={`w-full h-[44px] flex items-center justify-between rounded-md cursor-pointer transition-colors px-2 gap-3 pl-3 group ${
+                    isPremiumRouteActive
+                      ? "bg-brand-purple/10 border-l-2 border-brand-purple"
+                      : "hover:bg-dash-hover"
+                  }`}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={proSectionExpanded}
+                  aria-label="Opensox Pro section"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleProSectionClick();
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span
+                      className={`shrink-0 transition-colors ${
+                        isPremiumRouteActive
+                          ? "text-brand-purple"
+                          : "text-text-secondary group-hover:text-text-primary"
+                      }`}
+                    >
+                      <StarIcon className="size-5" />
+                    </span>
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <h1
+                        className={`text-xs font-medium transition-colors ${
+                          isPremiumRouteActive
+                            ? "text-text-primary"
+                            : "text-text-tertiary group-hover:text-text-primary"
+                        }`}
+                      >
+                        Opensox Pro
+                      </h1>
+                      <OpensoxProBadge className="px-1.5 py-0.5 scale-75 shrink-0" />
+                      {newFeaturesCount > 0 && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-brand-purple text-text-primary rounded-full shrink-0 min-w-[18px] h-[18px] flex items-center justify-center">
+                          {newFeaturesCount}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {isPaidUser && (
+                    <ChevronDownIcon
+                      className={`size-4 text-text-muted transition-transform duration-300 shrink-0 ${
+                        proSectionExpanded ? "" : "-rotate-90"
+                      }`}
+                    />
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* premium sub-items (only show if paid user and expanded) */}
+            {isPaidUser && proSectionExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="pl-8 space-y-1"
+              >
+                {PREMIUM_ROUTES.map((route) => {
+                  const isActive =
+                    pathname === route.path ||
+                    pathname.startsWith(`${route.path}/`);
+                  return (
+                    <Link href={route.path} key={route.path}>
+                      <div
+                        className={`w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 group ${
+                          isActive
+                            ? "bg-brand-purple/10 border-l-2 border-brand-purple"
+                            : "hover:bg-dash-hover"
+                        }`}
+                      >
+                        <span
+                          className={`shrink-0 transition-colors ${
+                            isActive
+                              ? "text-brand-purple"
+                              : "text-text-secondary group-hover:text-text-primary"
+                          }`}
+                        >
+                          {route.icon}
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                          <h1
+                            className={`text-xs font-medium transition-colors ${
+                              isActive
+                                ? "text-text-primary"
+                                : "text-text-tertiary group-hover:text-text-primary"
+                            }`}
+                          >
+                            {route.label}
+                          </h1>
+                          {route.badge && (
+                            <span className="px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider bg-brand-purple/20 text-text-primary rounded border border-brand-purple/30 shrink-0">
+                              {route.badge}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </motion.div>
+            )}
+
+            {/* free user: show locked preview */}
+            {!isPaidUser && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="pl-8 space-y-1"
+              >
+                {PREMIUM_ROUTES.map((route) => (
+                  <div
+                    key={route.path}
+                    onClick={() => router.push("/pricing")}
+                    className="w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 opacity-50 hover:opacity-75 group"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${route.label} - Upgrade to Pro`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        router.push("/pricing");
+                      }
+                    }}
+                  >
+                    <span className="shrink-0 text-text-secondary">
+                      {route.icon}
+                    </span>
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <h1 className="text-xs font-medium text-text-tertiary">
+                        {route.label}
+                      </h1>
+                      {route.badge && (
+                        <span className="px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider bg-brand-purple/20 text-text-primary rounded border border-brand-purple/30 shrink-0 opacity-75">
+                          {route.badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="ml-auto">
+                      <LockClosedIcon className="size-3 text-text-muted" />
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </div>
+        ) : (
+          // collapsed sidebar: show icon only
+          <div
+            onClick={handleProSectionClick}
+            className="w-full h-[44px] flex items-center justify-center rounded-md cursor-pointer transition-colors hover:bg-dash-hover group"
+            role="button"
+            tabIndex={0}
+            aria-label="Opensox Pro"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleProSectionClick();
+              }
+            }}
+          >
+            <StarIcon className="size-5 text-text-secondary group-hover:text-text-primary transition-colors" />
+          </div>
+        )}
+
+        {/* divider */}
+        {!isCollapsed && (
+          <div className="my-3 px-3">
+            <div className="border-t border-dash-border" />
+          </div>
+        )}
+
+        {/* utility features */}
         <SidebarItem
           itemName="Request a feature"
           onclick={reqFeatureHandler}
           icon={<SparklesIcon className="size-5" />}
           collapsed={isCollapsed}
         />
-        {!isCollapsed && !isPaidUser ? (
-          <div
-            className="w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 pl-3 hover:bg-dash-hover group"
-            onClick={proClickHandler}
-          >
-            <span className="shrink-0 text-text-secondary group-hover:text-text-primary transition-colors">
-              <StarIcon className="size-5" />
-            </span>
-            <div className="flex items-center gap-1">
-              <h1 className="text-xs font-medium text-text-tertiary group-hover:text-text-primary transition-colors">
-                Opensox Pro
-              </h1>
-              <OpensoxProBadge className="px-1.5 py-0.5 scale-75" />
-            </div>
-          </div>
-        ) : (
-          <SidebarItem
-            itemName="Opensox Pro"
-            onclick={proClickHandler}
-            icon={<StarIcon className="size-5" />}
-            collapsed={isCollapsed}
-          />
-        )}
       </div>
 
       {/* Bottom profile */}

@@ -15,25 +15,25 @@ export interface BlogPost {
 export const blogs: BlogPost[] = [
   {
     date: "24-08-25",
-    linkText: "how to build an online presense?",
+    linkText: "how to build an online presence?",
     link: "https://x.com/ajeetunc/status/1959480811293708369?s=20",
     tag: "distribution",
   },
   {
     date: "30-07-24",
-    linkText: "how to get into gsoc (part-2)",
+    linkText: "how to get into gsoc (part 2)",
     link: "https://x.com/ajeetunc/status/1818130583509156163?s=20",
     tag: "misc",
   },
   {
     date: "29-07-24",
-    linkText: "how to get into gsoc (part-1)",
+    linkText: "how to get into gsoc (part 1)",
     link: "https://x.com/ajeetunc/status/1817760248599634314?s=20",
     tag: "misc",
   },
   {
     date: "02-08-24",
-    linkText: "how to get into gsoc (part-3)",
+    linkText: "how to get into gsoc (part 3)",
     link: "https://x.com/ajeetunc/status/1819209955330666623?s=20",
     tag: "misc",
   },
@@ -51,7 +51,7 @@ export const blogs: BlogPost[] = [
   },
   {
     date: "08-11-25",
-    linkText: "why you shouln't register a company?",
+    linkText: "why you shouldn't register a company?",
     link: "https://x.com/ajeetunc/status/1987125877985968217?s=20",
     tag: "startup",
   },
@@ -63,7 +63,7 @@ export const blogs: BlogPost[] = [
   },
   {
     date: "29-10-25",
-    linkText: "how to be layoff proof?",
+    linkText: "how to be layoff-proof?",
     link: "https://x.com/ajeetunc/status/1983389367327699032?s=20",
     tag: "misc",
   },
@@ -75,7 +75,7 @@ export const blogs: BlogPost[] = [
   },
   {
     date: "19-11-25",
-    linkText: "how to make your website design conistent?",
+    linkText: "how to make your website design consistent?",
     link: "https://x.com/ajeetunc/status/1991106654247743717?s=20",
     tag: "engineering",
   },
