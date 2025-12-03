@@ -37,7 +37,7 @@ const Navbar = () => {
     { name: "Pricing", href: "/pricing" },
     { name: "Features", href: "/#features" },
     { name: "Demo", href: "/#demo" },
-    { name: "How it works", href: "/#HIW" },
+    { name: "working", href: "/#HIW" },
     { name: "Stats", href: "/#Stats" },
     { name: "Contact", href: "/#Contact" },
     { name: "FAQ", href: "/#faq" },
@@ -46,7 +46,7 @@ const Navbar = () => {
   return (
     <motion.nav
       initial={{ opacity: 0 }}
-      animate={showNavbar ? { opacity: 1 } : { opacity: 0, display: 'none' }}
+      animate={showNavbar ? { opacity: 1 } : { opacity: 0, display: "none" }}
       transition={{ duration: 0.3 }}
       className={cn(
         " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
@@ -79,7 +79,7 @@ const Navbar = () => {
           </div>
         </div>
         {/* links to be rendered */}
-        <div className="hidden md:flex items-center gap-5 tracking-tight text-lg font-light text-text-tertiary">
+        <div className="hidden md:flex items-center gap-5 tracking-tight text-sm lg:text-base xl:text-lg font-light text-text-tertiary">
           {links.map((link, index) => {
             const isActive = pathname === link.href;
             return (
@@ -103,7 +103,7 @@ const Navbar = () => {
             href="https://github.com/apsinghdev/opensox"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:flex items-center gap-2 px-4 py-2.5 bg-[#0d1117] hover:bg-[#161b22] transition-colors rounded-lg border border-[#30363d] text-white"
+            className="hidden xl:flex items-center gap-2 px-4 py-2.5 bg-[#0d1117] hover:bg-[#161b22] transition-colors rounded-lg border border-[#30363d] text-white"
           >
             <Github className="w-5 h-5" />
             <span className="text-sm font-medium">Contribute</span>
