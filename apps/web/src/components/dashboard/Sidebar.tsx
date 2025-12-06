@@ -110,18 +110,27 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
   const mobileWidth = desktopWidth;
 
   return (
-    <motion.div
-      className={`h-screen flex flex-col bg-dash-surface border-r border-dash-border z-50 ${
-        overlay ? "fixed left-0 top-0 bottom-0 xl:hidden" : ""
-      }`}
-      initial={
-        overlay ? { x: -400, width: mobileWidth } : { width: desktopWidth }
-      }
-      animate={overlay ? { x: 0, width: mobileWidth } : { width: desktopWidth }}
-      exit={overlay ? { x: -400, width: mobileWidth } : undefined}
-      transition={{ type: "spring", stiffness: 260, damping: 30 }}
-      style={{ width: overlay ? mobileWidth : desktopWidth }}
-    >
+  <motion.div
+    className={`h-screen flex flex-col bg-dash-surface border-r border-dash-border z-50 ${
+      overlay ? "fixed left-0 top-0 bottom-0 xl:hidden" : ""
+    }`}
+    initial={
+      overlay ? { x: -400, width: mobileWidth } : { width: desktopWidth }
+    }
+    animate={overlay ? { x: 0, width: mobileWidth } : { width: desktopWidth }}
+    exit={overlay ? { x: -400, width: mobileWidth } : undefined}
+    transition={{ type: "spring", stiffness: 260, damping: 30 }}
+    style={{ width: overlay ? mobileWidth : desktopWidth }}
+    
+    //hover logic
+    onMouseEnter={() => {
+      if (!overlay && isCollapsed) toggleCollapsed();
+    }}
+    onMouseLeave={() => {
+      if (!overlay && !isCollapsed) toggleCollapsed();
+    }}
+  >
+
       {/* Mobile header */}
       <div className="flex justify-between items-center h-16 px-4 border-b border-dash-border xl:hidden bg-dash-surface">
         <div className="flex items-center">
