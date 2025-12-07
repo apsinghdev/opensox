@@ -19,6 +19,7 @@ import {
   Squares2X2Icon,
   ChevronDownIcon,
   LockClosedIcon,
+  AcademicCapIcon
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -50,6 +51,11 @@ const FREE_ROUTES: RouteConfig[] = [
     path: "/dashboard/sheet",
     label: "OSS Sheet",
     icon: <DocumentTextIcon className="size-5" />,
+  },
+  {
+    path: "/dashboard/oss-programs",
+    label: "OSS Programs",
+    icon: <AcademicCapIcon className="size-5" />,
   },
 ];
 

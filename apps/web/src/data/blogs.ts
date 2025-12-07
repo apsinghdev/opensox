@@ -14,6 +14,18 @@ export interface BlogPost {
 
 export const blogs: BlogPost[] = [
   {
+    date: "07-12-25",
+    linkText: "why should you open source ur project?",
+    link: "https://x.com/ajeetunc/status/1997556803123712428?s=20",
+    tag: "engineering",
+  },
+  {
+    date: "06-12-25",
+    linkText: 'why opensox ai doesn\'t do "follow-ups"?',
+    link: "https://x.com/ajeetunc/status/1997309049910730995?s=20",
+    tag: "startup",
+  },
+  {
     date: "24-08-25",
     linkText: "how to build an online presence?",
     link: "https://x.com/ajeetunc/status/1959480811293708369?s=20",

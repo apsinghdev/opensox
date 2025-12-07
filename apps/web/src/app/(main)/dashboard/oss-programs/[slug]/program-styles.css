@@ -1,0 +1,166 @@
+:root {
+  --color-primary: #9455f4;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-text-primary: #333;
+  --color-text-secondary: #444;
+  --color-text-tertiary: #9ca3af;
+  --color-bg-secondary: #252525;
+}
+
+/* Base list styling */
+.program-content li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.program-content ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.program-content ol {
+  counter-reset: item;
+}
+
+.program-content ol li {
+  counter-increment: item;
+}
+
+.program-content ol li::before {
+  content: counter(item) ".";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.program-content ul li::marker,
+.program-content ol li::marker {
+  content: "";
+}
+
+/* Eligibility section - checkmarks for "good match" list */
+.eligibility-section ul:first-of-type li::before {
+  content: "✓";
+  color: var(--color-success);
+}
+
+/* Keep in mind - simple muted styling */
+.eligibility-section p:last-of-type {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-text-secondary);
+  margin-top: 1rem;
+}
+
+/* Preparation checklist - numbered steps with subtle background */
+.preparation-checklist ol li {
+  background: var(--color-bg-secondary);
+  padding: 0.75rem 1rem 0.75rem 2.25rem;
+  margin: 0.5rem 0;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.preparation-checklist ol li:hover {
+  border-color: #333;
+}
+
+.preparation-checklist ol li::before {
+  left: 0.75rem;
+  top: 0.75rem;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* Application process - step indicators */
+.application-timeline ul {
+  padding-left: 0.5rem;
+  border-left: 2px solid #333;
+  margin-left: 0.5rem;
+}
+
+.application-timeline ul li {
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  margin: 0;
+}
+
+.application-timeline ul li::before {
+  content: "";
+  position: absolute;
+  left: -0.85rem;
+  top: 0.85rem;
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+.application-timeline ul li:first-child::before,
+.application-timeline ul li:last-child::before {
+  background: var(--color-primary);
+}
+
+/* Mask the line above the first dot */
+.application-timeline ul li:first-child::after {
+  content: "";
+  position: absolute;
+  left: -2rem;
+  /* Cover the border area to the left */
+  top: 0;
+  width: 2rem;
+  height: 0.85rem;
+  /* Height up to the dot */
+  background: theme('colors.dash.base');
+  /* Match page background */
+  z-index: 1;
+}
+
+/* Mask the line below the last dot */
+.application-timeline ul li:last-child::after {
+  content: "";
+  position: absolute;
+  left: -2rem;
+  top: calc(0.85rem + 8px);
+  /* Start after the dot */
+  bottom: 0;
+  width: 2rem;
+  background: theme('colors.dash.base');
+  z-index: 1;
+}
+
+/* What this program is about section styling */
+.what-section p {
+  line-height: 2 !important;
+  /* Increased line spacing */
+  margin-bottom: 1.5rem !important;
+  /* More space between paragraphs */
+  color: #e5e5e5;
+  /* Slightly brighter text for clarity */
+}
+
+.what-section h3 {
+  margin-top: 3rem !important;
+  /* significantly more space before subsections like Duration/Stipend */
+  margin-bottom: 1rem !important;
+  color: var(--color-primary);
+  /* Highlight these headers */
+}
+
+.what-section h4 {
+  margin-top: 2.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+/* If Duration/Stipend are emphasized text at start of lines */
+.what-section p strong {
+  color: white;
+}

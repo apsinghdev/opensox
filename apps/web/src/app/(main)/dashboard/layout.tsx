@@ -16,7 +16,7 @@ export default function DashboardLayout({
   const { showFilters } = useFilterStore();
   const { showSidebar, setShowSidebar } = useShowSidebar();
   return (
-    <div className="flex w-screen h-screen bg-dash-base overflow-hidden">
+    <div className="flex w-full h-screen bg-dash-base overflow-hidden">
       {showFilters && <FiltersContainer />}
       <aside className="hidden xl:block h-full">
         <Sidebar />
