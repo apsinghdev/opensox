@@ -37,7 +37,7 @@ const Navbar = () => {
     { name: "Pricing", href: "/pricing" },
     { name: "Features", href: "/#features" },
     { name: "Demo", href: "/#demo" },
-    { name: "workflow", href: "/#workflow" },
+    { name: "Workflow", href: "/#workflow" },
     { name: "Stats", href: "/#Stats" },
     { name: "Contact", href: "/#Contact" },
     { name: "FAQ", href: "/#faq" },
@@ -70,7 +70,7 @@ const Navbar = () => {
             <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
               <Image
                 src="/assets/logo.svg"
-                alt="background"
+                alt="Opensox AI logo"
                 fill
                 className="object-cover w-full h-full"
               />
