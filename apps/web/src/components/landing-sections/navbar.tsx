@@ -79,7 +79,7 @@ const Navbar = () => {
           </div>
         </div>
         {/* links to be rendered */}
-        <div className="hidden md:flex items-center gap-5 tracking-tight text-sm lg:text-base xl:text-lg font-light text-text-tertiary">
+        <div className="hidden md:flex items-center gap-3 tracking-tight text-sm lg:text-base xl:text-lg font-light text-text-tertiary">
           {links.map((link, index) => {
             const isActive = pathname === link.href;
             return (
