@@ -71,6 +71,14 @@ const Footer = () => {
                 >
                   Blogs
                 </Link>
+                <Link
+                  href="https://github.com/apsinghdev/opensox/graphs/contributors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
+                >
+                  Team
+                </Link>
                 {/* <Link
                   href="#"
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
