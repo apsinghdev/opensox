@@ -10,7 +10,7 @@ import { authConfig } from "@/lib/auth/config";
 import { SessionWrapper } from "./SessionWrapper";
 import { TRPCProvider } from "@/providers/trpc-provider";
 import { GeistSans } from "geist/font/sans";
-
+import ScrollToTop from "@/components/ui/ScrollToTop";
 // DM Mono - Used for code, terminal, and monospace text
 const dmMono = localFont({
   src: [
@@ -100,6 +100,7 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -126,6 +127,7 @@ export default async function RootLayout({
         </PostHogProvider>
         <Analytics />
         <SpeedInsights />
+        <ScrollToTop /> 
       </body>
     </html>
   );
