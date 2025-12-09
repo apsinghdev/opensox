@@ -40,7 +40,8 @@ export default function ScrollToTop() {
           onClick={scrollToTop}
           className={cn(
             "fixed bottom-8 right-8 z-50",
-            "w-12 h-12 rounded-xl",
+            "group",
+            "w-12 h-12 rounded-[16px]",
             "shadow-lg hover:shadow-xl hover:shadow-brand-purple/20",
             "transition-all duration-300 ease-in-out",
             "animate-in fade-in slide-in-from-bottom-4",
