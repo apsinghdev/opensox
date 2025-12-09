@@ -41,14 +41,14 @@ export default function ScrollToTop() {
           className={cn(
             "fixed bottom-8 right-8 z-50",
             "w-12 h-12 rounded-xl",
-            "bg-[#1e1e1e] border-2 border-[#252525]",
-            "hover:border-brand-purple hover:bg-[#252525]",
             "shadow-lg hover:shadow-xl hover:shadow-brand-purple/20",
             "transition-all duration-300 ease-in-out",
             "animate-in fade-in slide-in-from-bottom-4",
             "cursor-pointer",
             "active:scale-95",
-            "focus:outline-none focus:ring-2 focus:ring-brand-purple focus:ring-offset-2 focus:ring-offset-[#101010]"
+            "bg-surface-elevated border-2 border-border-subtle",
+            "hover:border-brand-purple hover:bg-surface-elevated-hover",
+            "focus:outline-none focus:ring-2 focus:ring-brand-purple focus:ring-offset-2 focus:ring-offset-surface-root"
           )}
           aria-label="Scroll to top"
         >
