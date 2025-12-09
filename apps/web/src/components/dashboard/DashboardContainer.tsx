@@ -9,20 +9,31 @@ import { ErrMsg } from "../ui/ErrMsg";
 import SpinnerElm from "../ui/SpinnerElm";
 import { usePathname } from "next/navigation";
 
+import DashboardSponsorList from "./DashboardSponsorList";
+
 export default function DashboardContainer() {
   const { renderProjects } = useRenderProjects();
   const { data } = useProjectsData();
   const { loading } = useLoading();
   const { projectsNotFound } = useProjectsNotFoundStore();
   const pathname = usePathname();
-  
+
   const isProjectsPage = pathname === "/dashboard/projects";
 
   return (
-    <div className={`min-h-[calc(100vh-64px)] ${isProjectsPage ? "flex items-center justify-center" : ""}`}>
+    <div
+      className={`min-h-[calc(100vh-64px)] ${isProjectsPage ? "flex items-center justify-center" : ""}`}
+    >
       <div className={`w-full ${!loading ? "h-full" : ""}`}>
         {renderProjects && !loading && (
-          <ProjectsContainer projects={data}></ProjectsContainer>
+          <>
+            {!isProjectsPage && (
+              <div className="px-4 md:px-8 mt-6">
+                <DashboardSponsorList />
+              </div>
+            )}
+            <ProjectsContainer projects={data}></ProjectsContainer>
+          </>
         )}
         {loading && (
           <div className="flex items-center justify-center h-full">

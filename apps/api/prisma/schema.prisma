@@ -42,6 +42,7 @@ model User {
   accounts       Account[]
   payments       Payment[]
   subscriptions  Subscription[]
+  sponsors       Sponsor[]
 }
 
 model Account {
@@ -64,7 +65,7 @@ model Account {
 
 model Payment {
   id                String        @id @default(cuid())
-  userId            String
+  userId            String?
   subscriptionId    String?
   razorpayPaymentId String        @unique
   razorpayOrderId   String
@@ -74,7 +75,7 @@ model Payment {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {
@@ -101,4 +102,21 @@ model Plan {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]
+}
+
+model Sponsor {
+  id                  String   @id @default(cuid())
+  userId              String?
+  company_name        String
+  description         String
+  website             String
+  image_url           String
+  razorpay_payment_id String?
+  razorpay_sub_id     String?
+  plan_status         String   // active, cancelled, pending_payment, pending_submission, failed
+  contact_name        String?  // customer name from razorpay
+  contact_email       String?  // customer email from razorpay
+  contact_phone       String?  // customer phone from razorpay
+  created_at          DateTime @default(now())
+  user                User?    @relation(fields: [userId], references: [id])
 }

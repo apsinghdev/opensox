@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "bash ./scripts/init-submodules.sh && next build",
+    "build": "next build",
+    "build:with-premium": "bash ./scripts/init-submodules.sh && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
+    "@hookform/resolvers": "^5.2.2",
     "@opensox/shared": "workspace:*",
+    "api": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
@@ -19,7 +22,7 @@
     "@tanstack/react-query": "^5.90.2",
     "@trpc/client": "^11.6.0",
     "@trpc/react-query": "^11.6.0",
-    "@trpc/server": "^11.5.1",
+    "@trpc/server": "^11.7.2",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
     "class-variance-authority": "^0.7.0",
@@ -36,12 +39,14 @@
     "posthog-js": "^1.203.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.68.0",
     "react-qr-code": "^2.0.18",
     "react-tweet": "^3.2.1",
     "sanitize-html": "^2.11.0",
     "superjson": "^2.2.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.1.9",
     "zustand": "^5.0.1"
   },
   "devDependencies": {

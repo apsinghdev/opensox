@@ -66,6 +66,12 @@ const Footer = () => {
                   Pricing
                 </Link>
                 <Link
+                  href="/sponsor"
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
+                >
+                  Sponsor
+                </Link>
+                <Link
                   href="/blogs"
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
                 >

@@ -1,6 +1,6 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
-import type { AppRouter } from "../../../api/src/routers/_app";
+import type { AppRouter } from "@api/routers/_app";
 import type { Session } from "next-auth";
 
 /**

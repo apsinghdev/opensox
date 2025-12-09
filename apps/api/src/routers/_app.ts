@@ -14,6 +14,8 @@ const testRouter = router({
     }),
 });
 
+import { sponsorRouter } from "./sponsor.js";
+
 export const appRouter = router({
   hello: testRouter,
   query: queryRouter,
@@ -21,6 +23,7 @@ export const appRouter = router({
   project: projectRouter,
   auth: authRouter,
   payment: paymentRouter,
+  sponsor: sponsorRouter,
 });
 
 export type AppRouter = typeof appRouter;

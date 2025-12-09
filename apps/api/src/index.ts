@@ -14,8 +14,33 @@ import crypto from "crypto";
 import { paymentService } from "./services/payment.service.js";
 import { verifyToken } from "./utils/auth.js";
 import { SUBSCRIPTION_STATUS } from "./constants/subscription.js";
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { handleRazorpayWebhook } from "./webhooks.js";
 
 dotenv.config();
+
+// validate required environment variables early
+const requiredEnv = [
+  "CLOUDINARY_CLOUD_NAME",
+  "CLOUDINARY_API_KEY",
+  "CLOUDINARY_API_SECRET",
+  "RAZORPAY_WEBHOOK_SECRET",
+] as const;
+
+for (const key of requiredEnv) {
+  if (!process.env[key] || process.env[key]!.trim().length === 0) {
+    console.error(`missing required env var: ${key}`);
+    process.exit(1);
+  }
+}
+
+// configure cloudinary (kept local to this route)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+  api_key: process.env.CLOUDINARY_API_KEY!,
+  api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -62,8 +87,9 @@ const apiLimiter = rateLimit({
 
 // Request size limits (except for webhook - needs raw body)
 app.use("/webhook/razorpay", express.raw({ type: "application/json" }));
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ limit: "10kb", extended: true }));
+// Reduce global JSON/urlencoded limits to prevent DoS
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // CORS configuration
 const corsOptions: CorsOptionsType = {
@@ -97,6 +123,63 @@ app.get("/admin/blocked-ips", (req: Request, res: Response) => {
 app.get("/test", apiLimiter, (req: Request, res: Response) => {
   res.status(200).json({ status: "ok", message: "Test endpoint is working" });
 });
+
+// Secure multipart upload setup with strict validation
+const upload = multer({
+  storage: multer.memoryStorage(), // avoid temp files; stream to Cloudinary
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB per-file limit for this endpoint
+    files: 1,
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!allowed.includes(file.mimetype)) {
+      return cb(new Error("Invalid file type"));
+    }
+    cb(null, true);
+  },
+});
+
+// Dedicated upload endpoint that only accepts multipart/form-data
+app.post(
+  "/upload/sponsor-image",
+  apiLimiter,
+  (req, res, next) => {
+    if (!req.is("multipart/form-data")) {
+      return res.status(415).json({ error: "Unsupported Media Type. Use multipart/form-data." });
+    }
+    next();
+  },
+  upload.single("file"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file provided" });
+      }
+
+      const file = req.file; // narrow for TypeScript across closures
+
+      // Stream upload to Cloudinary
+      const folder = "opensox/sponsors";
+      const result = await new Promise<any>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ folder }, (error, uploadResult) => {
+          if (error) return reject(error);
+          resolve(uploadResult);
+        });
+        stream.end(file.buffer);
+      });
+
+      return res.status(200).json({
+        url: result.secure_url,
+        bytes: file.size,
+        mimetype: file.mimetype,
+      });
+    } catch (err: any) {
+      const isLimit = err?.message?.toLowerCase()?.includes("file too large");
+      return res.status(isLimit ? 413 : 400).json({ error: err.message || "Upload failed" });
+    }
+  }
+);
 
 // Slack Community Invite Endpoint (Protected)
 app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
@@ -153,104 +236,8 @@ app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
   }
 });
 
-// Razorpay Webhook Handler (Backup Flow)
-app.post("/webhook/razorpay", async (req: Request, res: Response) => {
-  try {
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    if (!webhookSecret) {
-      console.error("RAZORPAY_WEBHOOK_SECRET not configured");
-      return res.status(500).json({ error: "Webhook not configured" });
-    }
-
-    // Get signature from headers
-    const signature = req.headers["x-razorpay-signature"] as string;
-    if (!signature) {
-      return res.status(400).json({ error: "Missing signature" });
-    }
-
-    // Verify webhook signature
-    const body = req.body.toString();
-    const expectedSignature = crypto
-      .createHmac("sha256", webhookSecret)
-      .update(body)
-      .digest("hex");
-
-    const isValidSignature = crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
-
-    if (!isValidSignature) {
-      console.error("Invalid webhook signature");
-      return res.status(400).json({ error: "Invalid signature" });
-    }
-
-    // Parse the event
-    const event = JSON.parse(body);
-    const eventType = event.event;
-
-    // Handle payment.captured event
-    if (eventType === "payment.captured") {
-      const payment = event.payload.payment.entity;
-
-      // Extract payment details
-      const razorpayPaymentId = payment.id;
-      const razorpayOrderId = payment.order_id;
-      const amount = payment.amount;
-      const currency = payment.currency;
-
-      // Get user ID from order notes (should be stored when creating order)
-      const notes = payment.notes || {};
-      const userId = notes.user_id;
-
-      if (!userId) {
-        console.error("User ID not found in payment notes");
-        return res.status(400).json({ error: "User ID not found" });
-      }
-
-      // Get plan ID from notes
-      const planId = notes.plan_id;
-      if (!planId) {
-        console.error("Plan ID not found in payment notes");
-        return res.status(400).json({ error: "Plan ID not found" });
-      }
-
-      try {
-        // Create payment record (with idempotency check)
-        const paymentRecord = await paymentService.createPaymentRecord(userId, {
-          razorpayPaymentId,
-          razorpayOrderId,
-          amount,
-          currency,
-        });
-
-        // Create subscription (with idempotency check)
-        await paymentService.createSubscription(
-          userId,
-          planId,
-          paymentRecord.id
-        );
-
-        console.log(
-          `✅ Webhook: Payment ${razorpayPaymentId} processed successfully`
-        );
-        return res.status(200).json({ status: "ok" });
-      } catch (error: any) {
-        console.error("Webhook payment processing error:", error);
-        // Return 200 to prevent Razorpay retries for application errors
-        return res
-          .status(200)
-          .json({ status: "ok", note: "Already processed" });
-      }
-    }
-
-    // Acknowledge other events
-    return res.status(200).json({ status: "ok" });
-  } catch (error: any) {
-    console.error("Webhook error:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
+// Razorpay Webhook Handler
+app.post("/webhook/razorpay", handleRazorpayWebhook);
 
 // Connect to database
 prismaModule.connectDB();
