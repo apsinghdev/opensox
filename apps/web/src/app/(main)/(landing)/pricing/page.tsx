@@ -112,7 +112,7 @@ const Pricing = () => {
   return (
     <>
       <main className="w-full  overflow-hidden flex flex-col items-center justify-center relative">
-        <Header title="We are working on Opensox 2.0" />
+        <Header title="We are working on Opensox 2.0" homeLink="/dashboard/home" />
         <div className="flex flex-col bg-[#151515]/20 backdrop-blur-xl relative w-full ">
           <div className="h-full  pv relative">
             <div className=" py-8 border-b border-[#252525]">

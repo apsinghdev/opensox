@@ -3,10 +3,21 @@ import { motion } from 'framer-motion'
 import React from 'react'
 import { FlickeringGrid } from './flickering-grid'
 import { colors } from '@/lib/design-tokens'
+import Link from 'next/link'
+import { Home } from 'lucide-react'
 
-const Header = ({title}: {title: string}) => {
+
+const Header = ({title, homeLink}: {title: string, homeLink?: string}) => {
     return (
         <div className="px-[30px] py-10 h-[160px] relative overflow-hidden border-b border w-full">
+            {homeLink && (
+                <Link 
+                    href={homeLink} 
+                    className="absolute left-2 top-4 lg:left-8 lg:top-8 z-40 p-1.5 lg:p-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full transition-all duration-200 group"
+                >
+                    <Home className="w-4 h-4 lg:w-5 lg:h-5 text-white/70 group-hover:text-white" />
+                </Link>
+            )}
             <motion.h4
                 initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
