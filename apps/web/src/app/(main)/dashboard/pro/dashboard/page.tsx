@@ -106,7 +106,7 @@ export default function ProDashboardPage() {
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-4">
           hi investors, ajeetunc is on the way to deliver the shareholder value.
-          soon you&apos;ll see all the pro perks here. thanks for investing
+          soon you&apos;ll see all the pro perks here. thanks for investin!
         </h1>
         {isPaidUser && (
           <div className="mt-6">

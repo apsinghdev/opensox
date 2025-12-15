@@ -11,6 +11,7 @@ import {
   HomeIcon,
   FolderIcon,
   ArrowRightOnRectangleIcon,
+  ArrowLeftOnRectangleIcon,
   SparklesIcon,
   StarIcon,
   DocumentTextIcon,
@@ -427,6 +428,7 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
   const { data: session } = useSession();
   const router = useRouter();
 
+  const isLoggedIn = !!session;
   const fullName = session?.user?.name || "User";
   const firstName = fullName.split(" ")[0];
   const userEmail = session?.user?.email || "";
@@ -461,9 +463,11 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
           <div className="flex-1 flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs text-text-secondary font-semibold">
-                {firstName}
+                {isLoggedIn ? firstName : "Guest"}
               </span>
-              <span className="text-[10px] text-text-muted">{userEmail}</span>
+              <span className="text-[10px] text-text-muted">
+                {isLoggedIn ? userEmail : "Not signed in"}
+              </span>
             </div>
             <ChevronLeftIcon
               className={`size-4 text-text-muted transition-transform ${open ? "rotate-90" : "-rotate-90"}`}
@@ -488,35 +492,52 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
                 <ProfilePic imageUrl={userImage} />
                 <div className="flex flex-col">
                   <span className="text-sm text-text-primary font-semibold">
-                    {fullName}
+                    {isLoggedIn ? fullName : "Guest"}
                   </span>
-                  <span className="text-xs text-text-muted">{userEmail}</span>
+                  <span className="text-xs text-text-muted">
+                    {isLoggedIn ? userEmail : "Not signed in"}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Menu Items */}
             <div className="py-1">
-              <button
-                onClick={() => {
-                  router.push("/dashboard/account");
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
-              >
-                <Cog6ToothIcon className="size-4" />
-                <span>Account Settings</span>
-              </button>
-              <button
-                onClick={() => {
-                  signOut({ callbackUrl: "/" });
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-surface transition-colors"
-              >
-                <ArrowRightOnRectangleIcon className="size-4" />
-                <span>Logout</span>
-              </button>
+              {isLoggedIn && (
+                <button
+                  onClick={() => {
+                    router.push("/dashboard/account");
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
+                >
+                  <Cog6ToothIcon className="size-4" />
+                  <span>Account Settings</span>
+                </button>
+              )}
+              {isLoggedIn ? (
+                <button
+                  onClick={() => {
+                    signOut({ callbackUrl: "/" });
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
+                >
+                  <ArrowRightOnRectangleIcon className="size-4" />
+                  <span>Logout</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    router.push("/login");
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
+                >
+                  <ArrowLeftOnRectangleIcon className="size-4" />
+                  <span>Login</span>
+                </button>
+              )}
             </div>
           </motion.div>
         )}

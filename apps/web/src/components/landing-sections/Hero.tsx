@@ -51,15 +51,20 @@ const Hero = () => {
           variants={itemVariants}
           className="flex items-center justify-center gap-2 mb-4 [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-black/40 backdrop-blur-sm border border">
-            <span className="text-text-secondary text-sm font-medium">Backed by</span>
+          <Link
+            href="/pitch"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-black/40 backdrop-blur-sm border border hover:bg-black/60 transition-colors cursor-pointer"
+          >
+            <span className="text-text-secondary text-sm font-medium">
+              Backed by
+            </span>
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 bg-gradient-to-br from-[#FF6154] to-[#FF8C00] rounded flex items-center justify-center">
                 <span className="text-white text-xs font-bold">U</span>
               </div>
               <span className="text-white text-sm font-medium">sers</span>
             </div>
-          </div>
+          </Link>
         </motion.div>
         <motion.h1
           variants={itemVariants}
