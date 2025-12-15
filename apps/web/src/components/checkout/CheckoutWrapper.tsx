@@ -1,15 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import CheckoutConfirmation from "./checkout-confirmation";
 
 export default function CheckoutWrapper() {
   const { isPaidUser, isLoading } = useSubscription();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, update } = useSession();
+  const paymentSuccess = searchParams.get("payment") === "success";
+  const [hasRefreshed, setHasRefreshed] = useState(false);
 
-  // Show loading state while checking subscription
+  useEffect(() => {
+    if (paymentSuccess && session && !hasRefreshed) {
+      update().then(() => {
+        setHasRefreshed(true);
+        router.refresh();
+      });
+    }
+  }, [paymentSuccess, session, update, hasRefreshed, router]);
+
   if (isLoading) {
     return (
       <div className="flex flex-col h-screen w-full justify-center items-center">
@@ -18,7 +31,6 @@ export default function CheckoutWrapper() {
     );
   }
 
-  // Redirect to pricing if not a paid user
   if (!isPaidUser) {
     router.push("/pricing");
     return (
@@ -28,6 +40,5 @@ export default function CheckoutWrapper() {
     );
   }
 
-  // Show checkout confirmation for paid users
   return <CheckoutConfirmation />;
 }

@@ -42,7 +42,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
   buttonText = "Invest",
   buttonClassName,
 }) => {
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus, update } = useSession();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const orderDataRef = useRef<{
@@ -71,8 +71,10 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           planId: planId,
         });
 
-        // Show success and redirect
-        router.push("/checkout");
+        await update();
+
+        router.push("/checkout?payment=success");
+        router.refresh();
       } catch (error) {
         console.error("Verification failed:", error);
         alert("Payment verification failed. Please contact support.");

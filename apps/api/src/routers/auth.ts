@@ -68,7 +68,51 @@ export const authRouter = router({
     }),
   getSession: protectedProcedure.query(
     async ({ ctx }: { ctx: { user: any } }) => {
-      return authService.getSession(ctx.user);
+      const userId = ctx.user.id;
+      const user = await ctx.db.prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          subscriptions: {
+            where: {
+              status: "active",
+              endDate: {
+                gte: new Date(),
+              },
+            },
+            orderBy: {
+              startDate: "desc",
+            },
+            take: 1,
+            include: {
+              plan: true,
+            },
+          },
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const activeSubscription = user.subscriptions[0] || null;
+
+      return authService.getSession({
+        ...user,
+        isPaidUser: !!activeSubscription,
+        subscription: activeSubscription
+          ? {
+              id: activeSubscription.id,
+              status: activeSubscription.status,
+              startDate: activeSubscription.startDate,
+              endDate: activeSubscription.endDate,
+              planId: activeSubscription.planId,
+              planName: activeSubscription.plan?.name,
+            }
+          : null,
+      });
     }
   ),
   generateJWT: publicProcedure
