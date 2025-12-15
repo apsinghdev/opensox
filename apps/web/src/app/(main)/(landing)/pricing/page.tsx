@@ -6,10 +6,11 @@ import { motion } from "framer-motion";
 import { Check, CornerDownRight, Target, Terminal } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import PrimaryButton from "@/components/ui/custom-button";
 import PaymentFlow from "@/components/payment/PaymentFlow";
 import { ActiveTag } from "@/components/ui/ActiveTag";
+import { usePathname } from "next/navigation";
 const opensoxFeatures = [
   {
     id: 1,
@@ -66,7 +67,7 @@ const whySub = [
   },
   {
     content:
-      "This offer is only available for the first 1000 (20 slots booked) users",
+      "This offer is only available for the first 1000 (64 slots booked) users",
   },
   {
     content:
@@ -109,6 +110,28 @@ const premiumPlanCard = {
 };
 
 const Pricing = () => {
+  const pathname = usePathname();
+  const callbackUrl = `${pathname}#pro-price-card`;
+
+  useEffect(() => {
+    if (window.location.hash === "#pro-price-card") {
+      const element = document.getElementById("pro-price-card");
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+    if (window.location.hash === "#testimonials") {
+      const element = document.getElementById("testimonials");
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+  }, []);
+
   return (
     <>
       <main className="w-full  overflow-hidden flex flex-col items-center justify-center relative">
@@ -247,7 +270,7 @@ const Pricing = () => {
               </div>
               <div className="flex flex-col lg:flex-row items-stretch justify-center gap-6">
                 <PricingCard />
-                <SecondaryPricingCard />
+                <SecondaryPricingCard callbackUrl={callbackUrl} />
               </div>
             </div>
           </div>
@@ -347,7 +370,7 @@ const PricingCard = () => {
   );
 };
 
-const SecondaryPricingCard = () => {
+const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
   const premiumPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
   const planIdOk =
     typeof premiumPlanId === "string" && premiumPlanId.length > 0;
@@ -375,7 +398,10 @@ const SecondaryPricingCard = () => {
               </div>
             </div>
 
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4">
+            <div
+              id="pro-price-card"
+              className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4"
+            >
               <div className="flex items-center gap-4 flex-wrap">
                 <h2 className="text-6xl lg:text-[90px] lg:leading-[82px] tracking-tight font-semibold">
                   $49{" "}
@@ -386,9 +412,9 @@ const SecondaryPricingCard = () => {
                 </h2>
               </div>
               <div className="flex items-center gap-3 mt-3 flex-wrap">
-                <p className="text-lg text-white-400">(~ ₹4,351 INR)</p>
+                <p className="text-lg text-white-400">(~ ₹4,410 INR)</p>
                 <span className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-full text-green-400 text-sm font-medium">
-                  Discounted till 10 December
+                  Discounted till 30 December
                 </span>
               </div>
             </div>
@@ -401,7 +427,16 @@ const SecondaryPricingCard = () => {
                 buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${
                   planIdOk ? "" : "opacity-60 cursor-not-allowed"
                 }`}
+                callbackUrl={callbackUrl}
               />
+              <div className="flex justify-center mt-3">
+                <Link
+                  href="/pitch"
+                  className="text-sm text-text-tertiary hover:text-brand-purple-light transition-colors lowercase"
+                >
+                  still not sure? read my pitch to you.
+                </Link>
+              </div>
             </div>
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4 flex-1">
               <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">
@@ -552,7 +587,7 @@ const TestimonialsSection = () => {
   };
 
   return (
-    <div className=" text-white ">
+    <div className=" text-white " id="testimonials">
       <Header title="What our Pro customers say about us" />
       <div className="border-b  border-[#252525] w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
         <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">

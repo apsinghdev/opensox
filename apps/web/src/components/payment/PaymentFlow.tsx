@@ -14,6 +14,7 @@ interface PaymentFlowProps {
   description?: string;
   buttonText?: string;
   buttonClassName?: string;
+  callbackUrl?: string;
 }
 
 /**
@@ -41,6 +42,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
   description = "Payment",
   buttonText = "Invest",
   buttonClassName,
+  callbackUrl,
 }) => {
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
@@ -50,6 +52,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     amount: number; // Stored for display purposes only
   } | null>(null);
 
+  const utils = trpc.useUtils();
   const createOrderMutation = (trpc.payment as any).createOrder.useMutation();
   const verifyPaymentMutation = (
     trpc.payment as any
@@ -71,7 +74,26 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           planId: planId,
         });
 
-        // Show success and redirect
+        // payment verification succeeded - proceed with redirect
+        // subscription cache refresh is decoupled as best-effort background action
+        // errors in refresh won't affect the successful payment verification
+        (async () => {
+          try {
+            await (utils.user as any).subscriptionStatus.invalidate();
+            await Promise.race([
+              (utils.user as any).subscriptionStatus.fetch(undefined),
+              new Promise((resolve) => setTimeout(resolve, 3000)), // 3s timeout
+            ]);
+          } catch (refreshError) {
+            console.warn(
+              "subscription cache refresh failed (non-fatal):",
+              refreshError
+            );
+          }
+        })();
+
+        // redirect immediately after successful verification
+        // checkout page will refetch subscription status if cache refresh failed
         router.push("/checkout");
       } catch (error) {
         console.error("Verification failed:", error);
@@ -101,7 +123,8 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       }
 
       if (sessionStatus === "unauthenticated" || !session) {
-        router.push("/login?callbackUrl=/pricing");
+        const redirectUrl = callbackUrl || "/pricing";
+        router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
         return;
       }
 
@@ -152,7 +175,8 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     } catch (error: any) {
       console.warn("Failed to create order:", error);
       setIsProcessing(false);
-      router.push("/login?callbackUrl=/pricing");
+      const redirectUrl = callbackUrl || "/pricing";
+      router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
     }
   };
 

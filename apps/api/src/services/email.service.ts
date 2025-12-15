@@ -117,7 +117,7 @@ export const emailService = {
         </p>
         
         <div style="margin: 30px 0; text-align: center;">
-          <a href="https://cal.com/ajeetunc/secret" 
+          <a href="https://cal.com/ajeetunc/opensox" 
              style="background-color: #007bff; color: white; padding: 14px 32px; 
                     text-decoration: none; border-radius: 6px; display: inline-block; 
                     font-weight: 600; font-size: 16px;">
@@ -126,7 +126,7 @@ export const emailService = {
         </div>
         
         <p style="color: #333; line-height: 1.8; font-size: 16px;">
-          <strong>Cal:</strong> <a href="https://cal.com/ajeetunc/secret" style="color: #007bff;">https://cal.com/ajeetunc/secret</a>
+          <strong>Cal:</strong> <a href="https://cal.com/ajeetunc/opensox" style="color: #007bff;">https://cal.com/ajeetunc/opensox</a>
         </p>
         
         <p style="color: #333; line-height: 1.8; font-size: 16px; margin-top: 30px;">
@@ -150,7 +150,7 @@ Let's have a chat over a meeting so that I can understand where you are currentl
 
 Again, thank you :)
 
-Cal: https://cal.com/ajeetunc/secret
+Cal: https://cal.com/ajeetunc/opensox
 
 Best,
 Ajeet from Opensox.ai`;

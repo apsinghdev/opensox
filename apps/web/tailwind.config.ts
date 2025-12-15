@@ -72,6 +72,13 @@ const config: Config = {
         warning: colors.status.warning,
         info: colors.status.info,
 
+        // External brand colors
+        github: {
+          bg: colors.external.github.bg,
+          hover: colors.external.github.hover,
+          border: colors.external.github.border,
+        },
+
         // Legacy ox-* colors (for gradual migration) - will be deprecated
         "ox-purple": colors.brand.purple.DEFAULT,
         "ox-purple-2": colors.brand.purple.dark,
