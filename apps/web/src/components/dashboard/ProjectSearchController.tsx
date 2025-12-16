@@ -52,7 +52,7 @@ export default function ProjectsSearchController() {
     }, 600);
 
     return () => clearTimeout(t);
-  }, [input]);
+  }, [input, setData, setLoading, setProjectsNotFound, getProjects]);
   return (
     <div className="relative">
       <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
