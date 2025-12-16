@@ -121,6 +121,7 @@ export default function ProjectsContainer({
                         <Image
                           src={p.avatarUrl}
                           className="w-full h-full object-cover"
+                          unoptimized
                           alt={p.name}
                           width={24}
                           height={24}
