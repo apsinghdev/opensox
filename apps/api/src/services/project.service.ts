@@ -23,9 +23,14 @@ export const projectService = {
    */
   async fetchGithubProjects(
     filters: Partial<FilterProps> = {},
-    options: Partial<OptionsTypesProps> = {}
+    options: Partial<OptionsTypesProps> = {},
+    search?: string
   ): Promise<RepositoryProps[]> {
     const queryParts: string[] = [];
+
+    if (search) {
+      queryParts.push(`${search} in:name,description`);
+    }
 
     if (filters.language) {
       queryParts.push(`language:${filters.language}`);
@@ -53,6 +58,7 @@ export const projectService = {
     queryParts.push(`fork:true`);
 
     const searchQueryString = queryParts.join(" ");
+    // console.log(searchQueryString);
 
     const response: GraphQLResponseProps = await graphqlWithAuth(
       `
@@ -88,7 +94,7 @@ export const projectService = {
         first: options.per_page || 100,
       }
     );
-
+    // console.log(response.search.nodes);
     return response.search.nodes;
   },
 };

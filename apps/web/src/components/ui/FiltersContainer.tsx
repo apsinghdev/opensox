@@ -40,7 +40,7 @@ export default function FiltersContainer() {
       setLoading(true);
       router.push("/dashboard/projects");
       const modifiedFilters = convertUserInputToApiInput(filters);
-      const response = await getProjects(modifiedFilters);
+      const response = await getProjects( {filters: modifiedFilters});
       const projects = response;
       if (!projects) {
         setProjectsNotFound(true);
