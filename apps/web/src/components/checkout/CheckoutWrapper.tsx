@@ -1,13 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import CheckoutConfirmation from "./checkout-confirmation";
 
 export default function CheckoutWrapper() {
   const { isPaidUser, isLoading } = useSubscription();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, update } = useSession();
+  const paymentSuccess = searchParams.get("payment") === "success";
+  const [hasRefreshed, setHasRefreshed] = useState(false);
+
+  useEffect(() => {
+    if (paymentSuccess && session && !hasRefreshed) {
+      update().then(() => {
+        setHasRefreshed(true);
+        router.refresh();
+      });
+    }
+  }, [paymentSuccess, session, update, hasRefreshed, router]);
 
   // Show loading state while checking subscription
   if (isLoading) {

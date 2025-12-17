@@ -111,7 +111,6 @@ app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
 
     const token = authHeader.substring(7);
 
-    // Verify token and get user
     let user;
     try {
       user = await verifyToken(token);
@@ -119,18 +118,7 @@ app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Unauthorized - Invalid token" });
     }
 
-    // Check if user has an active subscription
-    const subscription = await prismaModule.prisma.subscription.findFirst({
-      where: {
-        userId: user.id,
-        status: SUBSCRIPTION_STATUS.ACTIVE,
-        endDate: {
-          gte: new Date(),
-        },
-      },
-    });
-
-    if (!subscription) {
+    if (!user.isPaidUser || !user.subscription) {
       return res.status(403).json({
         error: "Forbidden - Active subscription required to join community",
       });

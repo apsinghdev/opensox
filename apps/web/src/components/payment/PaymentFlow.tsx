@@ -44,7 +44,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
   buttonClassName,
   callbackUrl,
 }) => {
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus, update } = useSession();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const orderDataRef = useRef<{
@@ -52,7 +52,6 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     amount: number; // Stored for display purposes only
   } | null>(null);
 
-  const utils = trpc.useUtils();
   const createOrderMutation = (trpc.payment as any).createOrder.useMutation();
   const verifyPaymentMutation = (
     trpc.payment as any
@@ -74,27 +73,10 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           planId: planId,
         });
 
-        // payment verification succeeded - proceed with redirect
-        // subscription cache refresh is decoupled as best-effort background action
-        // errors in refresh won't affect the successful payment verification
-        (async () => {
-          try {
-            await (utils.user as any).subscriptionStatus.invalidate();
-            await Promise.race([
-              (utils.user as any).subscriptionStatus.fetch(undefined),
-              new Promise((resolve) => setTimeout(resolve, 3000)), // 3s timeout
-            ]);
-          } catch (refreshError) {
-            console.warn(
-              "subscription cache refresh failed (non-fatal):",
-              refreshError
-            );
-          }
-        })();
+        await update();
 
-        // redirect immediately after successful verification
-        // checkout page will refetch subscription status if cache refresh failed
-        router.push("/checkout");
+        router.push("/checkout?payment=success");
+        router.refresh();
       } catch (error) {
         console.error("Verification failed:", error);
         alert("Payment verification failed. Please contact support.");

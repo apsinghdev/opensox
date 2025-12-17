@@ -1,5 +1,6 @@
 import { generateToken } from "../utils/auth.js";
 import type { PrismaClient } from "@prisma/client";
+import { SUBSCRIPTION_STATUS } from "../constants/subscription.js";
 
 interface GoogleAuthInput {
   email: string;
@@ -39,20 +40,49 @@ export const authService = {
         authMethod: authMethod || "google",
         lastLogin: new Date(),
       },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        authMethod: true,
-        createdAt: true,
-        lastLogin: true,
+      include: {
+        subscriptions: {
+          where: {
+            status: SUBSCRIPTION_STATUS.ACTIVE,
+            endDate: {
+              gte: new Date(),
+            },
+          },
+          orderBy: {
+            startDate: "desc",
+          },
+          take: 1,
+          include: {
+            plan: true,
+          },
+        },
       },
     });
 
+    const activeSubscription = user.subscriptions[0] || null;
     const token = generateToken(email);
 
     return {
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        authMethod: user.authMethod,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        completedSteps: user.completedSteps,
+        isPaidUser: !!activeSubscription,
+        subscription: activeSubscription
+          ? {
+              id: activeSubscription.id,
+              status: activeSubscription.status,
+              startDate: activeSubscription.startDate,
+              endDate: activeSubscription.endDate,
+              planId: activeSubscription.planId,
+              planName: activeSubscription.plan?.name,
+            }
+          : null,
+      },
       token,
     };
   },
@@ -197,12 +227,19 @@ export const authService = {
     });
   },
 
-  /**
-   * Get user session information
-   */
   getSession(user: any) {
     return {
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        authMethod: user.authMethod,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        completedSteps: user.completedSteps,
+        isPaidUser: user.isPaidUser || false,
+        subscription: user.subscription || null,
+      },
     };
   },
 };

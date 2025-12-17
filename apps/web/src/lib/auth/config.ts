@@ -2,6 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { serverTrpc } from "../trpc-server";
+import { createAuthenticatedClient } from "../trpc-server";
 
 export const authConfig: NextAuthOptions = {
   providers: [
@@ -17,6 +18,21 @@ export const authConfig: NextAuthOptions = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === "production" ? "__Secure-" : ""}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   callbacks: {
     async signIn({ user, profile, account }) {
       try {
@@ -41,14 +57,22 @@ export const authConfig: NextAuthOptions = {
     },
 
     async session({ session, token }) {
+      const isPaidUser = (token.isPaidUser as boolean) || false;
+      const subscription = (token.subscription as any) || null;
+
       return {
         ...session,
-        accessToken: token.jwtToken,
+        accessToken: token.jwtToken as string,
         expires: session.expires,
+        user: {
+          ...session.user,
+          isPaidUser,
+          subscription,
+        },
       };
     },
 
-    async jwt({ token, account, user }) {
+    async jwt({ token, account, user, trigger }) {
       if (account && user) {
         try {
           const data = await serverTrpc.auth.generateJWT.mutate({
@@ -60,6 +84,34 @@ export const authConfig: NextAuthOptions = {
           console.error("JWT token error:", error);
         }
       }
+
+      if (token.jwtToken) {
+        const shouldRefresh =
+          trigger === "update" ||
+          trigger === "signIn" ||
+          !token.isPaidUser ||
+          token.isPaidUser === undefined;
+
+        if (shouldRefresh) {
+          try {
+            const tempSession = {
+              accessToken: token.jwtToken as string,
+              user: { email: user?.email || token.email },
+            } as any;
+
+            const trpc = createAuthenticatedClient(tempSession);
+            const sessionData = await (trpc.auth as any).getSession.query();
+
+            if (sessionData?.user) {
+              token.isPaidUser = sessionData.user.isPaidUser || false;
+              token.subscription = sessionData.user.subscription || null;
+            }
+          } catch (error) {
+            console.error("Session refresh error:", error);
+          }
+        }
+      }
+
       return token;
     },
   },

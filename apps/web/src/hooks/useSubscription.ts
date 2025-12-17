@@ -27,10 +27,10 @@ export function useSubscription() {
     isFetched,
   } = (trpc.user as any).subscriptionStatus.useQuery(undefined, {
     enabled: !!session?.user && status === "authenticated",
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {
