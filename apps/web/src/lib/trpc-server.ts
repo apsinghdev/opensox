@@ -10,7 +10,7 @@ export const serverTrpc = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
       transformer: superjson,
-      url: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/trpc`,
+      url: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/trpc`,
       headers() {
         return {};
       },
@@ -26,7 +26,7 @@ export function createAuthenticatedClient(session: Session) {
     links: [
       httpBatchLink({
         transformer: superjson,
-        url: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/trpc`,
+        url: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/trpc`,
         headers() {
           const token = session.accessToken;
           if (token) {

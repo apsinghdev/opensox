@@ -23,7 +23,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 
   // Recreate client when session changes to ensure we get the latest token
   const trpcClient = useMemo(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     const trpcUrl = baseUrl.endsWith("/trpc") ? baseUrl : `${baseUrl}/trpc`;
 
     return trpc.createClient({

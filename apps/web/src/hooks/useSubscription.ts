@@ -19,18 +19,21 @@ export function useSubscription() {
     isLoading,
   } = useSubscriptionStore();
 
+  const utils = trpc.useUtils();
+
   // Fetch subscription status using tRPC
   const {
     data,
     isLoading: isFetching,
     isError,
     isFetched,
+    refetch,
   } = (trpc.user as any).subscriptionStatus.useQuery(undefined, {
     enabled: !!session?.user && status === "authenticated",
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true, // refetch when user returns to tab
     refetchOnMount: true,
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    staleTime: 2 * 60 * 1000, // consider data fresh for 2 minutes (reduced from 5)
+    gcTime: 10 * 60 * 1000, // keep in cache for 10 minutes
   });
 
   useEffect(() => {
@@ -69,9 +72,16 @@ export function useSubscription() {
     reset,
   ]);
 
+  // manual refetch function for immediate cache invalidation
+  const refetchSubscription = async () => {
+    await (utils.user as any).subscriptionStatus.invalidate();
+    await refetch();
+  };
+
   return {
     isPaidUser,
     subscription,
     isLoading,
+    refetchSubscription, // expose manual refetch function
   };
 }

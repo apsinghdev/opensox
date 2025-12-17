@@ -6,7 +6,7 @@ import { useRazorpay } from "@/hooks/useRazorpay";
 import type { RazorpayOptions } from "@/lib/razorpay";
 import PrimaryButton from "@/components/ui/custom-button";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface PaymentFlowProps {
   planId: string; // Required: Plan ID from database
@@ -46,6 +46,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
 }) => {
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [isProcessing, setIsProcessing] = useState(false);
   const orderDataRef = useRef<{
     orderId: string;
@@ -85,6 +86,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
               new Promise((resolve) => setTimeout(resolve, 3000)), // 3s timeout
             ]);
           } catch (refreshError) {
+            // log refresh errors separately without affecting payment flow
             console.warn(
               "subscription cache refresh failed (non-fatal):",
               refreshError
@@ -123,8 +125,13 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       }
 
       if (sessionStatus === "unauthenticated" || !session) {
-        const redirectUrl = callbackUrl || "/pricing";
-        router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
+        router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+        return;
+      }
+
+      // check if session has accessToken - if not, re-authenticate
+      if (!session.accessToken) {
+        router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
         return;
       }
 
@@ -173,10 +180,26 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
       await initiatePayment(options);
     } catch (error: any) {
-      console.warn("Failed to create order:", error);
+      console.error("Failed to create order:", error);
       setIsProcessing(false);
-      const redirectUrl = callbackUrl || "/pricing";
-      router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
+
+      // only redirect to login for authentication errors
+      const errorMsg = error?.message?.toLowerCase() || "";
+      const isAuthError =
+        error?.data?.code === "UNAUTHORIZED" ||
+        errorMsg.includes("unauthorized") ||
+        errorMsg.includes("not authenticated") ||
+        errorMsg.includes("authentication failed") ||
+        errorMsg.includes("missing or invalid authorization");
+
+      if (isAuthError) {
+        router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+      } else {
+        // show error message for non-auth errors
+        const errorMessage =
+          error?.message || "Failed to process payment. Please try again.";
+        alert(errorMessage);
+      }
     }
   };
 
