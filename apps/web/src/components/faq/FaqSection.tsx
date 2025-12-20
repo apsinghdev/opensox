@@ -49,9 +49,11 @@ export function FaqSection() {
                 <AccordionTrigger className="px-6 py-4 text-left text-base lg:text-lg font-medium hover:bg-[#252525]/30 transition-colors [&[data-state=open]]:bg-[#252525]/50">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="px-6 pb-4 text-[#d1d1d1] text-sm lg:text-base leading-relaxed">
-                  {faq.answer}
-                </AccordionContent>
+               
+                <AccordionContent className="p-3 sm:p-4 lg:p-6 text-[#d1d1d1] text-sm lg:text-base leading-relaxed">
+  {faq.answer}
+</AccordionContent>
+
               </AccordionItem>
             ))}
           </Accordion>
