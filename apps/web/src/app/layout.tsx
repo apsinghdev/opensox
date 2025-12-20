@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "./theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { PostHogProvider } from "./providers";
+import { PostHogProvider, PostHogAuthTracker } from "./providers";
 import { getServerSession } from "next-auth/next";
 import { authConfig } from "@/lib/auth/config";
 import { SessionWrapper } from "./SessionWrapper";
@@ -120,6 +120,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <SessionWrapper session={session}>
+              <PostHogAuthTracker />
               <TRPCProvider>{children}</TRPCProvider>
             </SessionWrapper>
           </ThemeProvider>

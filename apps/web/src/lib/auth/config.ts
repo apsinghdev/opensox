@@ -20,7 +20,7 @@ export const authConfig: NextAuthOptions = {
   callbacks: {
     async signIn({ user, profile, account }) {
       try {
-        await serverTrpc.auth.googleAuth.mutate({
+        const authResult = await serverTrpc.auth.googleAuth.mutate({
           email: user.email!,
           firstName: user.name ?? (profile as any)?.name,
           authMethod: account?.provider ?? "google",
@@ -33,6 +33,11 @@ export const authConfig: NextAuthOptions = {
           scope: account?.scope,
         });
 
+        // Store createdAt in user object for JWT callback
+        if (authResult?.user?.createdAt) {
+          (user as any).createdAt = authResult.user.createdAt;
+        }
+
         return true;
       } catch (error) {
         console.error("Sign-in error:", error);
@@ -41,6 +46,11 @@ export const authConfig: NextAuthOptions = {
     },
 
     async session({ session, token }) {
+      // Add createdAt from token to session
+      if (token.createdAt && session.user) {
+        session.user.createdAt = token.createdAt as string;
+      }
+
       return {
         ...session,
         accessToken: token.jwtToken,
@@ -56,6 +66,11 @@ export const authConfig: NextAuthOptions = {
           });
 
           token.jwtToken = data.token;
+
+          // Store createdAt in token if available
+          if ((user as any).createdAt) {
+            token.createdAt = new Date((user as any).createdAt).toISOString();
+          }
         } catch (error) {
           console.error("JWT token error:", error);
         }

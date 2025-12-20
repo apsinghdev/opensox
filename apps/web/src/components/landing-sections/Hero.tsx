@@ -5,8 +5,10 @@ import React from "react";
 import PrimaryButtom from "../ui/custom-button";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Hero = () => {
+  const { trackButtonClick } = useAnalytics();
   // Container variants for staggered children animation
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -32,6 +34,9 @@ const Hero = () => {
     },
   };
 
+  const handleGetStartedClick = () => {
+    trackButtonClick("Get Started", "hero");
+  };
   return (
     <div className="w-full min-h-[50dvh] lg:h-[69dvh] relative overflow-hidden z-10 p-4 lg:p-[60px] flex flex-col items-center justify-center gap-6 ">
       <Image
@@ -51,21 +56,26 @@ const Hero = () => {
           variants={itemVariants}
           className="flex items-center justify-center gap-2 mb-4 [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-black/40 backdrop-blur-sm border border">
-            <span className="text-text-secondary text-sm font-medium">Backed by</span>
+          <Link
+            href="/pitch"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-black/40 backdrop-blur-sm border border hover:bg-black/60 transition-colors cursor-pointer"
+          >
+            <span className="text-text-secondary text-sm font-medium">
+              Backed by
+            </span>
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 bg-gradient-to-br from-[#FF6154] to-[#FF8C00] rounded flex items-center justify-center">
                 <span className="text-white text-xs font-bold">U</span>
               </div>
               <span className="text-white text-sm font-medium">sers</span>
             </div>
-          </div>
+          </Link>
         </motion.div>
         <motion.h1
           variants={itemVariants}
           className="text-5xl text-[2.8rem] lg:text-7xl lg:text-[6rem] font-medium tracking-tighter [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
-          Find your perfect Open-Source Repo
+          Only platform you need to get into Open Source
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
@@ -78,8 +88,8 @@ const Hero = () => {
           }}
           className="w-full lg:text-2xl tracking-tight font-light sm:max-w-lg mx-auto lg:max-w-4xl lg:text-balance text-text-secondary"
         >
-          Find top open-source repos in seconds. Filter by your language,
-          framework, or niche. Start contributing in seconds, not hours.
+          Find suitabe OSS repos in seconds. learn the basics,
+          get the mentorship for OSS opportunities, GSoC, etc, and start making progress from today itself.
         </motion.p>
       </motion.div>
       <motion.div
@@ -92,7 +102,11 @@ const Hero = () => {
         }}
         className="cursor-pointer z-30 [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
       >
-        <Link href="/dashboard/home" className="block">
+        <Link
+          href="/dashboard/home"
+          className="block"
+          onClick={handleGetStartedClick}
+        >
           <PrimaryButtom>
             <Terminal />
             Get Started

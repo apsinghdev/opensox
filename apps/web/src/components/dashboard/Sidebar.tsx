@@ -11,6 +11,7 @@ import {
   HomeIcon,
   FolderIcon,
   ArrowRightOnRectangleIcon,
+  ArrowLeftOnRectangleIcon,
   SparklesIcon,
   StarIcon,
   DocumentTextIcon,
@@ -19,7 +20,7 @@ import {
   Squares2X2Icon,
   ChevronDownIcon,
   LockClosedIcon,
-  AcademicCapIcon
+  AcademicCapIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -27,6 +28,7 @@ import { ProfilePic } from "./ProfilePic";
 import { useSubscription } from "@/hooks/useSubscription";
 import { OpensoxProBadge } from "../sheet/OpensoxProBadge";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 type RouteConfig = {
   path: string;
@@ -81,6 +83,7 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
   const pathname = usePathname();
   const { isPaidUser } = useSubscription();
   const [proSectionExpanded, setProSectionExpanded] = useState(true);
+  const { trackLinkClick, trackButtonClick } = useAnalytics();
 
   // auto-expand pro section if user is on a premium route
   useEffect(() => {
@@ -95,6 +98,13 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
   }, [pathname, isPaidUser]);
 
   const reqFeatureHandler = () => {
+    // Track feature request click
+    trackLinkClick(
+      "https://github.com/apsinghdev/opensox/issues",
+      "Request a feature",
+      "sidebar",
+      true
+    );
     window.open("https://github.com/apsinghdev/opensox/issues", "_blank");
   };
 
@@ -102,6 +112,8 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
     if (isPaidUser) {
       setProSectionExpanded(!proSectionExpanded);
     } else {
+      // Track upgrade button click for free users
+      trackButtonClick("Opensox Pro", "sidebar");
       router.push("/pricing");
     }
   };
@@ -165,7 +177,14 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
           const isActive =
             pathname === route.path || pathname.startsWith(`${route.path}/`);
           return (
-            <Link href={route.path} key={route.path}>
+            <Link
+              href={route.path}
+              key={route.path}
+              onClick={() => {
+                // Track navigation link click
+                trackLinkClick(route.path, route.label, "sidebar", false);
+              }}
+            >
               <div
                 className={`w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 pl-3 group ${
                   isActive
@@ -296,7 +315,19 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
                     pathname === route.path ||
                     pathname.startsWith(`${route.path}/`);
                   return (
-                    <Link href={route.path} key={route.path}>
+                    <Link
+                      href={route.path}
+                      key={route.path}
+                      onClick={() => {
+                        // Track premium navigation link click
+                        trackLinkClick(
+                          route.path,
+                          route.label,
+                          "sidebar",
+                          false
+                        );
+                      }}
+                    >
                       <div
                         className={`w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 group ${
                           isActive
@@ -348,7 +379,11 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
                 {PREMIUM_ROUTES.map((route) => (
                   <div
                     key={route.path}
-                    onClick={() => router.push("/pricing")}
+                    onClick={() => {
+                      // Track locked premium feature click
+                      trackButtonClick(`${route.label} (Locked)`, "sidebar");
+                      router.push("/pricing");
+                    }}
                     className="w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 opacity-50 hover:opacity-75 group"
                     role="button"
                     tabIndex={0}
@@ -356,6 +391,7 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
+                        trackButtonClick(`${route.label} (Locked)`, "sidebar");
                         router.push("/pricing");
                       }
                     }}
@@ -426,7 +462,9 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
   const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const { trackButtonClick, trackLinkClick } = useAnalytics();
 
+  const isLoggedIn = !!session;
   const fullName = session?.user?.name || "User";
   const firstName = fullName.split(" ")[0];
   const userEmail = session?.user?.email || "";
@@ -461,9 +499,11 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
           <div className="flex-1 flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs text-text-secondary font-semibold">
-                {firstName}
+                {isLoggedIn ? firstName : "Guest"}
               </span>
-              <span className="text-[10px] text-text-muted">{userEmail}</span>
+              <span className="text-[10px] text-text-muted">
+                {isLoggedIn ? userEmail : "Not signed in"}
+              </span>
             </div>
             <ChevronLeftIcon
               className={`size-4 text-text-muted transition-transform ${open ? "rotate-90" : "-rotate-90"}`}
@@ -488,35 +528,63 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
                 <ProfilePic imageUrl={userImage} />
                 <div className="flex flex-col">
                   <span className="text-sm text-text-primary font-semibold">
-                    {fullName}
+                    {isLoggedIn ? fullName : "Guest"}
                   </span>
-                  <span className="text-xs text-text-muted">{userEmail}</span>
+                  <span className="text-xs text-text-muted">
+                    {isLoggedIn ? userEmail : "Not signed in"}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Menu Items */}
             <div className="py-1">
-              <button
-                onClick={() => {
-                  router.push("/dashboard/account");
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
-              >
-                <Cog6ToothIcon className="size-4" />
-                <span>Account Settings</span>
-              </button>
-              <button
-                onClick={() => {
-                  signOut({ callbackUrl: "/" });
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-surface transition-colors"
-              >
-                <ArrowRightOnRectangleIcon className="size-4" />
-                <span>Logout</span>
-              </button>
+              {isLoggedIn && (
+                <button
+                  onClick={() => {
+                    // Track account settings click
+                    trackLinkClick(
+                      "/dashboard/account",
+                      "Account Settings",
+                      "sidebar",
+                      false
+                    );
+                    router.push("/dashboard/account");
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
+                >
+                  <Cog6ToothIcon className="size-4" />
+                  <span>Account Settings</span>
+                </button>
+              )}
+              {isLoggedIn ? (
+                <button
+                  onClick={() => {
+                    // Track logout click
+                    trackButtonClick("Logout", "sidebar");
+                    signOut({ callbackUrl: "/" });
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
+                >
+                  <ArrowRightOnRectangleIcon className="size-4" />
+                  <span>Logout</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    // Track login click
+                    trackButtonClick("Login", "sidebar");
+                    router.push("/login");
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-secondary hover:bg-dash-hover transition-colors"
+                >
+                  <ArrowLeftOnRectangleIcon className="size-4" />
+                  <span>Login</span>
+                </button>
+              )}
             </div>
           </motion.div>
         )}
