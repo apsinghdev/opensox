@@ -38,26 +38,26 @@ export function FaqSection() {
           className="w-[30px] lg:w-[50px] absolute right-0 top-0"
         />
 
+      
         <div className="max-w-4xl mx-auto">
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem 
-                value={`item-${index}`} 
-                key={index}
-                className="border border-[#252525] rounded-lg bg-[#151515]/20 backdrop-blur-xl overflow-hidden"
-              >
-                <AccordionTrigger className="px-6 py-4 text-left text-base lg:text-lg font-medium hover:bg-[#252525]/30 transition-colors [&[data-state=open]]:bg-[#252525]/50">
-                  {faq.question}
-                </AccordionTrigger>
-               
-                <AccordionContent className="p-3 sm:p-4 lg:p-6 text-[#d1d1d1] text-sm lg:text-base leading-relaxed">
-  {faq.answer}
-</AccordionContent>
-
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
+  <Accordion type="single" collapsible className="w-full space-y-4">
+    {faqs.map((faq, index) => (
+      <AccordionItem 
+        value={`item-${index}`} 
+        key={index}
+        className="border border-border rounded-lg bg-background/20 backdrop-blur-xl overflow-hidden"
+      >
+        <AccordionTrigger className="px-6 py-4 text-left text-base lg:text-lg font-medium hover:bg-background.hover transition-colors [&[data-state=open]]:bg-background.hover/50">
+          {faq.question}
+        </AccordionTrigger>
+       
+        <AccordionContent className="p-3 sm:p-4 lg:p-6 text-text.tertiary text-sm lg:text-base leading-relaxed">
+          {faq.answer}
+        </AccordionContent>
+      </AccordionItem>
+    ))}
+  </Accordion>
+</div>
       </div>
     </div>
   );
