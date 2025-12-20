@@ -7,6 +7,7 @@ import type { RazorpayOptions } from "@/lib/razorpay";
 import PrimaryButton from "@/components/ui/custom-button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface PaymentFlowProps {
   planId: string; // Required: Plan ID from database
@@ -14,6 +15,8 @@ interface PaymentFlowProps {
   description?: string;
   buttonText?: string;
   buttonClassName?: string;
+  callbackUrl?: string;
+  buttonLocation?: string; // Location for analytics tracking (e.g., "pricing_page", "pitch_page")
 }
 
 /**
@@ -41,6 +44,8 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
   description = "Payment",
   buttonText = "Invest",
   buttonClassName,
+  callbackUrl,
+  buttonLocation = "payment_flow", // Default location if not specified
 }) => {
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
@@ -50,10 +55,20 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     amount: number; // Stored for display purposes only
   } | null>(null);
 
+  const utils = trpc.useUtils();
   const createOrderMutation = (trpc.payment as any).createOrder.useMutation();
   const verifyPaymentMutation = (
     trpc.payment as any
   ).verifyPayment.useMutation();
+
+  // Analytics tracking
+  const {
+    trackInvestButtonClick,
+    trackPaymentInitiated,
+    trackPaymentCompleted,
+    trackPaymentFailed,
+    trackSubscriptionStarted,
+  } = useAnalytics();
 
   const { initiatePayment, isLoading, error } = useRazorpay({
     onSuccess: async (response) => {
@@ -71,16 +86,51 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           planId: planId,
         });
 
-        // Show success and redirect
+        // Track successful payment
+        trackPaymentCompleted(planId, response.razorpay_order_id);
+        trackSubscriptionStarted(planId);
+
+        // payment verification succeeded - proceed with redirect
+        // subscription cache refresh is decoupled as best-effort background action
+        // errors in refresh won't affect the successful payment verification
+        (async () => {
+          try {
+            await (utils.user as any).subscriptionStatus.invalidate();
+            await Promise.race([
+              (utils.user as any).subscriptionStatus.fetch(undefined),
+              new Promise((resolve) => setTimeout(resolve, 3000)), // 3s timeout
+            ]);
+          } catch (refreshError) {
+            console.warn(
+              "subscription cache refresh failed (non-fatal):",
+              refreshError
+            );
+          }
+        })();
+
+        // redirect immediately after successful verification
+        // checkout page will refetch subscription status if cache refresh failed
         router.push("/checkout");
       } catch (error) {
         console.error("Verification failed:", error);
+        // Track payment verification failure
+        trackPaymentFailed(
+          planId,
+          "verification_failed",
+          error instanceof Error ? error.message : "Unknown error"
+        );
         alert("Payment verification failed. Please contact support.");
         setIsProcessing(false);
       }
     },
     onFailure: (error) => {
       console.error("Payment failed:", error);
+      // Track payment failure
+      trackPaymentFailed(
+        planId,
+        "payment_failed",
+        error instanceof Error ? error.message : String(error)
+      );
       alert("Payment failed. Please try again.");
       setIsProcessing(false);
     },
@@ -90,6 +140,10 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
   });
 
   const handlePayment = async () => {
+    // Track invest button click immediately
+    const isAuthenticated = sessionStatus === "authenticated" && !!session;
+    trackInvestButtonClick(buttonLocation, isAuthenticated, planId);
+
     try {
       if (!planId || planId.trim().length === 0) {
         alert("Payment is currently unavailable. Please contact support.");
@@ -101,7 +155,8 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       }
 
       if (sessionStatus === "unauthenticated" || !session) {
-        router.push("/login?callbackUrl=/pricing");
+        const redirectUrl = callbackUrl || "/pricing";
+        router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
         return;
       }
 
@@ -125,6 +180,9 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
         orderId: order.id,
         amount: order.amount, // Amount from backend response
       };
+
+      // Track payment initiation
+      trackPaymentInitiated(planId, order.amount);
 
       // Immediately open Razorpay checkout with the order
       const options: Omit<RazorpayOptions, "handler" | "modal"> = {
@@ -151,8 +209,15 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       await initiatePayment(options);
     } catch (error: any) {
       console.warn("Failed to create order:", error);
+      // Track order creation failure
+      trackPaymentFailed(
+        planId,
+        "order_creation_failed",
+        error?.message || "Failed to create order"
+      );
       setIsProcessing(false);
-      router.push("/login?callbackUrl=/pricing");
+      const redirectUrl = callbackUrl || "/pricing";
+      router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
     }
   };
 
