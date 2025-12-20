@@ -132,10 +132,10 @@ const Navbar = () => {
             >
               {link.name}
             
-              {isActive && (
+            {isActive && (
   <motion.span
     layoutId="underline"
-    className="absolute left-0 right-0 bottom-0 mx-auto w-[55%] h-[2px] bg-[#7C3AED] rounded-full"
+    className="absolute left-0 right-0 bottom-0 mx-auto w-[55%] h-[2px] bg-brand-purple rounded-full"
     transition={{ type: "spring", stiffness: 300, damping: 25 }}
   />
 )}
