@@ -61,33 +61,47 @@ const Navbar = () => {
   
   ];
 
-  // 🌟 Scroll Spy effect to highlight active section
-  useEffect(() => {
-    const sectionIds = links
-      .filter((link) => link.href.startsWith("/#"))
-      .map((link) => link.href.replace("/#", ""));
+  
+// scroll spy to highlight active section
+useEffect(() => {
+  const sectionIds = links
+    .filter((link) => link.href.startsWith("/#"))
+    .map((link) => link.href.replace("/#", ""));
 
-    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
+  const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+    // Filter for intersecting sections
+    const visibleEntries = entries.filter(entry => entry.isIntersecting);
+    
+    if (visibleEntries.length > 0) {
+      // Find the section with highest visibility
+      let mostVisibleEntry = visibleEntries[0];
+      
+      for (const entry of visibleEntries) {
+        if (entry.intersectionRatio > mostVisibleEntry.intersectionRatio) {
+          mostVisibleEntry = entry;
         }
-      });
-    };
+      }
+      
+      // Update active section if target has an id
+      if (mostVisibleEntry.target.id) {
+        setActiveSection(mostVisibleEntry.target.id);
+      }
+    }
+  };
 
-    const observer = new IntersectionObserver(handleIntersect, {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.5,
-    });
+  const observer = new IntersectionObserver(handleIntersect, {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.5,
+  });
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+  sectionIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
 
-    return () => observer.disconnect();
-  }, [links]);
+  return () => observer.disconnect();
+}, [links]);
 
   return (
     <motion.nav
