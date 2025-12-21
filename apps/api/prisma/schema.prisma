@@ -102,3 +102,19 @@ model Plan {
   updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]
 }
+
+model Tutorial {
+  id             String   @id @default(cuid())
+  userId         String
+  repoUrl        String
+  projectName    String
+  language       String   @default("english")
+  indexContent   String   @db.Text
+  mermaidDiagram String   @db.Text
+  chapters       Json     // Array of {filename: string, content: string}
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([repoUrl])
+}

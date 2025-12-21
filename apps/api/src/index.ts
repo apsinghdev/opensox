@@ -62,8 +62,12 @@ const apiLimiter = rateLimit({
 
 // Request size limits (except for webhook - needs raw body)
 app.use("/webhook/razorpay", express.raw({ type: "application/json" }));
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ limit: "10kb", extended: true }));
+// Higher limit for tRPC (tutorial generation sends file content up to 3.0MB)
+app.use("/trpc", express.json({ limit: "5mb" }));
+app.use("/trpc", express.urlencoded({ limit: "5mb", extended: true }));
+// Default limit for other endpoints
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ limit: "100kb", extended: true }));
 
 // CORS configuration
 const corsOptions: CorsOptionsType = {
