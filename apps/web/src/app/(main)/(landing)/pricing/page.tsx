@@ -424,9 +424,8 @@ const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
                 planName="Opensox Pro"
                 description="Annual Subscription"
                 buttonText={planIdOk ? "Invest" : "Unavailable"}
-                buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${
-                  planIdOk ? "" : "opacity-60 cursor-not-allowed"
-                }`}
+                buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${planIdOk ? "" : "opacity-60 cursor-not-allowed"
+                  }`}
                 callbackUrl={callbackUrl}
                 buttonLocation="pricing_page"
               />

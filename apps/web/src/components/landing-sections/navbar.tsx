@@ -63,12 +63,7 @@ const Navbar = () => {
       initial={{ opacity: 0 }}
       animate={showNavbar ? { opacity: 1 } : { opacity: 0, display: "none" }}
       transition={{ duration: 0.3 }}
-      className={cn(
-        " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
-        isPricingPage
-          ? "relative h-max md:w-full top-0 border-b"
-          : "fixed rounded-3xl top-4 border w-[94%] md:w-[80%] mx-auto left-1/2 -translate-x-1/2"
-      )}
+      className="z-40 flex items-center justify-between px-4 py-3 bg-neutral-900/5 backdrop-blur-xl border-white/10 fixed rounded-3xl top-4 border w-[94%] md:w-[80%] mx-auto left-1/2 -translate-x-1/2"
     >
       <div className="flex items-center gap-3">
         <button

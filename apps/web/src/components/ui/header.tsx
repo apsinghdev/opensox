@@ -6,7 +6,7 @@ import { colors } from "@/lib/design-tokens";
 
 const Header = ({ title }: { title: string | React.ReactNode }) => {
   return (
-    <div className="px-[30px] py-10 h-[160px] relative overflow-hidden border-b border w-full">
+    <div className="px-[30px] mt-28 py-10 h-[160px] relative overflow-hidden border-b border w-full">
       <motion.h4
         initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
