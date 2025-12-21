@@ -6,6 +6,18 @@ thank you for your interest in contributing to opensox ai! 🎉
 
 please refer to our [readme.md](./readme.md) for detailed setup instructions on how to get the project running locally.
 
+### Windows quick setup
+
+If you're on Windows, there's a small helper script to automate common steps (install packages, create minimal `.env` files, run Prisma generate/migrate):
+
+Run from the repository root in PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1
+```
+
+The script will prompt for your Postgres `DATABASE_URL`, `JWT_SECRET`, and `NEXTAUTH_SECRET`, run `pnpm install --ignore-scripts`, generate the Prisma client, and optionally start the API and Web dev servers in new PowerShell windows.
+
 ## contribution guidelines
 
 1. **we love our contributors and love the contributions!**
