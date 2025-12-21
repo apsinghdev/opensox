@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: opensox
+      POSTGRES_PASSWORD: opensox
+      POSTGRES_DB: opensox
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://opensox:opensox@postgres:5432/opensox?schema=public
+      JWT_SECRET: jwts3cr3tk3y # Replace with a strong secret (e.g., run `openssl rand -base64 32` in terminal)
+      PORT: 4000
+      NODE_ENV: production
+      RAZORPAY_KEY_ID: dummy_key_id              # Add this
+      RAZORPAY_KEY_SECRET: dummy_key_secret
+      # Optional: Add if you need GitHub features
+      # GITHUB_PERSONAL_ACCESS_TOKEN: ghp_yourtokenhere
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
