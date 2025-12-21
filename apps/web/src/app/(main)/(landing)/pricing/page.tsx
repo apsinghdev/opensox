@@ -428,6 +428,7 @@ const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
                   planIdOk ? "" : "opacity-60 cursor-not-allowed"
                 }`}
                 callbackUrl={callbackUrl}
+                buttonLocation="pricing_page"
               />
               <div className="flex justify-center mt-3">
                 <Link

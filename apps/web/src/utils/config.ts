@@ -149,4 +149,18 @@ export const projectsOfTheWeek = [
     competition: "Very low",
     activity: "Highest",
   },
+  {
+    id: "11",
+    name: "Gsoc-Orgs",
+    description:
+      "Making GSOC journey easier. Helping select orgs, projects, tech-stack for GSOC to increase your chances of getting selected.",
+    url: "https://github.com/ketankauntia/gsoc-orgs",
+    avatarUrl: "https://avatars.githubusercontent.com/u/44080191?s=48&v=4",
+    totalIssueCount: 11,
+    primaryLanguage: "Typescript",
+    popularity: "Low",
+    stage: "Very early",
+    competition: "Very low",
+    activity: "Normal",
+  },
 ];

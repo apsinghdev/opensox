@@ -7,6 +7,7 @@ import { Terminal, Github, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Navbar = () => {
   const { scrollYProgress } = useScroll();
@@ -14,6 +15,20 @@ const Navbar = () => {
   const isPricingPage = pathname === "/pricing";
   const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
   const [isOpen, setIsOpen] = useState(false);
+  const { trackButtonClick, trackLinkClick } = useAnalytics();
+
+  const handleGetStartedClick = (location: "navbar" | "mobile_menu") => {
+    trackButtonClick("Get Started", location);
+  };
+
+  const handleContributeClick = (location: "navbar" | "mobile_menu") => {
+    trackLinkClick(
+      "https://github.com/apsinghdev/opensox",
+      "Contribute",
+      location,
+      true
+    );
+  };
 
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -98,12 +113,17 @@ const Navbar = () => {
           href="https://github.com/apsinghdev/opensox"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => handleContributeClick("navbar")}
           className="hidden min-[1115px]:flex items-center gap-2 px-4 py-2.5 bg-github-bg hover:bg-github-hover transition-colors rounded-lg border border-github-border text-white"
         >
           <Github className="w-5 h-5" />
           <span className="text-sm font-medium">Contribute</span>
         </Link>
-        <Link href="/dashboard/home" className="cursor-pointer z-30">
+        <Link
+          href="/dashboard/home"
+          className="cursor-pointer z-30"
+          onClick={() => handleGetStartedClick("navbar")}
+        >
           <PrimaryButton classname="px-3 py-2 text-sm whitespace-nowrap md:px-5 md:py-3 md:text-base">
             <Terminal className="w-4 h-4 md:w-5 md:h-5" />
             <span>Get Started</span>
@@ -131,7 +151,10 @@ const Navbar = () => {
             href="https://github.com/apsinghdev/opensox"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              handleContributeClick("mobile_menu");
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-github-bg hover:bg-github-hover rounded-lg border border-github-border text-white transition-colors"
           >
             <Github className="w-5 h-5" />
