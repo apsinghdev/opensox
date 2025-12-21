@@ -34,18 +34,17 @@ export const tutorialRouter = router({
     }),
 
   /**
-   * Check if a tutorial already exists for a repo URL
+   * Check if a tutorial already exists for a repo URL (shows all public tutorials)
    */
   checkExisting: publicProcedure
     .input(z.object({ repoUrl: z.string() }))
     .query(async ({ input, ctx }) => {
       // @ts-ignore
-      const userId = ctx.user?.id || "anonymous";
+      const currentUserId = ctx.user?.id || "anonymous";
 
       const tutorials = await prisma.tutorial.findMany({
         where: {
           repoUrl: input.repoUrl,
-          userId: userId,
         },
         orderBy: { createdAt: "desc" },
         select: {
@@ -53,12 +52,16 @@ export const tutorialRouter = router({
           projectName: true,
           language: true,
           createdAt: true,
+          userId: true, 
         },
       });
 
       return {
         exists: tutorials.length > 0,
-        tutorials,
+        tutorials: tutorials.map(t => ({
+          ...t,
+          isOwnTutorial: t.userId === currentUserId,
+        })),
       };
     }),
 

@@ -158,7 +158,9 @@ export default function TutorialGenerator({ onTutorialGenerated }: TutorialGener
             <FolderOpenIcon className="w-5 h-5 text-brand-purple mt-0.5" />
             <div className="flex-1">
               <h3 className="text-sm font-medium text-text-primary mb-2">
-                Existing tutorials found for this repository
+                {existingTutorials.some(t => t.isOwnTutorial) 
+                  ? "Existing tutorials found (including yours)" 
+                  : "Existing tutorials found from other users"}
               </h3>
               <div className="space-y-2 mb-4">
                 {existingTutorials.map((tutorial) => (
@@ -167,7 +169,14 @@ export default function TutorialGenerator({ onTutorialGenerated }: TutorialGener
                     className="flex items-center justify-between p-2 bg-dash-base rounded-md"
                   >
                     <div>
-                      <p className="text-sm text-text-primary">{tutorial.projectName}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-text-primary">{tutorial.projectName}</p>
+                        {tutorial.isOwnTutorial && (
+                          <span className="text-xs bg-brand-purple/20 text-brand-purple px-2 py-0.5 rounded">
+                            Your tutorial
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-text-tertiary">
                         {new Date(tutorial.createdAt).toLocaleDateString()} • {tutorial.language}
                       </p>
