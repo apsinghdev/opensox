@@ -1,15 +1,33 @@
 "use client";
-import Footer from "@/components/landing-sections/footer";
 import Header from "@/components/ui/header";
-import { ShineBorder } from "@/components/ui/shine-borders";
-import { motion } from "framer-motion";
 import { Check, CornerDownRight, Target, Terminal } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import PrimaryButton from "@/components/ui/custom-button";
-import PaymentFlow from "@/components/payment/PaymentFlow";
+import React, { useEffect } from "react";
 import { ActiveTag } from "@/components/ui/ActiveTag";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { ShineBorder } from "@/components/ui/shine-borders";
+import PrimaryButton from "@/components/ui/custom-button";
+import dynamic from "next/dynamic";
+
+const Footer = dynamic(
+  () =>
+    import("@/components/landing-sections/footer").then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
+
+// lazy load PaymentFlow - it's inside pricing card but can wait
+const PaymentFlow = dynamic(
+  () => import("@/components/payment/PaymentFlow").then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 const opensoxFeatures = [
   {
     id: 1,
@@ -66,11 +84,11 @@ const whySub = [
   },
   {
     content:
-      "This offer is only available for the first 1000 (20 slots booked) users",
+      "This offer is only available for the first 1000 (64 slots booked) users",
   },
   {
     content:
-      "After the launch, this $49 offer be removed and Opensox Pro will be around ~ $120 for whole year ($10/mo.)",
+      "After the launch, this $49 offer be removed and Opensox Pro will be around ~ $89 for whole year.",
   },
   {
     content: "The price of the dollar is constantly increasing.",
@@ -109,42 +127,126 @@ const premiumPlanCard = {
 };
 
 const Pricing = () => {
+  const pathname = usePathname();
+  const callbackUrl = `${pathname}#pro-price-card`;
+
+  useEffect(() => {
+    const handleHashScroll = () => {
+      if (window.location.hash === "#pro-price-card") {
+        const element = document.getElementById("pro-price-card");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+      if (window.location.hash === "#testimonials") {
+        const element = document.getElementById("testimonials");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    };
+
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(handleHashScroll, { timeout: 2000 });
+    } else {
+      setTimeout(handleHashScroll, 100);
+    }
+  }, []);
+
   return (
     <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          /* critical css for LCP element - inline for fastest rendering */
+          /* font-family matches Tailwind's font-mono class exactly to ensure consistent fallbacks */
+          .lcp-feature-item { display: flex; flex-direction: column; gap: 1rem; width: 100%; flex: 1; }
+          .lcp-feature-content { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+          .lcp-feature-header { display: flex; gap: 1rem; align-items: center; }
+          .lcp-feature-number { font-size: 3.75rem; font-family: var(--font-dm-mono), Menlo, Monaco, "Courier New", monospace; font-weight: 600; background: linear-gradient(to bottom, #a472ea, #341e7b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+          .lcp-feature-title { font-size: 1.5rem; font-weight: 500; }
+          .lcp-feature-description { font-weight: 500; }
+        `,
+        }}
+      />
       <main className="w-full  overflow-hidden flex flex-col items-center justify-center relative">
         <Header title="We are working on Opensox 2.0" />
-        <div className="flex flex-col bg-[#151515]/20 backdrop-blur-xl relative w-full ">
+        <div className="flex flex-col bg-[#151515]/20 relative w-full ">
           <div className="h-full  pv relative">
             <div className=" py-8 border-b border-[#252525]">
-              <motion.h2
-                initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{
-                  duration: 0.6,
-                  ease: "easeOut",
-                  type: "spring",
-                  delay: 0.4,
-                }}
-                className="text-center text-3xl tracking-tight font-medium"
-              >
+              <h2 className="text-center text-3xl tracking-tight font-medium">
                 What is Opensox 2.0?
-              </motion.h2>
+              </h2>
             </div>
             <div className=" w-full h-full flex flex-col gap-6  border-b border-[#252525]">
               <ul className="flex flex-col lg:flex-row [&>li]:w-full  [&>li]:p-6 divide-y lg:divide-y-0 lg:divide-x divide-[#252525] h-full ">
                 {opensoxFeatures.map((feature, index) => {
+                  // render first item (LCP element) immediately without animation
+                  const isLCPElement = index === 0;
+
+                  if (isLCPElement) {
+                    return (
+                      <li key={index} className="lcp-feature-item">
+                        <div className="lcp-feature-content">
+                          <div className="lcp-feature-header">
+                            <div className="lcp-feature-number">
+                              {index + 1}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="lcp-feature-title">
+                                {feature.title}
+                              </h3>
+                              {feature.title === "OX Newsletter" && (
+                                <ActiveTag text="completed" />
+                              )}
+                            </div>
+                          </div>
+                          {Array.isArray(feature.description) ? (
+                            <div className="font-medium">
+                              {feature.description.map(
+                                (sentence, sentenceIndex) => (
+                                  <p key={sentenceIndex} className="mb-2">
+                                    {sentence}
+                                  </p>
+                                )
+                              )}
+                            </div>
+                          ) : (
+                            <p className="lcp-feature-description">
+                              {feature.description}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-2 w-full h-full">
+                          <ul className="flex flex-col gap-3 w-full h-full pb-8">
+                            {feature.features.map((feature, featureIndex) => {
+                              return (
+                                <li
+                                  key={featureIndex}
+                                  className="text-sm flex items-center gap-4"
+                                >
+                                  <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea]" />
+                                  {feature}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </li>
+                    );
+                  }
+
                   return (
                     <motion.li
-                      initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.6,
+                        duration: 0.3,
                         ease: "easeOut",
-                        type: "spring",
-                        delay: 0.5 + index * 0.1,
+                        delay: 0.2 + (index - 1) * 0.05,
                       }}
                       key={index}
-                      className="flex flex-col gap-4 w-full flex-1 "
+                      className="flex flex-col gap-4 w-full flex-1"
                     >
                       <div className="flex flex-col gap-2 w-full">
                         <div className="flex gap-4 items-center">
@@ -176,10 +278,10 @@ const Pricing = () => {
                       </div>
                       <div className="flex flex-col gap-2 w-full h-full">
                         <ul className="flex flex-col gap-3 w-full h-full pb-8">
-                          {feature.features.map((feature, index) => {
+                          {feature.features.map((feature, featureIndex) => {
                             return (
                               <li
-                                key={index}
+                                key={featureIndex}
                                 className="font- text-sm flex items-center gap-4"
                               >
                                 <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea]" />
@@ -198,13 +300,12 @@ const Pricing = () => {
           <div className="h-full  relative ">
             <div className="py-8 border-b border-[#252525]">
               <motion.h2
-                initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 0.6,
+                  duration: 0.3,
                   ease: "easeOut",
-                  type: "spring",
-                  delay: 0.8,
+                  delay: 0.15,
                 }}
                 className="text-center text-3xl tracking-tight font-medium"
               >
@@ -216,13 +317,12 @@ const Pricing = () => {
                 {whySub.map((sub, index) => {
                   return (
                     <motion.p
-                      initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.6,
+                        duration: 0.3,
                         ease: "easeOut",
-                        type: "spring",
-                        delay: 0.9 + index * 0.1,
+                        delay: 0.2 + index * 0.05,
                       }}
                       key={index}
                       className="flex items-center gap-4"
@@ -242,12 +342,13 @@ const Pricing = () => {
                   src="/assets/layer1.svg"
                   alt="background"
                   fill
+                  loading="lazy"
                   className=" w-full h-full  -z-10 opacity-90"
                 />
               </div>
               <div className="flex flex-col lg:flex-row items-stretch justify-center gap-6">
                 <PricingCard />
-                <SecondaryPricingCard />
+                <SecondaryPricingCard callbackUrl={callbackUrl} />
               </div>
             </div>
           </div>
@@ -276,11 +377,11 @@ const PricingCard = () => {
       <div className=" border-border-primary w-full mx-auto flex h-full">
         <div className="border-dashed border-border-primary w-full lg:w-max mx-auto relative h-full">
           <div className="w-full h-full lg:w-[500px] relative overflow-hidden mx-auto py-10 pb-14 flex flex-col rounded-3xl">
-            <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
             <Image
               src="/assets/card_bg.svg"
               alt="background"
               fill
+              loading="lazy"
               className="object-cover object-bottom w-full h-full absolute -z-10"
             />
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 pb-4">
@@ -289,10 +390,12 @@ const PricingCard = () => {
                   src="/assets/logo_var2.svg"
                   alt="background"
                   fill
+                  loading="lazy"
                   className="object-cover size-full"
                 />
               </div>
             </div>
+            <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
 
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4">
               <h2 className="text-6xl lg:text-[90px] lg:leading-[82px] tracking-tight font-semibold">
@@ -339,7 +442,7 @@ const PricingCard = () => {
                 })}
               </div>
             </div>
-            <div className="bg-white mix-blend-plus-lighter absolute h-[100px] w-full blur-[50px] right-0 -bottom-20"></div>
+            <div className="bg-white mix-blend-plus-lighter absolute h-[120px] w-full blur-[60px] right-0 -bottom-20 opacity-80"></div>
           </div>
         </div>
       </div>
@@ -347,7 +450,7 @@ const PricingCard = () => {
   );
 };
 
-const SecondaryPricingCard = () => {
+const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
   const premiumPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
   const planIdOk =
     typeof premiumPlanId === "string" && premiumPlanId.length > 0;
@@ -357,11 +460,11 @@ const SecondaryPricingCard = () => {
       <div className=" border-border-primary w-full mx-auto flex h-full">
         <div className="border-dashed border-border-primary w-full lg:w-max mx-auto relative h-full">
           <div className=" w-full lg:w-[500px] relative overflow-hidden mx-auto py-10 pb-14 flex flex-col h-full rounded-3xl">
-            <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
             <Image
               src="/assets/card_bg.svg"
               alt="background"
               fill
+              loading="lazy"
               className="object-cover object-bottom w-full h-full absolute -z-10"
             />
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 pb-4">
@@ -370,25 +473,30 @@ const SecondaryPricingCard = () => {
                   src="/assets/logo_var2.svg"
                   alt="background"
                   fill
+                  loading="lazy"
                   className="object-cover size-full"
                 />
               </div>
             </div>
+            <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
 
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4">
+            <div
+              id="pro-price-card"
+              className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4"
+            >
               <div className="flex items-center gap-4 flex-wrap">
                 <h2 className="text-6xl lg:text-[90px] lg:leading-[82px] tracking-tight font-semibold">
                   $49{" "}
                   <span className="text-3xl lg:text-4xl text-white-400 line-through decoration-2">
-                    $69
+                    $89
                   </span>{" "}
                   <span className="text-4xl">/ year</span>
                 </h2>
               </div>
               <div className="flex items-center gap-3 mt-3 flex-wrap">
-                <p className="text-lg text-white-400">(~ ₹4,351 INR)</p>
+                <p className="text-lg text-white-400">(~ ₹4,410 INR)</p>
                 <span className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-full text-green-400 text-sm font-medium">
-                  Discounted till 10 December
+                  Discounted till 30 December
                 </span>
               </div>
             </div>
@@ -401,7 +509,17 @@ const SecondaryPricingCard = () => {
                 buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${
                   planIdOk ? "" : "opacity-60 cursor-not-allowed"
                 }`}
+                callbackUrl={callbackUrl}
+                buttonLocation="pricing_page"
               />
+              <div className="flex justify-center mt-3">
+                <Link
+                  href="/pitch"
+                  className="text-sm text-text-tertiary hover:text-brand-purple-light transition-colors lowercase"
+                >
+                  still not sure? read my pitch to you.
+                </Link>
+              </div>
             </div>
             <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4 flex-1">
               <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">
@@ -434,7 +552,7 @@ const SecondaryPricingCard = () => {
                 })}
               </div>
             </div>
-            <div className="bg-white mix-blend-plus-lighter absolute h-[100px] w-full blur-[50px] right-0 -bottom-20"></div>
+            <div className="bg-white mix-blend-plus-lighter absolute h-[120px] w-full blur-[60px] right-0 -bottom-20 opacity-80"></div>
           </div>
         </div>
       </div>
@@ -552,7 +670,7 @@ const TestimonialsSection = () => {
   };
 
   return (
-    <div className=" text-white ">
+    <div className=" text-white " id="testimonials">
       <Header title="What our Pro customers say about us" />
       <div className="border-b  border-[#252525] w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
         <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">

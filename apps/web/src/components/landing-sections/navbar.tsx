@@ -14,6 +14,20 @@ const Navbar = () => {
   const isPricingPage = pathname === "/pricing";
   const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
   const [isOpen, setIsOpen] = useState(false);
+  const { trackButtonClick, trackLinkClick } = useAnalytics();
+
+  const handleGetStartedClick = (location: "navbar" | "mobile_menu") => {
+    trackButtonClick("Get Started", location);
+  };
+
+  const handleContributeClick = (location: "navbar" | "mobile_menu") => {
+    trackLinkClick(
+      "https://github.com/apsinghdev/opensox",
+      "Contribute",
+      location,
+      true
+    );
+  };
 
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

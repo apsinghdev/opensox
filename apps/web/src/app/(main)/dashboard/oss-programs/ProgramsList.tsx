@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Program } from "@/data/oss-programs/types";
 import { SearchInput, TagFilter, ProgramCard } from "@/components/oss-programs";
 
@@ -12,6 +12,15 @@ interface ProgramsListProps {
 export default function ProgramsList({ programs, tags }: ProgramsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Memoize handlers to prevent child re-renders
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+  }, []);
+
+  const handleTagsChange = useCallback((newTags: string[]) => {
+    setSelectedTags(newTags);
+  }, []);
 
   const filteredPrograms = useMemo(() => {
     return programs.filter((program) => {
@@ -41,13 +50,13 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
           <div className="flex flex-col md:flex-row gap-4 w-full min-w-0">
             <SearchInput
               value={searchQuery}
-              onChange={setSearchQuery}
+              onChange={handleSearchChange}
               placeholder="Search programs..."
             />
             <TagFilter
               tags={tags}
               selectedTags={selectedTags}
-              onTagsChange={setSelectedTags}
+              onTagsChange={handleTagsChange}
             />
           </div>
         </div>
