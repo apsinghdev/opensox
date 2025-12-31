@@ -102,3 +102,28 @@ model Plan {
   updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]
 }
+
+model WeeklySession {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  youtubeUrl  String
+  sessionDate DateTime
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  topics      SessionTopic[]
+
+  @@index([sessionDate])
+  @@index([createdAt])
+}
+
+model SessionTopic {
+  id        String         @id @default(cuid())
+  sessionId String
+  timestamp String
+  topic     String
+  order     Int
+  session   WeeklySession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, order])
+}

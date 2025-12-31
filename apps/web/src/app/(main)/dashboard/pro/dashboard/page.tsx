@@ -4,6 +4,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { Play } from "lucide-react";
 
 export default function ProDashboardPage() {
   const { isPaidUser, isLoading } = useSubscription();
@@ -109,16 +111,25 @@ export default function ProDashboardPage() {
           soon you&apos;ll see all the pro perks here. thanks for investin!
         </h1>
         {isPaidUser && (
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/dashboard/pro/sessions"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-purple hover:bg-brand-purple-light text-text-primary font-medium rounded-lg transition-colors duration-200 text-sm"
+            >
+              <Play className="w-4 h-4" />
+              Pro Sessions
+            </Link>
             <button
               onClick={handleJoinSlack}
               disabled={isJoining}
-              className="px-4 py-2 bg-brand-purple hover:bg-brand-purple-light text-text-primary font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="px-4 py-2 bg-dash-surface border border-dash-border hover:border-brand-purple/50 text-text-primary font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isJoining ? "Joining..." : "Join Slack"}
             </button>
-            {error && <p className="text-error-text text-sm mt-2">{error}</p>}
           </div>
+        )}
+        {error && (
+          <p className="text-error-text text-sm mt-2 text-center">{error}</p>
         )}
       </div>
     </div>
