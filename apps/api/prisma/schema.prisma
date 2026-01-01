@@ -39,6 +39,7 @@ model User {
   createdAt      DateTime       @default(now())
   lastLogin      DateTime       @updatedAt
   completedSteps Json?
+  saved_repos    Json           @default("[]")
   accounts       Account[]
   payments       Payment[]
   subscriptions  Subscription[]

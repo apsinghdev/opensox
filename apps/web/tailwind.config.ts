@@ -67,10 +67,30 @@ const config: Config = {
         },
 
         // Status colors
-        success: colors.status.success,
-        error: colors.status.error,
-        warning: colors.status.warning,
-        info: colors.status.info,
+        success: {
+          DEFAULT: colors.status.success.text,
+          bg: colors.status.success.bg,
+          text: colors.status.success.text,
+          border: colors.status.success.border,
+        },
+        error: {
+          DEFAULT: colors.status.error.text,
+          bg: colors.status.error.bg,
+          text: colors.status.error.text,
+          border: colors.status.error.border,
+        },
+        warning: {
+          DEFAULT: colors.status.warning.text,
+          bg: colors.status.warning.bg,
+          text: colors.status.warning.text,
+          border: colors.status.warning.border,
+        },
+        info: {
+          DEFAULT: colors.status.info.text,
+          bg: colors.status.info.bg,
+          text: colors.status.info.text,
+          border: colors.status.info.border,
+        },
 
         // External brand colors
         github: {

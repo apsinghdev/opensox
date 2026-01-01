@@ -1,0 +1,32 @@
+# Base stage with pnpm
+FROM node:20-alpine AS base
+RUN npm install -g pnpm
+WORKDIR /app
+
+# API development
+FROM base AS api
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
+RUN pnpm install
+COPY packages/shared ./packages/shared
+COPY apps/api ./apps/api
+WORKDIR /app/packages/shared
+RUN pnpm run build
+WORKDIR /app/apps/api
+RUN pnpm exec prisma generate
+EXPOSE 8080
+CMD ["pnpm", "run", "dev"]
+
+# Web development
+FROM base AS web
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/ui/package.json ./packages/ui/ 
+RUN pnpm install
+COPY packages ./packages
+COPY apps/web ./apps/web
+WORKDIR /app/apps/web
+EXPOSE 3000
+CMD ["pnpm", "run", "dev"]

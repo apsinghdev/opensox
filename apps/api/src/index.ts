@@ -98,6 +98,11 @@ app.get("/test", apiLimiter, (req: Request, res: Response) => {
   res.status(200).json({ status: "ok", message: "Test endpoint is working" });
 });
 
+// Health check endpoint for Docker
+app.get("/health", (req: Request, res: Response) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Slack Community Invite Endpoint (Protected)
 app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
   try {

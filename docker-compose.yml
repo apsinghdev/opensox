@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: opensox-db
+    environment:
+      POSTGRES_USER: opensox
+      POSTGRES_PASSWORD: opensox_dev_password
+      POSTGRES_DB: opensox
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opensox -d opensox"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: api
+    container_name: opensox-api
+    env_file:
+      - ./apps/api/.env
+    environment:
+      - DATABASE_URL=postgresql://opensox:opensox_dev_password@postgres:5432/opensox?schema=public
+      - NODE_ENV=development
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./apps/api/prisma:/app/apps/api/prisma
+      - ./packages:/app/packages
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: >
+      sh -c "pnpm exec prisma migrate deploy && pnpm exec prisma db seed || true && pnpm run dev"
+
+  # Frontend Web App
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: web
+    container_name: opensox-web
+    env_file:
+      - ./apps/web/.env.local
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+      - ./apps/web/public:/app/apps/web/public
+      - ./packages:/app/packages
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

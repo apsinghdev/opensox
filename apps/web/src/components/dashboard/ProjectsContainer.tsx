@@ -16,6 +16,10 @@ import Image from "next/image";
 import { useFilterStore } from "@/store/useFilterStore";
 import { usePathname } from "next/navigation";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import SaveToggle from "./SaveToggle";
+import SavedProjectsPanel from "./SavedProjectsPanel";
+import { useSavedProjectsStore } from "@/store/useSavedProjectsStore";
+import { useState } from "react";
 
 type ProjectsContainerProps = { projects: DashboardProjectsProps[] };
 
@@ -42,6 +46,7 @@ const getColor = (c?: string) =>
   languageColors[(c || "").toLowerCase()] || "bg-gray-200/10 text-gray-300";
 
 const tableColumns = [
+  "Save",
   "Project",
   "Issues",
   "Language",
@@ -57,6 +62,8 @@ export default function ProjectsContainer({
   const pathname = usePathname();
   const { projectTitle } = useProjectTitleStore();
   const { setShowFilters } = useFilterStore();
+  const { savedProjects } = useSavedProjectsStore();
+  const [showSavedPanel, setShowSavedPanel] = useState(false);
   const isProjectsPage = pathname === "/dashboard/projects";
 
   return (
@@ -66,12 +73,39 @@ export default function ProjectsContainer({
           {projectTitle}
         </h2>
         {isProjectsPage && (
-          <Button
-            className="font-semibold text-text-primary bg-ox-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-white-500 rounded-md"
-            onClick={() => setShowFilters(true)}
-          >
-            Find projects
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              className="font-semibold text-text-primary bg-brand-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-brand-purple/80 rounded-md"
+              onClick={() => setShowSavedPanel(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === " ") e.preventDefault();
+                  setShowSavedPanel(true);
+                }
+              }}
+              aria-label="View saved projects"
+            >
+              Saved Projects
+              {savedProjects.length > 0 && (
+                <Badge className="ml-2 bg-white text-brand-purple">
+                  {savedProjects.length}
+                </Badge>
+              )}
+            </Button>
+            <Button
+              className="font-semibold text-text-primary bg-brand-purple text-sm sm:text-base h-10 sm:h-11 px-5 sm:px-6 hover:bg-brand-purple/80 rounded-md"
+              onClick={() => setShowFilters(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === " ") e.preventDefault();
+                  setShowFilters(true);
+                }
+              }}
+              aria-label="Open project filters"
+            >
+              Find projects
+            </Button>
+          </div>
         )}
       </div>
 
@@ -115,6 +149,10 @@ export default function ProjectsContainer({
                   className="border-y border-ox-gray cursor-pointer hover:bg-white/5 transition-colors"
                   onClick={() => window.open(p.url, "_blank")}
                 >
+                  <TableCell className="p-1 sm:p-2 text-center">
+                    <SaveToggle project={p} />
+                  </TableCell>
+
                   <TableCell className="p-1 sm:p-2">
                     <div className="flex items-center gap-2">
                       <div className="rounded-full overflow-hidden inline-block h-4 w-4 sm:h-6 sm:w-6 border">
@@ -174,6 +212,11 @@ export default function ProjectsContainer({
           </p>
         </div>
       ) : null}
+
+      <SavedProjectsPanel
+        isOpen={showSavedPanel}
+        onClose={() => setShowSavedPanel(false)}
+      />
     </div>
   );
 }

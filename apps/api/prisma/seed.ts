@@ -62,25 +62,25 @@ async function main() {
 
   const premiumSubscription = existingSubscription
     ? await prisma.subscription.update({
-        where: { id: existingSubscription.id },
-        data: {
-          planId: testPlan.id,
-          status: 'active',
-          startDate: new Date(),
-          endDate: new Date(Date.now() + MILLIS_PER_YEAR), // 1 year from now
-          autoRenew: true,
-        },
-      })
+      where: { id: existingSubscription.id },
+      data: {
+        planId: testPlan.id,
+        status: 'active',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + MILLIS_PER_YEAR), // 1 year from now
+        autoRenew: true,
+      },
+    })
     : await prisma.subscription.create({
-        data: {
-          userId: premiumUser.id,
-          planId: testPlan.id,
-          status: 'active',
-          startDate: new Date(),
-          endDate: new Date(Date.now() + MILLIS_PER_YEAR), // 1 year from now
-          autoRenew: true,
-        },
-      });
+      data: {
+        userId: premiumUser.id,
+        planId: testPlan.id,
+        status: 'active',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + MILLIS_PER_YEAR), // 1 year from now
+        autoRenew: true,
+      },
+    });
   console.log('✅ Created/updated premium subscription');
 
   // Create test payment
@@ -127,4 +127,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

@@ -38,234 +38,166 @@ We love our contributors! Here’s how you can contribute:
 - [Open an issue](https://github.com/apsinghdev/opensox/issues) if you believe you’ve encountered a bug.
 - Make a [pull request](https://github.com/apsinghdev/opensox/pulls) to add new features, improve quality of life, or fix bugs.
 
-### Setting up locally
+## Quick Start (Docker) 🐳
 
-Opensox AI's stack consists of the following elements:
+Get up and running in **3 steps**:
 
-- A backend API built with tRPC and Express.js
-- A frontend written in Next.js and TypeScript
-- A PostgreSQL database
-- A Redis database (in process)
-- What's for AI? Coming very soon…
+### Prerequisites
 
-#### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) installed and running
+- [Make](https://www.gnu.org/software/make/) (pre-installed on Mac/Linux)
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/apsinghdev/opensox.git
+cd opensox
+```
+
+### 2. Run setup
+```bash
+# Mac/Linux
+make setup
+
+# Windows (PowerShell)
+.\setup.ps1
+```
+
+This will automatically:
+- ✅ Create environment files from templates
+- ✅ Generate secure secrets
+- ✅ Start all services (Database, API, Web)
+- ✅ Run database migrations
+- ✅ Seed initial data
+
+### 3. Configure Google OAuth (Required for login)
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create a new project (or use existing)
+3. Configure OAuth consent screen
+4. Create OAuth 2.0 Client ID (Web application)
+5. Add redirect URI: `http://localhost:3000/api/auth/callback/google`
+6. Copy credentials to `apps/web/.env.local`:
+   ```
+   GOOGLE_CLIENT_ID="your-client-id"
+   GOOGLE_CLIENT_SECRET="your-client-secret"
+   ```
+7. Restart: `make restart`
+
+**Done! 🎉** Visit http://localhost:3000
+
+---
+
+## Common Commands
+
+| Command | Description |
+|---------|-------------|
+| `make start` | Start all services |
+| `make stop` | Stop all services |
+| `make logs` | View live logs |
+| `make status` | Check service health |
+| `make reset` | Reset database (deletes data) |
+| `make studio` | Open Prisma Studio (DB GUI) |
+| `make help` | Show all available commands |
+
+---
+
+## Troubleshooting
+
+<details>
+<summary>🔴 "Cannot connect to Docker daemon"</summary>
+
+Make sure Docker Desktop is running.
+</details>
+
+<details>
+<summary>🔴 "Port 3000/8080 is already in use"</summary>
+
+Stop the process using the port:
+```bash
+# Find process (Mac/Linux)
+lsof -i :3000
+
+# Windows PowerShell
+netstat -ano | findstr :3000
+```
+</details>
+
+<details>
+<summary>🔴 "OAuth error: redirect_uri_mismatch"</summary>
+
+Ensure your Google OAuth redirect URI exactly matches:
+`http://localhost:3000/api/auth/callback/google`
+</details>
+
+<details>
+<summary>🔴 Database connection errors</summary>
+
+Reset the database:
+```bash
+make reset
+```
+</details>
+
+---
+
+<details>
+<summary><h2>Manual Setup (without Docker)</h2></summary>
+
+### Prerequisites
 
 Opensox needs [TypeScript](https://www.typescriptlang.org/download/) and [Node.js >= 18](https://nodejs.org/en/download/package-manager) installations.
 
-## Setup environment variables
+### Setup environment variables
 
 Create environment files for both the backend and the frontend before running the apps.
 
-### Backend (`apps/api/.env`)
-
-Copy the example environment file and update it with your values:
+#### Backend (`apps/api/.env`)
 
 ```bash
 cd apps/api
 cp .env.example .env
 ```
 
-Then edit `apps/api/.env` and fill in the required values:
+Edit `apps/api/.env` and fill in:
+- `DATABASE_URL` - Your PostgreSQL connection string
+- `JWT_SECRET` - Generate with `openssl rand -base64 32`
+
+#### Frontend (`apps/web/.env.local`)
 
 ```bash
-# Required
-DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/opensox?schema=public"
-JWT_SECRET="replace-with-a-strong-random-secret"
-
-# Optional (good defaults shown)
-PORT=8080
-CORS_ORIGINS=http://localhost:3000
-NODE_ENV=development
-
-# Optional but needed for GitHub queries to work
-# Generate a classic token with "public_repo" access at https://github.com/settings/tokens
-GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+cd apps/web
+cp .env.example .env.local
 ```
 
-Notes:
-- DATABASE_URL: point this to your PostgreSQL instance. Example for local Postgres is shown above.
-- JWT_SECRET: generate one, e.g. `openssl rand -base64 32` or `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
-- CORS_ORIGINS: comma-separated list of allowed origins. Keep `http://localhost:3000` for local web app.
+Edit `apps/web/.env.local` and fill in your Google OAuth credentials.
 
-### Frontend (`apps/web/.env.local`)
-
-Create a file at `apps/web/.env.local` with:
-
-```bash
-# Required
-NEXT_PUBLIC_API_URL="http://localhost:8080"
-GOOGLE_CLIENT_ID="your-google-oauth-client-id"
-GOOGLE_CLIENT_SECRET="your-google-oauth-client-secret"
-NEXTAUTH_SECRET="replace-with-a-strong-random-secret"
-
-# Recommended for production (optional for local dev)
-NEXTAUTH_URL="http://localhost:3000"
-
-# Optional analytics (PostHog)
-# If you don't use PostHog, you can omit these
-# NEXT_PUBLIC_POSTHOG_KEY="phc_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-# NEXT_PUBLIC_POSTHOG_HOST="https://us.i.posthog.com" # or https://app.posthog.com
-```
-
-Notes:
-- NEXT_PUBLIC_API_URL must point to the backend base URL; the frontend calls `${NEXT_PUBLIC_API_URL}/api/...` for auth and data.
-- Google OAuth: create credentials in Google Cloud Console (OAuth 2.0 Client ID), add Authorized redirect URIs for NextAuth (e.g., `http://localhost:3000/api/auth/callback/google`).
-- NEXTAUTH_SECRET: generate one just like `JWT_SECRET`. It’s used by NextAuth; it can be different from the backend secret.
-
-After creating these files, restart your dev servers so changes take effect.
-
-
-## Database setup (migrations and seed)
-
-Run these steps once your `DATABASE_URL` is set:
+### Database setup
 
 ```bash
 cd apps/api
-
-# Generate Prisma client (optional if already generated)
 npx prisma generate
-
-# Apply migrations locally
 npx prisma migrate dev --name init
+npx prisma db seed
 ```
 
-Seed initial data so features relying on it work correctly:
-
-- Option A (recommended): use Prisma Studio to insert the initial row
-
-  ```bash
-  npx prisma studio
-  ```
-
-  Then open the `QueryCount` model and create a row with:
-  - `id`: 1
-  - `total_queries`: 0
-
-- Option B: insert directly via SQL (replace the connection string as needed)
-
-  ```bash
-  psql "postgresql://USER:PASSWORD@localhost:5432/opensox" \
-    -c "INSERT INTO \"QueryCount\" (id, total_queries) VALUES (1, 0) ON CONFLICT (id) DO NOTHING;"
-  ```
-
-
-## Setup environment
-
-1. Fork and clone the opensox repo
+### Run the servers
 
 ```bash
-git clone https://github.com/[your-github-username]/opensox.git
-```
-
-2. `cd` into `opensox/apps/web` and install dependencies
-
-```bash
+# Terminal 1 - API
+cd apps/api
 pnpm install
-```
+pnpm run dev
 
-Now run the dev server:
-
-```bash
+# Terminal 2 - Web
+cd apps/web
+pnpm install
 pnpm run dev
 ```
 
-Congrats! Your frontend is running on `localhost:3000`.
+Frontend: http://localhost:3000 | API: http://localhost:8080
 
-3. `cd` into `opensox/apps/api` and install dependencies
+</details>
 
-```bash
-npm install
-```
-
-Now run the server:
-
-```bash
-pnpm run dev
-```
-
-Voila! Your API server is running on `localhost:4000`.
-
-Now you can access your app at `http://localhost:3000`.
-
-## Running the API with Docker
-
-Alternatively, you can run the API server using Docker. A `Dockerfile` is provided in the root directory.
-
-### Prerequisites
-
-- [Docker](https://docs.docker.com/get-docker/) installed on your machine
-
-### Building and Running
-
-1. Make sure you have your `.env` file set up in `apps/api/.env`. You can copy from `.env.example` (see [Backend environment variables](#backend-appsapienv) section above)
-
-2. From the root directory, build the Docker image:
-
-```bash
-docker build -t opensox-api .
-```
-
-3. Run the container with your environment variables:
-
-```bash
-docker run -p 4000:4000 \
-  --env-file apps/api/.env \
-  opensox-api
-```
-
-Or if you prefer to pass environment variables individually:
-
-```bash
-docker run -p 4000:4000 \
-  -e DATABASE_URL="postgresql://USER:PASSWORD@host.docker.internal:5432/opensox?schema=public" \
-  -e JWT_SECRET="your-secret" \
-  -e PORT=4000 \
-  opensox-api
-```
-
-**Note:** When using Docker, if your database is running on your host machine (not in a container), use `host.docker.internal` instead of `localhost` in your `DATABASE_URL`.
-
-Your API server will be available at `http://localhost:4000`.
-
-### Using Docker Compose (Optional)
-
-For a complete setup with PostgreSQL, you can create a `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: opensox
-      POSTGRES_PASSWORD: opensox
-      POSTGRES_DB: opensox
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  api:
-    build: .
-    ports:
-      - "4000:4000"
-    environment:
-      DATABASE_URL: postgresql://opensox:opensox@postgres:5432/opensox?schema=public
-      JWT_SECRET: your-secret-key
-      PORT: 4000
-      NODE_ENV: production
-    depends_on:
-      - postgres
-
-volumes:
-  postgres_data:
-```
-
-Then run:
-
-```bash
-docker-compose up -d
-```
 
 ## Our contributors
 
