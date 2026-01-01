@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { X, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface TagFilterProps {
   tags: string[];
@@ -21,6 +20,8 @@ export default function TagFilter({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (!isDropdownOpen) return; // Only attach listener when open
+
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
@@ -29,9 +30,13 @@ export default function TagFilter({
         setIsDropdownOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+
+    // Use passive listener for better scroll performance
+    document.addEventListener("mousedown", handleClickOutside, {
+      passive: true,
+    });
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isDropdownOpen]);
 
   const availableTags = useMemo(() => {
     return tags.filter(
@@ -107,33 +112,27 @@ export default function TagFilter({
         <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
       </div>
 
-      <AnimatePresence>
-        {isDropdownOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute z-20 top-full left-0 right-0 mt-2 bg-dash-surface border border-dash-border rounded-xl shadow-xl max-h-60 overflow-y-auto"
-          >
-            {availableTags.length === 0 ? (
-              <div className="p-4 text-gray-500 text-center">
-                No matching tags found
-              </div>
-            ) : (
-              availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => addTag(tag)}
-                  aria-label={`Add tag ${tag}`}
-                  className="w-full text-left px-4 py-3 hover:bg-dash-hover text-gray-300 hover:text-white transition-colors flex items-center justify-between"
-                >
-                  {tag}
-                </button>
-              ))
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Replaced Framer Motion with CSS transitions for better performance */}
+      {isDropdownOpen && (
+        <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-dash-surface border border-dash-border rounded-xl shadow-xl max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
+          {availableTags.length === 0 ? (
+            <div className="p-4 text-gray-500 text-center">
+              No matching tags found
+            </div>
+          ) : (
+            availableTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => addTag(tag)}
+                aria-label={`Add tag ${tag}`}
+                className="w-full text-left px-4 py-3 hover:bg-dash-hover text-gray-300 hover:text-white transition-colors flex items-center justify-between"
+              >
+                {tag}
+              </button>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

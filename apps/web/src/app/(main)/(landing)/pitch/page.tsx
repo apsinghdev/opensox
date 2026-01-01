@@ -1,13 +1,16 @@
 "use client";
-import Footer from "@/components/landing-sections/footer";
-import Header from "@/components/ui/header";
+
+import React, { useEffect } from "react";
+
 import { motion } from "framer-motion";
 import { CornerDownRight, Target } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import { usePathname } from "next/navigation";
+
+import Footer from "@/components/landing-sections/footer";
+import Header from "@/components/ui/header";
 import PrimaryButton from "@/components/ui/custom-button";
 import PaymentFlow from "@/components/payment/PaymentFlow";
-import { usePathname } from "next/navigation";
 
 const Pitch = () => {
   const pathname = usePathname();
@@ -42,10 +45,10 @@ const Pitch = () => {
             </>
           }
         />
-        <div className="flex flex-col bg-[#151515]/20 backdrop-blur-xl relative w-full">
+        <div className="flex flex-col bg-surface-secondary/20 backdrop-blur-xl relative w-full">
           {/* Introduction */}
           <div className="h-full pv relative">
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -74,9 +77,95 @@ const Pitch = () => {
             </div>
           </div>
 
+          <div className="py-4 border-b border-border px-4 lg:px-[60px]">
+            <motion.div
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+                type: "spring",
+                delay: 0.45,
+              }}
+              className="max-w-4xl mx-auto text-center"
+            >
+              <h2 className="text-2xl lg:text-3xl font-medium text-brand-purple-light font-mono mb-3 lowercase">
+                table of contents
+              </h2>
+              <nav>
+                <ul className="space-y-1.5 text-text-secondary font-medium lg:text-xl lowercase inline-block">
+                  <li>
+                    <a
+                      href="#mission-statement"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      mission statement
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#my-goal"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      my goal
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#the-plan"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      the plan
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#philosophies"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      philosophies i follow
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#so-how-small"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      so how small?
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#testimonials"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      what existing investors said
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#questions"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      questions you may have
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#invest"
+                      className="text-text-secondary hover:text-brand-purple-light transition-colors duration-300 underline"
+                    >
+                      how to invest in opensox.ai?
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </motion.div>
+          </div>
+
           {/* The Pitch */}
-          <div className="h-full relative border-b border-[#252525]">
-            <div className="py-8 border-b border-[#252525]">
+          <div className="h-full relative border-b border-border">
+            <div className="py-8 border-b border-border">
               <motion.h2
                 id="the-pitch"
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
@@ -94,7 +183,7 @@ const Pitch = () => {
             </div>
 
             {/* Mission Statement */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -125,7 +214,7 @@ const Pitch = () => {
             </div>
 
             {/* My Goal */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -154,22 +243,22 @@ const Pitch = () => {
                 </p>
                 <ul className="space-y-3 [&>li]:flex [&>li]:items-start [&>li]:gap-4 [&>li]:text-text-secondary [&>li]:font-medium [&>li]:text-lg [&>li]:lowercase">
                   <li>
-                    <CornerDownRight className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <CornerDownRight className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>gives you timely human feedback 24/7</span>
                   </li>
                   <li>
-                    <CornerDownRight className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <CornerDownRight className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>
                       keeps you updated with everything happening in the open
                       source ecosystem
                     </span>
                   </li>
                   <li>
-                    <CornerDownRight className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <CornerDownRight className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>keeps you aligned with your objectives</span>
                   </li>
                   <li>
-                    <CornerDownRight className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <CornerDownRight className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>gives you the freedom to ask anything anytime.</span>
                   </li>
                 </ul>
@@ -184,7 +273,7 @@ const Pitch = () => {
             </div>
 
             {/* The Plan */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -210,7 +299,7 @@ const Pitch = () => {
                 </p>
                 <ul className="space-y-4 [&>li]:flex [&>li]:items-start [&>li]:gap-4 [&>li]:text-text-secondary [&>li]:font-medium [&>li]:text-lg [&>li]:lowercase">
                   <li>
-                    <Target className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <Target className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>
                       <strong className="text-text-primary">
                         for timely human feedback 24/7
@@ -219,7 +308,7 @@ const Pitch = () => {
                     </span>
                   </li>
                   <li>
-                    <Target className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <Target className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>
                       <strong className="text-text-primary">
                         to keep you updated with open source
@@ -228,7 +317,7 @@ const Pitch = () => {
                     </span>
                   </li>
                   <li>
-                    <Target className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <Target className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>
                       <strong className="text-text-primary">
                         for weekly session
@@ -237,7 +326,7 @@ const Pitch = () => {
                     </span>
                   </li>
                   <li>
-                    <Target className="size-5 flex-shrink-0 text-[#a472ea] mt-1" />
+                    <Target className="size-5 flex-shrink-0 text-brand-purple-light mt-1" />
                     <span>
                       <strong className="text-text-primary">
                         for freedom to ask anything anytime
@@ -255,7 +344,7 @@ const Pitch = () => {
             </div>
 
             {/* Philosophies */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -311,7 +400,7 @@ const Pitch = () => {
                         help in a single day. and this defeats my main mission
                         statement with which i started in the first place.
                       </p>
-                      <div className="border-b border-[#252525] my-4"></div>
+                      <div className="border-b border-border my-4"></div>
                       <p>
                         <span className="underline decoration-brand-purple-light decoration-2">
                           now the second choice — stay small. stay effective.
@@ -380,7 +469,7 @@ const Pitch = () => {
             </div>
 
             {/* The Process */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -434,7 +523,7 @@ const Pitch = () => {
             </div>
 
             {/* What Existing Investors Said */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -470,7 +559,7 @@ const Pitch = () => {
             </div>
 
             {/* Questions */}
-            <div className="py-8 border-b border-[#252525] px-4 lg:px-[60px]">
+            <div className="py-8 border-b border-border px-4 lg:px-[60px]">
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -537,7 +626,7 @@ const Pitch = () => {
                     </h4>
                     <ul className="space-y-2 text-text-secondary font-medium text-lg pl-4 lowercase">
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>
                           once you invest in opensox.ai, you&apos;ll immediately
                           get an email with a meet link. that meet will be our
@@ -546,7 +635,7 @@ const Pitch = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>
                           also, you&apos;ll receive the invitation to our
                           internal slack channel, there you&apos;ll receive all
@@ -555,7 +644,7 @@ const Pitch = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>
                           at the same time, your pro plan on opensox.ai will get
                           activated, and pro newsletters, pro filters to search
@@ -564,7 +653,7 @@ const Pitch = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>
                           after that, we&apos;ll do weekly sessions where you
                           can ask me anything, and we&apos;ll discuss one
@@ -581,7 +670,7 @@ const Pitch = () => {
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>
                           along with this, whatever pro feature/service is
                           added, you&apos;ll get it without any extra charges.
@@ -696,21 +785,21 @@ const Pitch = () => {
                     </p>
                     <ul className="space-y-2 text-text-secondary font-medium text-lg pl-4 lowercase">
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>
                           you&apos;re already an expert in open source
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>you don&apos;t wanna do it fast</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>you wanna learn it the hard way</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea] mt-1" />
+                        <CornerDownRight className="size-4 flex-shrink-0 text-brand-purple-light mt-1" />
                         <span>you own 100 acres of land.</span>
                       </li>
                     </ul>
@@ -729,7 +818,7 @@ const Pitch = () => {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-[#252525]">
+                <div className="pt-6 border-t border-border">
                   <p className="text-text-secondary font-medium text-lg lowercase">
                     my question isn&apos;t here? shoot it here:{" "}
                     <Link
@@ -747,7 +836,7 @@ const Pitch = () => {
             {/* How to Invest */}
             <div
               id="invest"
-              className="py-12 border-b border-[#252525] px-4 lg:px-[60px]"
+              className="py-12 border-b border-border px-4 lg:px-[60px]"
             >
               <motion.div
                 initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}

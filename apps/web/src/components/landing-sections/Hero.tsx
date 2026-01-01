@@ -38,7 +38,7 @@ const Hero = () => {
     trackButtonClick("Get Started", "hero");
   };
   return (
-    <div className="w-full min-h-[50dvh] lg:h-[69dvh] relative overflow-hidden z-10 p-4 lg:p-[60px] flex flex-col items-center justify-center gap-6 ">
+    <div className="w-full min-h-[50dvh] lg:h-[75dvh] relative overflow-hidden z-10 p-4 lg:p-[60px] flex flex-col items-center justify-center gap-6 ">
       <Image
         src="/assets/bgmain.svg"
         alt="background"
@@ -50,7 +50,7 @@ const Hero = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full lg:max-w-3xl space-y-3 text-center"
+        className="w-full h-max lg:max-w-3xl space-y-1 text-center"
       >
         <motion.div
           variants={itemVariants}

@@ -1,4 +1,4 @@
-import { getProgramBySlug, getAllPrograms } from "@/data/oss-programs";
+import { getProgramBySlug, loadAllPrograms } from "@/data/oss-programs";
 import { notFound } from "next/navigation";
 import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
@@ -11,8 +11,63 @@ import "./program-styles.css";
 
 export const revalidate = 3600;
 
+// Pre-configure marked options once, not on every render
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
+
+// Sanitizer config - defined once to avoid recomputation
+const SANITIZE_CONFIG = {
+  allowedTags: [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "p",
+    "br",
+    "strong",
+    "em",
+    "u",
+    "s",
+    "code",
+    "pre",
+    "ul",
+    "ol",
+    "li",
+    "blockquote",
+    "a",
+    "img",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "hr",
+    "div",
+    "span",
+  ],
+  allowedAttributes: {
+    a: ["href", "title", "target", "rel"],
+    img: ["src", "alt", "title", "width", "height"],
+    code: ["class"],
+    pre: ["class"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+};
+
+// Fast markdown renderer - memoized config
+function renderMarkdown(markdown: string): string {
+  const html = marked.parse(markdown) as string;
+  return sanitizeHtml(html, SANITIZE_CONFIG);
+}
+
 export async function generateStaticParams() {
-  const programs = getAllPrograms();
+  // Load all programs for static generation
+  const programs = await loadAllPrograms();
   return programs.map((program) => ({
     slug: program.slug,
   }));
@@ -24,60 +79,19 @@ export default async function ProgramPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const program = getProgramBySlug(slug);
+
+  // Lazy load only the program we need
+  const program = await getProgramBySlug(slug);
 
   if (!program) {
     notFound();
   }
 
-  marked.setOptions({
-    gfm: true,
-    breaks: true,
-  });
-
-  const renderMarkdown = (markdown: string) => {
-    const html = marked.parse(markdown) as string;
-    return sanitizeHtml(html, {
-      allowedTags: [
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "p",
-        "br",
-        "strong",
-        "em",
-        "u",
-        "s",
-        "code",
-        "pre",
-        "ul",
-        "ol",
-        "li",
-        "blockquote",
-        "a",
-        "img",
-        "table",
-        "thead",
-        "tbody",
-        "tr",
-        "th",
-        "td",
-        "hr",
-        "div",
-        "span",
-      ],
-      allowedAttributes: {
-        a: ["href", "title", "target", "rel"],
-        img: ["src", "alt", "title", "width", "height"],
-        code: ["class"],
-        pre: ["class"],
-      },
-      allowedSchemes: ["http", "https", "mailto"],
-    });
-  };
+  // Pre-render all markdown sections at build time (server-side)
+  const sectionsWithHtml = program.sections.map((section) => ({
+    ...section,
+    contentHtml: renderMarkdown(section.bodyMarkdown),
+  }));
 
   return (
     <main className="min-h-screen w-full bg-dash-base text-white overflow-x-hidden">
@@ -86,12 +100,12 @@ export default async function ProgramPage({
         <ProgramMetadata program={program} />
 
         <div className="space-y-10">
-          {program.sections.map((section) => (
+          {sectionsWithHtml.map((section) => (
             <ProgramSection
               key={section.id}
               id={section.id}
               title={section.title}
-              contentHtml={renderMarkdown(section.bodyMarkdown)}
+              contentHtml={section.contentHtml}
             />
           ))}
         </div>

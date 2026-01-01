@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Program } from "@/data/oss-programs/types";
@@ -6,7 +7,7 @@ interface ProgramCardProps {
   program: Program;
 }
 
-export default function ProgramCard({ program }: ProgramCardProps) {
+function ProgramCard({ program }: ProgramCardProps) {
   return (
     <Link
       href={`/dashboard/oss-programs/${program.slug}`}
@@ -27,7 +28,9 @@ export default function ProgramCard({ program }: ProgramCardProps) {
             <p className="text-xs text-text-muted uppercase tracking-wide">
               Region
             </p>
-            <p className="text-sm text-text-secondary capitalize">{program.region}</p>
+            <p className="text-sm text-text-secondary capitalize">
+              {program.region}
+            </p>
           </div>
         </div>
 
@@ -38,3 +41,6 @@ export default function ProgramCard({ program }: ProgramCardProps) {
     </Link>
   );
 }
+
+// Memoize to prevent unnecessary re-renders during filtering/searching
+export default React.memo(ProgramCard);

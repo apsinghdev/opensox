@@ -26,7 +26,8 @@ const dmMono = localFont({
     },
   ],
   variable: "--font-dm-mono",
-  display: "swap",
+  display: "optional",
+  preload: true,
 });
 
 // Geist Sans - Primary font for body text and UI
