@@ -21,6 +21,7 @@ import {
   ChevronDownIcon,
   LockClosedIcon,
   AcademicCapIcon,
+  BookOpenIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -48,6 +49,12 @@ const FREE_ROUTES: RouteConfig[] = [
     path: "/dashboard/projects",
     label: "OSS Projects",
     icon: <FolderIcon className="size-5" />,
+  },
+  {
+    path: "/dashboard/tutorial",
+    label: "Code Tutorial",
+    icon: <BookOpenIcon className="size-5" />,
+    badge: "AI",
   },
   {
     path: "/dashboard/sheet",

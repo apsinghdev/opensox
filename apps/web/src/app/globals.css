@@ -72,3 +72,123 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Tutorial Content Styling */
+.tutorial-content {
+  @apply text-base leading-relaxed;
+}
+
+.tutorial-content .hljs {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.tutorial-content pre {
+  @apply bg-[#0d1117] !important;
+}
+
+.tutorial-content pre code {
+  @apply text-sm leading-relaxed;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+}
+
+/* Mermaid diagram styling */
+.tutorial-content .mermaid-diagram svg {
+  @apply max-w-full;
+}
+
+/* Sequence diagram styling */
+.tutorial-content .mermaid svg .actor {
+  fill: #1f2937 !important;
+  stroke: #6d28d9 !important;
+}
+
+.tutorial-content .mermaid svg .actor-line {
+  stroke: #6b7280 !important;
+}
+
+.tutorial-content .mermaid svg text.actor {
+  fill: #fff !important;
+  font-size: 14px !important;
+}
+
+.tutorial-content .mermaid svg .messageLine0,
+.tutorial-content .mermaid svg .messageLine1 {
+  stroke: #6b7280 !important;
+}
+
+.tutorial-content .mermaid svg .messageText {
+  fill: #d1d5db !important;
+  font-size: 12px !important;
+}
+
+.tutorial-content .mermaid svg .note {
+  fill: #1f2937 !important;
+  stroke: #6d28d9 !important;
+}
+
+.tutorial-content .mermaid svg .noteText {
+  fill: #d1d5db !important;
+}
+
+/* Flowchart styling */
+.tutorial-content .mermaid svg .node rect,
+.tutorial-content .mermaid svg .node polygon,
+.tutorial-content .mermaid svg .node circle {
+  fill: #1f2937 !important;
+  stroke: #6d28d9 !important;
+}
+
+.tutorial-content .mermaid svg .nodeLabel {
+  fill: #fff !important;
+}
+
+.tutorial-content .mermaid svg .edgePath path {
+  stroke: #6b7280 !important;
+}
+
+.tutorial-content .mermaid svg .edgeLabel {
+  background-color: #1f2937 !important;
+  fill: #d1d5db !important;
+}
+
+/* Code highlighting improvements */
+.tutorial-content .hljs-keyword {
+  @apply text-purple-400;
+}
+
+.tutorial-content .hljs-string {
+  @apply text-green-400;
+}
+
+.tutorial-content .hljs-number {
+  @apply text-orange-400;
+}
+
+.tutorial-content .hljs-function {
+  @apply text-blue-400;
+}
+
+.tutorial-content .hljs-comment {
+  @apply text-gray-500 italic;
+}
+
+.tutorial-content .hljs-built_in {
+  @apply text-cyan-400;
+}
+
+.tutorial-content .hljs-class {
+  @apply text-yellow-400;
+}
+
+.tutorial-content .hljs-variable {
+  @apply text-red-300;
+}
+
+.tutorial-content .hljs-attr {
+  @apply text-purple-300;
+}
+
+.tutorial-content .hljs-meta {
+  @apply text-gray-400;
+}
+
