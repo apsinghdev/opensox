@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PrimaryButton from "../ui/custom-button";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Image from "next/image";
@@ -15,6 +15,7 @@ const Navbar = () => {
   const isPricingPage = pathname === "/pricing";
   const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
   const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
   const { trackButtonClick, trackLinkClick } = useAnalytics();
 
   const handleGetStartedClick = (location: "navbar" | "mobile_menu") => {
@@ -30,18 +31,19 @@ const Navbar = () => {
     );
   };
 
-  React.useEffect(() => {
+  // Close mobile menu on Escape
+  useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
         setIsOpen(false);
         (document.activeElement as HTMLElement)?.blur();
       }
     };
-
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
+  // Show navbar when scrolling down (except on Pricing page)
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!isPricingPage) {
       setShowNavbar(latest > 0);
@@ -53,10 +55,53 @@ const Navbar = () => {
     { name: "Features", href: "/#features" },
     { name: "Demo", href: "/#demo" },
     { name: "How it works", href: "/#HIW" },
+    { name: "FAQ", href: "/#faq" },
     { name: "Stats", href: "/#Stats" },
     { name: "Contact", href: "/#Contact" },
-    { name: "FAQ", href: "/#faq" },
+  
   ];
+
+  
+// scroll spy to highlight active section
+useEffect(() => {
+  const sectionIds = links
+    .filter((link) => link.href.startsWith("/#"))
+    .map((link) => link.href.replace("/#", ""));
+
+  const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+    // Filter for intersecting sections
+    const visibleEntries = entries.filter(entry => entry.isIntersecting);
+    
+    if (visibleEntries.length > 0) {
+      // Find the section with highest visibility
+      let mostVisibleEntry = visibleEntries[0];
+      
+      for (const entry of visibleEntries) {
+        if (entry.intersectionRatio > mostVisibleEntry.intersectionRatio) {
+          mostVisibleEntry = entry;
+        }
+      }
+      
+      // Update active section if target has an id
+      if (mostVisibleEntry.target.id) {
+        setActiveSection(mostVisibleEntry.target.id);
+      }
+    }
+  };
+
+  const observer = new IntersectionObserver(handleIntersect, {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.5,
+  });
+
+  sectionIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  return () => observer.disconnect();
+}, [links]);
 
   return (
     <motion.nav
@@ -64,12 +109,13 @@ const Navbar = () => {
       animate={showNavbar ? { opacity: 1 } : { opacity: 0, display: "none" }}
       transition={{ duration: 0.3 }}
       className={cn(
-        " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
+        "z-40 flex items-center justify-between px-4 py-3 bg-neutral-900/5 backdrop-blur-xl border-white/10",
         isPricingPage
           ? "relative h-max md:w-full top-0 border-b"
           : "fixed rounded-3xl top-4 border w-[94%] md:w-[80%] mx-auto left-1/2 -translate-x-1/2"
       )}
     >
+      {/* Left: Logo + Menu */}
       <div className="flex items-center gap-3">
         <button
           className="min-[1115px]:hidden text-white"
@@ -91,23 +137,39 @@ const Navbar = () => {
           <span>Opensox AI</span>
         </div>
       </div>
+
+      {/* Center: Desktop Links */}
       <div className="hidden min-[1115px]:flex items-center gap-5 max-[1270px]:gap-4 max-[1173px]:gap-3 tracking-tight text-lg max-[1270px]:text-base max-[1173px]:text-sm font-light max-[1173px]:font-normal text-[#d1d1d1]">
         {links.map((link, index) => {
-          const isActive = pathname === link.href;
+          const isActive =
+            pathname === link.href ||
+            (link.href.startsWith("/#") &&
+              activeSection === link.href.replace("/#", ""));
+
           return (
             <Link
               key={index}
               href={link.href}
               className={cn(
-                "cursor-pointer hover:text-white",
-                isActive && "text-white"
+                "relative cursor-pointer hover:text-white transition-colors duration-300",
+                isActive && "text-white font-medium"
               )}
             >
               {link.name}
+            
+            {isActive && (
+  <motion.span
+    layoutId="underline"
+    className="absolute left-0 right-0 bottom-0 mx-auto w-[55%] h-[2px] bg-brand-purple rounded-full"
+    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+  />
+)}
             </Link>
           );
         })}
       </div>
+
+      {/* Right: Buttons */}
       <div className="flex items-center gap-3">
         <Link
           href="https://github.com/apsinghdev/opensox"
@@ -130,6 +192,8 @@ const Navbar = () => {
           </PrimaryButton>
         </Link>
       </div>
+
+      {/* Mobile Menu */}
       {isOpen && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
