@@ -20,4 +20,5 @@ export type FilterProps = {
     forks?: ForkRange;
     pushed?: string;
     created?: string;
+    repoName?: string
 }

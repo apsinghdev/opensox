@@ -47,6 +47,10 @@ export const projectService = {
       queryParts.push(`created:${filters.created}`);
     }
 
+    if(filters.repoName) {
+      const trimmedRepoName = filters.repoName.trim();
+      queryParts.push(`${trimmedRepoName} in:name`)
+    }
     // Default fields to filter contributor friendly repos
     queryParts.push(`is:organization`);
     queryParts.push(`is:public`);

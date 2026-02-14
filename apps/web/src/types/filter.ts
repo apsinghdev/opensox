@@ -53,4 +53,5 @@ export type UserInputFilterProps = {
   Competition?: string;
   Stage?: string;
   Activity?: string;
+  repoName?: string; 
 };

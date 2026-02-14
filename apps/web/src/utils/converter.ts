@@ -94,6 +94,7 @@ const userInputValues: UserFilterObjProps = {
 //   Competition: "High",
 //   Stage: "Very early",
 //   Activity: "Normal",
+//   repoName: "name"
 // };
 
 // API INPUT EXAMPLE
@@ -104,6 +105,7 @@ const userInputValues: UserFilterObjProps = {
 //   forks: { min: "50", max: "1000" },
 //   pushed: ">=2024-12-08",
 //   created: ">=2024-12-12",
+//   reponame: "name"
 // };
 
 export const convertUserInputToApiInput = (
@@ -133,7 +135,9 @@ export const convertUserInputToApiInput = (
   if (filter.Stage) {
     data.created = userInputValues.Stage[filter.Stage as keyof StageProps];
   }
-
+  if(filter.repoName) {
+    data.repoName = filter.repoName.trim()
+  }
   return data as FilterProps;
 };
 
