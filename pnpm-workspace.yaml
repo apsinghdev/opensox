@@ -1,3 +1,12 @@
 packages:
-  - 'apps/*'
-  - 'packages/*' 
+  - apps/*
+  - packages/*
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - core-js
+  - core-js-pure
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver
