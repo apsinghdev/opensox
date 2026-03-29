@@ -100,6 +100,7 @@ export default function StatusFilter({
             ref={inputRef}
             type="text"
             placeholder={selectedStatuses.length === 0 ? "Status..." : ""}
+            aria-label="Filter statuses"
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);

@@ -4,26 +4,43 @@ import { useState, useMemo, useCallback } from "react";
 import { Program } from "@/data/oss-programs/types";
 import { SearchInput, TagFilter, ProgramCard } from "@/components/oss-programs";
 import StatusFilter from "@/components/oss-programs/StatusFilter";
+import { matchesStatusFilters } from "@/utils/date-utils";
 
 interface ProgramsListProps {
   programs: Program[];
   tags: string[];
 }
 
+/**
+ * Filters OSS programs based on search query, selected tags, and selected statuses.
+ * Handles status filtering based on application dates with special handling for TBD status.
+ */
 export default function ProgramsList({ programs, tags }: ProgramsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
   // Memoize handlers to prevent child re-renders
+  /**
+ * Updates search query state when user types in search input
+ * @param value - The new search query string
+ */
   const handleSearchChange = useCallback((value: string) => {
     setSearchQuery(value);
   }, []);
 
+  /**
+ * Updates selected tags state when user adds/removes tags
+ * @param newTags - Array of currently selected tag strings
+ */
   const handleTagsChange = useCallback((newTags: string[]) => {
     setSelectedTags(newTags);
   }, []);
 
+  /**
+ * Updates selected statuses state when user adds/removes status filters
+ * @param newStatuses - Array of currently selected status strings
+ */
   const handleStatusesChange = useCallback((newStatuses: string[]) => {
     setSelectedStatuses(newStatuses);
   }, []);
@@ -40,33 +57,13 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
         selectedTags.length === 0 ||
         selectedTags.every((tag) => program.tags.includes(tag));
 
-      const findMatchesStatusesBasedOnApplicationDates = () => {
-        if (selectedStatuses.length === 0) return true;
+      const matchesStatuses = matchesStatusFilters(
+        program.applicationStart,
+        program.applicationEnd,
+        selectedStatuses
+      );
 
-        if(selectedStatuses.includes("TBD")) {
-          if(!program.applicationStart || !program.applicationEnd) return true;
-        }
-        
-        if(!program.applicationStart || !program.applicationEnd) return false;
-        
-        const today = new Date();
-        const start = new Date(program.applicationStart);
-        const end = new Date(program.applicationEnd);
-      
-        if (selectedStatuses.includes("Active")) {
-          if (today >= start && today <= end) return true;
-        }
-        if (selectedStatuses.includes("Upcoming")) {
-          if (today < start) return true;
-        }
-        if (selectedStatuses.includes("Historical")) {
-          if (today > end) return true;
-        }
-        
-        return false;
-      };
-
-      return matchesSearch && matchesTags && findMatchesStatusesBasedOnApplicationDates();
+      return matchesSearch && matchesTags && matchesStatuses;
     });
   }, [programs, searchQuery, selectedTags, selectedStatuses]);
 

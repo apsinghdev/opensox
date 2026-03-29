@@ -100,6 +100,7 @@ export default function TagFilter({
             ref={inputRef}
             type="text"
             placeholder={selectedTags.length === 0 ? "Tags..." : ""}
+            aria-label="Tag filter"
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);
