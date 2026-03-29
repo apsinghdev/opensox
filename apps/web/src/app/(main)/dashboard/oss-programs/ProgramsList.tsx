@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { Program } from "@/data/oss-programs/types";
 import { SearchInput, TagFilter, ProgramCard } from "@/components/oss-programs";
+import StatusFilter from "@/components/oss-programs/StatusFilter";
 
 interface ProgramsListProps {
   programs: Program[];
@@ -12,6 +13,7 @@ interface ProgramsListProps {
 export default function ProgramsList({ programs, tags }: ProgramsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
   // Memoize handlers to prevent child re-renders
   const handleSearchChange = useCallback((value: string) => {
@@ -20,6 +22,10 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
 
   const handleTagsChange = useCallback((newTags: string[]) => {
     setSelectedTags(newTags);
+  }, []);
+
+  const handleStatusesChange = useCallback((newStatuses: string[]) => {
+    setSelectedStatuses(newStatuses);
   }, []);
 
   const filteredPrograms = useMemo(() => {
@@ -34,9 +40,35 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
         selectedTags.length === 0 ||
         selectedTags.every((tag) => program.tags.includes(tag));
 
-      return matchesSearch && matchesTags;
+      const findMatchesStatusesBasedOnApplicationDates = () => {
+        if (selectedStatuses.length === 0) return true;
+
+        if(selectedStatuses.includes("TBD")) {
+          if(!program.applicationStart || !program.applicationEnd) return true;
+        }
+        
+        if(!program.applicationStart || !program.applicationEnd) return false;
+        
+        const today = new Date();
+        const start = new Date(program.applicationStart);
+        const end = new Date(program.applicationEnd);
+      
+        if (selectedStatuses.includes("Active")) {
+          if (today >= start && today <= end) return true;
+        }
+        if (selectedStatuses.includes("Upcoming")) {
+          if (today < start) return true;
+        }
+        if (selectedStatuses.includes("Historical")) {
+          if (today > end) return true;
+        }
+        
+        return false;
+      };
+
+      return matchesSearch && matchesTags && findMatchesStatusesBasedOnApplicationDates();
     });
-  }, [programs, searchQuery, selectedTags]);
+  }, [programs, searchQuery, selectedTags, selectedStatuses]);
 
   return (
     <div className="min-h-full w-[99vw] lg:w-[80vw] bg-dash-base text-white p-4 md:p-8 lg:p-12 overflow-x-hidden">
@@ -57,6 +89,11 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
               tags={tags}
               selectedTags={selectedTags}
               onTagsChange={handleTagsChange}
+            />
+            <StatusFilter
+              statuses={["Active","Upcoming","TBD","Historical"]}
+              selectedStatuses={selectedStatuses}
+              onStatusesChange={handleStatusesChange}
             />
           </div>
         </div>

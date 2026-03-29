@@ -31,7 +31,7 @@ export default function SearchInput({
   }, [value]);
 
   return (
-    <div className="relative flex-1 min-w-0">
+    <div className="relative flex-[3] min-w-0">
       <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none z-10" />
       <input
         type="text"

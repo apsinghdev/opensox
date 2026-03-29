@@ -2,10 +2,27 @@ import React from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Program } from "@/data/oss-programs/types";
+import { Badge } from "../ui/badge";
 
 interface ProgramCardProps {
   program: Program;
 }
+
+export const getProgramStatus = (program: Program) => {
+
+  if (!program.applicationStart || !program.applicationEnd) {
+    return <span className="text-neutral-500 p-0.5 px-2 rounded-full border border-neutral-500/20 border-0.5 text-xs">TBD</span>;;
+  }
+
+  const today = new Date();
+  const start = new Date(program.applicationStart);
+  const end = new Date(program.applicationEnd);
+
+  if (today >= start && today <= end) return <span className="text-green-500 bg-green-950 p-0.5 px-2 rounded-full border border-green-500/20 border-0.5 text-xs">Active</span>;
+  if (today < start) return <span className="text-yellow-500 bg-yellow-950 p-0.5 px-2 rounded-full border border-yellow-500/20 border-0.5 text-xs">Upcoming</span>;
+  return <span className="text-neutral-300 bg-neutral-700 p-0.5 px-2 rounded-full border border-neutral-500/20 border-0.5 text-xs">Historical</span>;
+
+};
 
 function ProgramCard({ program }: ProgramCardProps) {
   return (
@@ -31,6 +48,13 @@ function ProgramCard({ program }: ProgramCardProps) {
             <p className="text-sm text-text-secondary capitalize">
               {program.region}
             </p>
+          </div>
+        </div>
+
+        <div className="hidden md:flex items-center gap-6 flex-shrink-0">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-wide">Status</p>
+            {getProgramStatus(program)}
           </div>
         </div>
 

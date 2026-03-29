@@ -103,4 +103,6 @@ Always double check the official website because exact steps and dates can chang
     description:
       "Overview of Google Summer of Code: what it is about, who it is for, when it happens, how to prepare, and how to apply.",
   },
+  applicationStart: "2026-05-01",
+  applicationEnd: "2027-04-30",
 };
