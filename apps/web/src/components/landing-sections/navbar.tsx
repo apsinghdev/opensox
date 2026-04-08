@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const { scrollYProgress } = useScroll();
@@ -16,6 +17,7 @@ const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
   const [isOpen, setIsOpen] = useState(false);
   const { trackButtonClick, trackLinkClick } = useAnalytics();
+  const router = useRouter();
 
   const handleGetStartedClick = (location: "navbar" | "mobile_menu") => {
     trackButtonClick("Get Started", location);
@@ -78,7 +80,13 @@ const Navbar = () => {
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
-        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
+        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2 cursor-pointer" onClick={() => {
+          if(pathname === "/") {
+            window.scrollTo({top: 0, behavior: "smooth"});
+          } else{ 
+            router.push("/");
+          }
+        }}>
           <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
             <Image
               src="/assets/logo.svg"
