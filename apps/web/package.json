@@ -41,6 +41,7 @@
     "react-qr-code": "^2.0.18",
     "react-tweet": "^3.2.1",
     "sanitize-html": "^2.11.0",
+    "sonner": "^2.0.7",
     "superjson": "^2.2.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",

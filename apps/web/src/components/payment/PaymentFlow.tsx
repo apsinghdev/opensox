@@ -8,6 +8,7 @@ import PrimaryButton from "@/components/ui/custom-button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { toast } from "sonner";
 
 interface PaymentFlowProps {
   planId: string; // Required: Plan ID from database
@@ -119,7 +120,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           "verification_failed",
           error instanceof Error ? error.message : "Unknown error"
         );
-        alert("Payment verification failed. Please contact support.");
+        toast.error("Payment verification failed. Please contact support.");
         setIsProcessing(false);
       }
     },
@@ -131,7 +132,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
         "payment_failed",
         error instanceof Error ? error.message : String(error)
       );
-      alert("Payment failed. Please try again.");
+      toast.error("Payment failed. Please try again.");
       setIsProcessing(false);
     },
     onDismiss: () => {
@@ -146,7 +147,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
     try {
       if (!planId || planId.trim().length === 0) {
-        alert("Payment is currently unavailable. Please contact support.");
+        toast.error("Payment is currently unavailable. Please contact support.");
         return;
       }
 

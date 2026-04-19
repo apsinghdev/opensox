@@ -17,10 +17,11 @@ import { useRenderProjects } from "@/store/useRenderProjectsStore";
 import { useProjectsData } from "@/store/useProjectsDataStore";
 import { useLoading } from "@/store/useLoadingStore";
 import { useProjectsNotFoundStore } from "@/store/useProjectsFoundStore";
+import { toast } from "sonner";
 
 export default function FiltersContainer() {
   const handleClickWipFilters = () => {
-    window.alert("🏗️ Coming very soon! :)");
+    toast.info("Coming very soon ");
   };
 
   const { toggleShowFilters } = useFilterStore();
