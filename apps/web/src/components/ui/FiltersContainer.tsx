@@ -21,7 +21,7 @@ import { toast } from "sonner";
 
 export default function FiltersContainer() {
   const handleClickWipFilters = () => {
-    toast.info("Coming very soon ");
+    toast.info("🏗️ Coming very soon!");
   };
 
   const { toggleShowFilters } = useFilterStore();

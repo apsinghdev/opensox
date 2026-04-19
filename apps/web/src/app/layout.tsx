@@ -125,9 +125,9 @@ export default async function RootLayout({
               <PostHogAuthTracker />
               <TRPCProvider>{children}</TRPCProvider>
             </SessionWrapper>
+            <Toaster theme="system" richColors />
           </ThemeProvider>
         </PostHogProvider>
-        <Toaster />
         <Analytics />
         <SpeedInsights />
       </body>
