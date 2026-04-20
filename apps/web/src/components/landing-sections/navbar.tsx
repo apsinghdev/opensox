@@ -78,14 +78,17 @@ const Navbar = () => {
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
-        <Link href="/" className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
+        <Link 
+          href="/" 
+          className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2"
+          aria-label="Go to homepage"
+        >
           <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
             <Image
               src="/assets/logo.svg"
               alt="Opensox logo"
               fill
               className="object-cover w-full h-full"
-              aria-label="Go to homepage"
             />
           </div>
           <span>Opensox AI</span>
