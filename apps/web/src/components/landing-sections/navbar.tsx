@@ -1,12 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import PrimaryButton from "../ui/custom-button";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Image from "next/image";
 import { Terminal, Menu, X } from "lucide-react";
-import { Github } from "@/components/icons/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import PrimaryButton from "@/components/ui/custom-button";
+import { Github } from "@/components/icons/icons";
+
 import { cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
@@ -116,7 +118,7 @@ const Navbar = () => {
           onClick={() => handleContributeClick("navbar")}
           className="hidden min-[1115px]:flex items-center gap-2 px-4 py-2.5 bg-github-bg hover:bg-github-hover transition-colors rounded-lg border border-github-border text-white"
         >
-          <div className="w-5 h-5"><Github /></div>
+          <div className="w-5 h-5"><Github className="w-5 h-5" aria-hidden="true" /></div>
           <span className="text-sm font-medium">Contribute</span>
         </Link>
         <Link
@@ -157,7 +159,7 @@ const Navbar = () => {
             }}
             className="flex items-center gap-2 px-4 py-2 bg-github-bg hover:bg-github-hover rounded-lg border border-github-border text-white transition-colors"
           >
-            <div className="w-5 h-5"><Github /></div>
+            <div className="w-5 h-5"><Github className="w-5 h-5" aria-hidden="true" /></div>
             <span className="text-sm font-medium">Contribute</span>
           </Link>
         </motion.div>
