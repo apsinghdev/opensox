@@ -18,7 +18,7 @@ import { SUBSCRIPTION_STATUS } from "./constants/subscription.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 const CORS_ORIGINS = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",")
   : ["http://localhost:3000", "http://localhost:5000"];
