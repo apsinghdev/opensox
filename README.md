@@ -183,7 +183,7 @@ Now run the server:
 pnpm run dev
 ```
 
-Voila! Your API server is running on `localhost:4000`.
+Voila! Your API server is running on `localhost:8080`.
 
 Now you can access your app at `http://localhost:3000`.
 
@@ -208,7 +208,7 @@ docker build -t opensox-api .
 3. Run the container with your environment variables:
 
 ```bash
-docker run -p 4000:4000 \
+docker run -p 8080:8080 \
   --env-file apps/api/.env \
   opensox-api
 ```
@@ -216,16 +216,16 @@ docker run -p 4000:4000 \
 Or if you prefer to pass environment variables individually:
 
 ```bash
-docker run -p 4000:4000 \
+docker run -p 8080:8080 \
   -e DATABASE_URL="postgresql://USER:PASSWORD@host.docker.internal:5432/opensox?schema=public" \
   -e JWT_SECRET="your-secret" \
-  -e PORT=4000 \
+  -e PORT=8080 \
   opensox-api
 ```
 
 **Note:** When using Docker, if your database is running on your host machine (not in a container), use `host.docker.internal` instead of `localhost` in your `DATABASE_URL`.
 
-Your API server will be available at `http://localhost:4000`.
+Your API server will be available at `http://localhost:8080`.
 
 ### Using Docker Compose (Optional)
 
@@ -248,11 +248,11 @@ services:
   api:
     build: .
     ports:
-      - "4000:4000"
+      - "8080:8080"
     environment:
       DATABASE_URL: postgresql://opensox:opensox@postgres:5432/opensox?schema=public
       JWT_SECRET: your-secret-key
-      PORT: 4000
+      PORT: 8080
       NODE_ENV: production
     depends_on:
       - postgres
