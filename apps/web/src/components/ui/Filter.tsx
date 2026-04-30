@@ -1,7 +1,7 @@
 "use client";
 
 import { AccordionContent, AccordionItem, AccordionTrigger } from "./accordion";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useFilterInputStore } from "@/store/useFilterInputStore";
 import clsx from "clsx";
@@ -15,12 +15,8 @@ export default function Filter({
   filters: string[];
   onClick?: () => void;
 }) {
-  const { updateFilters } = useFilterInputStore();
-  const inputData: { [key: string]: string } = {};
-  const recordFilterInput = (filter: string) => {
-    inputData[filterName] = filter;
-    updateFilters(inputData);
-  };
+  const { filters: selectedFilters, toggleFilter } = useFilterInputStore();
+  const selectedValues = selectedFilters[filterName] || [];
 
   const triggerClasses = clsx("text-sm font-medium", {
     "text-slate-300": ["Hire contributors", "Funding", "Trending"].includes(
@@ -35,25 +31,24 @@ export default function Filter({
           <span className="text-sm font-medium text-white">{filterName}</span>
         </AccordionTrigger>
         <AccordionContent className="pt-1 pb-3">
-          <RadioGroup className="space-y-3">
+          <div className="space-y-3">
             {filters.map((filter) => (
               <div key={filter} className="flex items-center space-x-3">
-                <RadioGroupItem
-                  value={filter}
-                  id={filter}
-                  onClick={() => recordFilterInput(filter)}
-                  className="border-[#28282c] bg-[#141418] text-ox-purple transition data-[state=checked]:border-ox-purple data-[state=checked]:bg-ox-purple/20 data-[state=checked]:ring-2 data-[state=checked]:ring-ox-purple/50"
+                <Checkbox
+                  id={`${filterName}-${filter}`}
+                  checked={selectedValues.includes(filter)}
+                  onCheckedChange={() => toggleFilter(filterName, filter)}
+                  className="border-[#28282c] bg-[#141418] transition data-[state=checked]:border-ox-purple data-[state=checked]:bg-ox-purple data-[state=checked]:text-white"
                 />
                 <Label
-                  htmlFor={filter}
-                  onClick={() => recordFilterInput(filter)}
+                  htmlFor={`${filterName}-${filter}`}
                   className="text-sm text-zinc-300 cursor-pointer transition-colors"
                 >
                   {filter}
                 </Label>
               </div>
             ))}
-          </RadioGroup>
+          </div>
         </AccordionContent>
       </AccordionItem>
     </div>

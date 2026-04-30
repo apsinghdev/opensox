@@ -111,27 +111,62 @@ export const convertUserInputToApiInput = (
 ): FilterProps => {
   const data: Partial<FilterProps> = {};
 
-  if (filter["Tech stack"]) {
-    data.language = filter["Tech stack"];
+  // Handle multiple tech stacks - join with comma for API
+  if (filter["Tech stack"] && filter["Tech stack"].length > 0) {
+    data.language = filter["Tech stack"].join(",");
   }
 
-  if (filter.Popularity) {
-    data.stars =
-      userInputValues.Popularity[filter.Popularity as keyof PopularityProps];
+  // Handle multiple popularity values - merge ranges (min of mins, max of maxes)
+  if (filter.Popularity && filter.Popularity.length > 0) {
+    const ranges = filter.Popularity.map(
+      (p) => userInputValues.Popularity[p as keyof PopularityProps]
+    ).filter(Boolean);
+    if (ranges.length > 0) {
+      const mins = ranges.map((r) => parseInt(r.min || "0", 10));
+      const maxes = ranges.map((r) => (r.max ? parseInt(r.max, 10) : Infinity));
+      data.stars = {
+        min: String(Math.min(...mins)),
+        ...(Math.max(...maxes) !== Infinity && { max: String(Math.max(...maxes)) }),
+      };
+    }
   }
 
-  if (filter.Competition) {
-    data.forks =
-      userInputValues.Competition[filter.Competition as keyof CompetitionProps];
+  // Handle multiple competition values - merge ranges
+  if (filter.Competition && filter.Competition.length > 0) {
+    const ranges = filter.Competition.map(
+      (c) => userInputValues.Competition[c as keyof CompetitionProps]
+    ).filter(Boolean);
+    if (ranges.length > 0) {
+      const mins = ranges.map((r) => parseInt(r.min || "0", 10));
+      const maxes = ranges.map((r) => (r.max ? parseInt(r.max, 10) : Infinity));
+      data.forks = {
+        min: String(Math.min(...mins)),
+        ...(Math.max(...maxes) !== Infinity && { max: String(Math.max(...maxes)) }),
+      };
+    }
   }
 
-  if (filter.Activity) {
-    data.pushed =
-      userInputValues.Activity[filter.Activity as keyof ActivityProps];
+  // Handle multiple activity values - use the most recent date (broadest range)
+  if (filter.Activity && filter.Activity.length > 0) {
+    const dates = filter.Activity.map(
+      (a) => userInputValues.Activity[a as keyof ActivityProps]
+    ).filter(Boolean);
+    if (dates.length > 0) {
+      // Find the oldest date (most inclusive)
+      const oldestDate = dates.sort()[0];
+      data.pushed = oldestDate;
+    }
   }
 
-  if (filter.Stage) {
-    data.created = userInputValues.Stage[filter.Stage as keyof StageProps];
+  // Handle multiple stage values - use the oldest date (most inclusive)
+  if (filter.Stage && filter.Stage.length > 0) {
+    const dates = filter.Stage.map(
+      (s) => userInputValues.Stage[s as keyof StageProps]
+    ).filter(Boolean);
+    if (dates.length > 0) {
+      const oldestDate = dates.sort()[0];
+      data.created = oldestDate;
+    }
   }
 
   return data as FilterProps;
@@ -149,10 +184,10 @@ export const convertApiOutputToUserOutput = (
     avatarUrl: item.owner.avatarUrl,
     totalIssueCount: item.issues.totalCount,
     primaryLanguage: item.primaryLanguage?.name || "Other",
-    popularity: filters.Popularity ? filters.Popularity : "-",
-    stage: filters.Stage ? filters.Stage : "-",
-    competition: filters.Competition ? filters.Competition : "-",
-    activity: filters.Activity ? filters.Activity : "-",
+    popularity: filters.Popularity?.join(", ") || "-",
+    stage: filters.Stage?.join(", ") || "-",
+    competition: filters.Competition?.join(", ") || "-",
+    activity: filters.Activity?.join(", ") || "-",
   }));
   return data;
 };
