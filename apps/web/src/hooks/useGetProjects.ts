@@ -2,12 +2,21 @@ import { useCallback } from "react";
 import { FilterProps, RepositoryProps } from "@opensox/shared/types";
 import { trpc } from "@/lib/trpc";
 
+type GetProjectsInput = {
+  search?: string;
+  filters?: FilterProps;
+};
+
 export const useGetProjects = () => {
   const utils = trpc.useUtils();
 
   const func = useCallback(
-    async (filters: FilterProps): Promise<RepositoryProps[]> => {
+    async ({
+      search,
+      filters = {},
+    }: GetProjectsInput): Promise<RepositoryProps[]> => {
       const data = await (utils.client.project.getGithubProjects as any).query({
+        search,
         filters: filters as any,
         options: {
           sort: "stars" as const,

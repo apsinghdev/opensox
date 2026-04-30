@@ -33,6 +33,7 @@ const optionsSchema = z.object({
 const inputSchema = z.object({
   filters: filterPropsSchema.optional(),
   options: optionsSchema.optional(),
+  search: z.string().optional(),
 });
 
 export const projectRouter = router({
@@ -42,7 +43,8 @@ export const projectRouter = router({
       await queryService.incrementQueryCount(ctx.db.prisma);
       return await projectService.fetchGithubProjects(
         input.filters as any,
-        input.options as any
+        input.options as any,
+        input.search
       );
     }),
 });

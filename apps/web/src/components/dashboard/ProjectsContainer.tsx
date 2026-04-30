@@ -16,6 +16,8 @@ import Image from "next/image";
 import { useFilterStore } from "@/store/useFilterStore";
 import { usePathname } from "next/navigation";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Input } from "@/components/ui/input";
+import { useState, useMemo, useEffect } from "react";
 
 type ProjectsContainerProps = { projects: DashboardProjectsProps[] };
 
@@ -38,8 +40,13 @@ const languageColors: Record<string, string> = {
   elixir: "bg-purple-600/15 text-purple-600",
 };
 
-const getColor = (c?: string) =>
-  languageColors[(c || "").toLowerCase()] || "bg-gray-200/10 text-gray-300";
+const getColor = (c?: any) => {
+  const lang = typeof c === "string" ? c : c?.name;
+
+  return (
+    languageColors[(lang || "").toLowerCase()] || "bg-gray-200/10 text-gray-300"
+  );
+};
 
 const tableColumns = [
   "Project",
@@ -119,7 +126,7 @@ export default function ProjectsContainer({
                     <div className="flex items-center gap-2">
                       <div className="rounded-full overflow-hidden inline-block h-4 w-4 sm:h-6 sm:w-6 border">
                         <Image
-                          src={p.avatarUrl}
+                          src={p.avatarUrl || "/placeholder.svg"}
                           className="w-full h-full object-cover"
                           alt={p.name}
                           width={24}
@@ -141,7 +148,9 @@ export default function ProjectsContainer({
                       variant="secondary"
                       className={`${getColor(p.primaryLanguage)} text-[10px] sm:text-xs whitespace-nowrap`}
                     >
-                      {p.primaryLanguage}
+                      {typeof p.primaryLanguage === "string"
+                        ? p.primaryLanguage
+                        : p.primaryLanguage?.name}
                     </Badge>
                   </TableCell>
 
