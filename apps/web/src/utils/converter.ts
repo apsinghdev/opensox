@@ -112,7 +112,13 @@ export const convertUserInputToApiInput = (
   const data: Partial<FilterProps> = {};
 
   if (filter["Tech stack"]) {
-    data.language = filter["Tech stack"];
+    // Handle both single string and array of strings
+    if (Array.isArray(filter["Tech stack"])) {
+      // Join multiple languages with space (GitHub search syntax)
+      data.language = filter["Tech stack"].join(" ");
+    } else {
+      data.language = filter["Tech stack"];
+    }
   }
 
   if (filter.Popularity) {
