@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PrimaryButton from "../ui/custom-button";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Image from "next/image";
@@ -15,6 +15,7 @@ const Navbar = () => {
   const isPricingPage = pathname === "/pricing";
   const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { trackButtonClick, trackLinkClick } = useAnalytics();
 
   const handleGetStartedClick = (location: "navbar" | "mobile_menu") => {
@@ -29,6 +30,10 @@ const Navbar = () => {
       true
     );
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -57,40 +62,47 @@ const Navbar = () => {
     { name: "Stats", href: "/#Stats" },
   ];
 
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <motion.nav
       initial={{ opacity: 0 }}
-      animate={showNavbar ? { opacity: 1 } : { opacity: 0, display: "none" }}
+      animate={{ 
+        opacity: showNavbar ? 1 : 0,
+        pointerEvents: showNavbar ? "auto" : "none"
+      }}
       transition={{ duration: 0.3 }}
       className={cn(
-        " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
+        "z-40 flex items-center justify-between px-4 py-3 bg-neutral-900/5 backdrop-blur-xl border-white/10",
         isPricingPage
-          ? "relative h-max md:w-full top-0 border-b"
-          : "fixed rounded-3xl top-4 border w-[94%] md:w-[80%] mx-auto left-1/2 -translate-x-1/2"
+          ? "relative h-max w-full top-0 border-b"
+          : "fixed rounded-3xl top-4 border w-[calc(100%-2rem)] lg:w-[90%] xl:w-[85%] 2xl:w-[80%] max-w-[1600px] mx-auto left-1/2 -translate-x-1/2"
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 lg:gap-3">
         <button
-          className="min-[1115px]:hidden text-white"
+          className="lg:hidden text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
         >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
-        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
-          <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
+        <Link href="/" className="text-lg lg:text-xl xl:text-2xl font-medium tracking-tighter flex items-center gap-2">
+          <div className="w-8 lg:w-9 xl:w-10 aspect-square overflow-hidden relative flex-shrink-0">
             <Image
               src="/assets/logo.svg"
-              alt="background"
+              alt="Opensox AI logo"
               fill
-              className="object-cover w-full h-full"
+              className="object-cover"
             />
           </div>
-          <span>Opensox AI</span>
-        </div>
+          <span className="whitespace-nowrap">Opensox AI</span>
+        </Link>
       </div>
-      <div className="hidden min-[1115px]:flex items-center gap-5 max-[1270px]:gap-4 max-[1173px]:gap-3 tracking-tight text-lg max-[1270px]:text-base max-[1173px]:text-sm font-light max-[1173px]:font-normal text-[#d1d1d1]">
+      <div className="hidden lg:flex items-center gap-2 xl:gap-3 2xl:gap-4 tracking-tight text-sm xl:text-base 2xl:text-lg font-light xl:font-normal text-text-tertiary">
         {links.map((link, index) => {
           const isActive = pathname === link.href;
           return (
@@ -98,7 +110,7 @@ const Navbar = () => {
               key={index}
               href={link.href}
               className={cn(
-                "cursor-pointer hover:text-white",
+                "cursor-pointer hover:text-white transition-colors whitespace-nowrap",
                 isActive && "text-white"
               )}
             >
@@ -107,24 +119,24 @@ const Navbar = () => {
           );
         })}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 lg:gap-3">
         <Link
           href="https://github.com/apsinghdev/opensox"
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleContributeClick("navbar")}
-          className="hidden min-[1115px]:flex items-center gap-2 px-4 py-2.5 bg-github-bg hover:bg-github-hover transition-colors rounded-lg border border-github-border text-white"
+          className="hidden lg:flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 py-2 xl:py-2.5 bg-github-bg hover:bg-github-hover transition-colors rounded-lg border border-github-border text-white"
         >
-          <Github className="w-5 h-5" />
-          <span className="text-sm font-medium">Contribute</span>
+          <Github className="w-4 h-4 xl:w-5 xl:h-5 flex-shrink-0" />
+          <span className="text-xs xl:text-sm font-medium whitespace-nowrap">Contribute</span>
         </Link>
         <Link
           href="/dashboard/home"
           className="cursor-pointer z-30"
           onClick={() => handleGetStartedClick("navbar")}
         >
-          <PrimaryButton classname="px-3 py-2 text-sm whitespace-nowrap md:px-5 md:py-3 md:text-base">
-            <Terminal className="w-4 h-4 md:w-5 md:h-5" />
+          <PrimaryButton classname="px-3 py-2 text-xs lg:text-sm xl:text-base whitespace-nowrap lg:px-4 xl:px-5 lg:py-2.5 xl:py-3">
+            <Terminal className="w-4 h-4 xl:w-5 xl:h-5 flex-shrink-0" />
             <span>Get Started</span>
           </PrimaryButton>
         </Link>
@@ -134,14 +146,14 @@ const Navbar = () => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="absolute top-full mt-2 left-0 w-full bg-neutral-900/90 backdrop-blur-xl border border-white/10 min-[1115px]:hidden flex flex-col items-center py-5 space-y-4 z-50 rounded-3xl"
+          className="absolute top-full mt-2 left-0 w-full max-h-[80vh] overflow-y-auto bg-neutral-900/95 backdrop-blur-xl border border-white/10 lg:hidden flex flex-col items-center py-5 space-y-4 z-50 rounded-3xl shadow-xl"
         >
           {links.map((link, index) => (
             <Link
               key={index}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-white hover:text-gray-300 text-lg"
+              className="text-white hover:text-gray-300 text-base transition-colors"
             >
               {link.name}
             </Link>
@@ -154,7 +166,7 @@ const Navbar = () => {
               setIsOpen(false);
               handleContributeClick("mobile_menu");
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-github-bg hover:bg-github-hover rounded-lg border border-github-border text-white transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 bg-github-bg hover:bg-github-hover rounded-lg border border-github-border text-white transition-colors"
           >
             <Github className="w-5 h-5" />
             <span className="text-sm font-medium">Contribute</span>
