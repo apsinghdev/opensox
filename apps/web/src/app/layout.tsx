@@ -10,6 +10,7 @@ import { authConfig } from "@/lib/auth/config";
 import { SessionWrapper } from "./SessionWrapper";
 import { TRPCProvider } from "@/providers/trpc-provider";
 import { GeistSans } from "geist/font/sans";
+import { Toaster } from "sonner";
 
 // DM Mono - Used for code, terminal, and monospace text
 const dmMono = localFont({
@@ -124,6 +125,7 @@ export default async function RootLayout({
               <PostHogAuthTracker />
               <TRPCProvider>{children}</TRPCProvider>
             </SessionWrapper>
+            <Toaster theme="system" richColors />
           </ThemeProvider>
         </PostHogProvider>
         <Analytics />
