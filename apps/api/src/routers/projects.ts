@@ -21,6 +21,7 @@ const filterPropsSchema = z.object({
     .optional(),
   pushed: z.string().optional(),
   created: z.string().optional(),
+  repoName: z.string().optional()
 });
 
 const optionsSchema = z.object({

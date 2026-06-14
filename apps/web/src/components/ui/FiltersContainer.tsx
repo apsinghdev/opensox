@@ -25,7 +25,7 @@ export default function FiltersContainer() {
 
   const { toggleShowFilters } = useFilterStore();
   const { setRenderProjects } = useRenderProjects();
-  const { filters, resetFilters } = useFilterInputStore();
+  const { filters, resetFilters, updateFilters } = useFilterInputStore();
   const { setData, eraseData } = useProjectsData();
   const { setProjectsNotFound } = useProjectsNotFoundStore();
   const getProjects = useGetProjects();
@@ -80,6 +80,16 @@ export default function FiltersContainer() {
         {/* Filter Content */}
         <div className="flex-1 overflow-y-auto py-4">
           <Accordion type="multiple" className="space-y-2">
+            <div className="w-full px-6 flex justify-center h-10">
+              <input 
+                type="text" 
+                placeholder="Enter repository name"
+                className="w-full rounded-md outline-none focus:outline-2 focus:outline-ox-purple px-2"
+                onChange={(e) => {
+                  updateFilters({repoName: e.target.value})
+                }}
+              />
+            </div>
             <Filter
               filterName="Tech stack"
               filters={[
