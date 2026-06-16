@@ -192,7 +192,9 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
               }}
             >
               <div
-                className={`w-full h-[44px] flex items-center rounded-md cursor-pointer transition-colors px-2 gap-3 pl-3 group ${
+                className={`w-full h-[44px] flex items-center justify-center rounded-md cursor-pointer transition-colors px-2 gap-3 group ${
+                  isCollapsed ? "" : "pl-3"
+                } ${
                   isActive
                     ? "bg-brand-purple/10 border-l-2 border-brand-purple"
                     : "hover:bg-dash-hover"
