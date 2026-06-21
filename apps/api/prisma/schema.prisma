@@ -107,14 +107,15 @@ model Subscription {
 }
 
 model Plan {
-  id            String         @id @default(cuid())
-  name          String
-  interval      String
-  price         Int
-  currency      String         @default("INR")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  subscriptions Subscription[]
+  id             String         @id @default(cuid())
+  name           String
+  interval       String
+  durationMonths Int            @default(12)
+  price          Int
+  currency       String         @default("INR")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  subscriptions  Subscription[]
 }
 
 model WeeklySession {

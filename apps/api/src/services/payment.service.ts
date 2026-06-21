@@ -30,6 +30,31 @@ function isTransientDbError(error: unknown): boolean {
   return false;
 }
 
+function resolvePlanDurationMonths(plan: {
+  durationMonths?: number | null;
+  interval?: string | null;
+}): number {
+  if (
+    typeof plan.durationMonths === "number" &&
+    Number.isFinite(plan.durationMonths) &&
+    plan.durationMonths > 0
+  ) {
+    return plan.durationMonths;
+  }
+
+  switch ((plan.interval ?? "").toLowerCase()) {
+    case "monthly":
+      return 1;
+    case "quarterly":
+      return 3;
+    case "yearly":
+    case "annual":
+      return 12;
+    default:
+      return 12;
+  }
+}
+
 interface CreateOrderInput {
   amount: number;
   currency: string;
@@ -283,28 +308,14 @@ export const paymentService = {
         throw new Error("Plan not found");
       }
 
-      // Calculate end date - Currently only yearly plan is supported
+      // Calculate end date from the plan's duration. Prefer the explicit
+      // durationMonths field; fall back to interpreting the interval string so
+      // older plans without a duration still resolve to a sensible length.
       const startDate = new Date();
       const endDate = new Date(startDate);
 
-      // Set subscription for 1 year (yearly plan)
-      endDate.setFullYear(endDate.getFullYear() + 1);
-
-      // Future plan intervals (commented out for now):
-      // switch (plan.interval.toLowerCase()) {
-      //   case "monthly":
-      //     endDate.setMonth(endDate.getMonth() + 1);
-      //     break;
-      //   case "quarterly":
-      //     endDate.setMonth(endDate.getMonth() + 3);
-      //     break;
-      //   case "yearly":
-      //   case "annual":
-      //     endDate.setFullYear(endDate.getFullYear() + 1);
-      //     break;
-      //   default:
-      //     endDate.setFullYear(endDate.getFullYear() + 1);
-      // }
+      const durationMonths = resolvePlanDurationMonths(plan);
+      endDate.setMonth(endDate.getMonth() + durationMonths);
 
       // Check if user already has an active subscription for this payment
       const existingSubscription = await prisma.subscription.findFirst({

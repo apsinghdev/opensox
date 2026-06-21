@@ -15,19 +15,35 @@ async function main() {
   // await prisma.user.deleteMany();
   // await prisma.plan.deleteMany();
 
-  // Create test plan (1 rupee test plan)
+  // Create test plan (1 rupee test plan - 1 year)
   const testPlan = await prisma.plan.upsert({
     where: { id: '385b8215-d70f-473e-81c9-68a673c0d2fc-test' },
-    update: {},
+    update: { durationMonths: 12 },
     create: {
       id: '385b8215-d70f-473e-81c9-68a673c0d2fc-test',
       name: 'Test Plan',
       interval: 'yearly',
+      durationMonths: 12,
       price: 100, // 1 rupee in paise
       currency: 'INR',
     },
   });
   console.log('✅ Created test plan:', testPlan.id);
+
+  // Create 4-year test plan (dummy plan for the 48-month duration)
+  const fourYearPlan = await prisma.plan.upsert({
+    where: { id: '385b8215-d70f-473e-81c9-68a673c0d2fc-4yr-test' },
+    update: { durationMonths: 48 },
+    create: {
+      id: '385b8215-d70f-473e-81c9-68a673c0d2fc-4yr-test',
+      name: 'Pro 4 Year (Test)',
+      interval: 'yearly',
+      durationMonths: 48,
+      price: 100, // 1 rupee in paise (test price)
+      currency: 'INR',
+    },
+  });
+  console.log('✅ Created 4-year test plan:', fourYearPlan.id);
 
   // Create test user
   const testUser = await prisma.user.upsert({

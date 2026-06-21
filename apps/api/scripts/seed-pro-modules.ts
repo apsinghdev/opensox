@@ -102,7 +102,7 @@ async function main(): Promise<void> {
   let plan = await prisma.plan.findFirst({ where: { name: "Pro (dev seed)" } });
   if (!plan) {
     plan = await prisma.plan.create({
-      data: { name: "Pro (dev seed)", interval: "yearly", price: 0, currency: "INR" },
+      data: { name: "Pro (dev seed)", interval: "yearly", durationMonths: 12, price: 0, currency: "INR" },
     });
   }
 
