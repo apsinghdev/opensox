@@ -315,7 +315,17 @@ export const paymentService = {
       const endDate = new Date(startDate);
 
       const durationMonths = resolvePlanDurationMonths(plan);
-      endDate.setMonth(endDate.getMonth() + durationMonths);
+      // Add months with year wraparound, clamping to the last valid day of the
+      // target month so month-end start dates (e.g. Jan 31, or Feb 29 on a leap
+      // year) don't overflow into the following month.
+      const monthsFromYearStart = endDate.getMonth() + durationMonths;
+      const targetYear =
+        endDate.getFullYear() + Math.floor(monthsFromYearStart / 12);
+      const targetMonth = ((monthsFromYearStart % 12) + 12) % 12;
+      endDate.setFullYear(targetYear, targetMonth, endDate.getDate());
+      if (endDate.getMonth() !== targetMonth) {
+        endDate.setDate(0);
+      }
 
       // Check if user already has an active subscription for this payment
       const existingSubscription = await prisma.subscription.findFirst({

@@ -146,7 +146,7 @@ const Pricing = () => {
     <>
       <main className="w-full overflow-hidden flex flex-col items-center justify-center relative">
         {/* SECTION 1 - hero */}
-        <section className="relative flex w-full items-center overflow-hidden border-b border-[#252525] lg:min-h-[calc(100svh-73px)]">
+        <section className="relative flex w-full items-center overflow-hidden border-b border-border lg:min-h-[calc(100svh-73px)]">
           {/* same violet texture that sits at the bottom of the pricing cards,
               faded out toward the top so it blends in instead of reading as a blob */}
           <div
@@ -216,7 +216,7 @@ const Pricing = () => {
               transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
               className="flex flex-col items-center gap-4"
             >
-              <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-[#252525]">
+              <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-border">
                 <Image
                   src="/assets/jackedaj.jpg"
                   alt="jackedAJ"
@@ -236,7 +236,7 @@ const Pricing = () => {
         {/* SECTION 2 - pricing cards */}
         <section
           id="pro-price-card"
-          className="relative w-full overflow-hidden border-b border-[#252525]"
+          className="relative w-full overflow-hidden border-b border-border"
         >
           {/* contained soft glow sitting behind the cards (does not bleed up into the hero) */}
           <div
@@ -288,7 +288,7 @@ const Pricing = () => {
             </Link>
           </p>
         </div>
-        <div className="w-full border-b border-[#252525] text-center py-4 font-bold px-4">
+        <div className="w-full border-b border-border text-center py-4 font-bold px-4">
           For any doubts or queries, feel free to ping us at{" "}
           <Link
             href="mailto:opensoxlabs@gmail.com"
@@ -539,8 +539,8 @@ const TestimonialsSection = () => {
   return (
     <div className=" text-white " id="testimonials">
       <Header title="What our Pro customers say about us" />
-      <div className="border-b  border-[#252525] w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
-        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">
+      <div className="border-b  border-border w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
+        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-border">
           {groupedTestimonials[1].map((testimonial) => (
             <div
               key={testimonial.id}
@@ -556,7 +556,7 @@ const TestimonialsSection = () => {
           ))}
         </div>
 
-        <div className="h-full border-y lg:border-x lg:border-y-0 border-[#252525] p-6 lg:p-10 mx-auto flex flex-col gap-6 flex-shrink-0 lg:col-span-3 font-medium">
+        <div className="h-full border-y lg:border-x lg:border-y-0 border-border p-6 lg:p-10 mx-auto flex flex-col gap-6 flex-shrink-0 lg:col-span-3 font-medium">
           {groupedTestimonials[2].map((testimonial) => (
             <div key={testimonial.id} className="flex flex-col gap-6">
               <PremiumTestimonialCard username={testimonial.username} />
@@ -569,7 +569,7 @@ const TestimonialsSection = () => {
           ))}
         </div>
 
-        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">
+        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-border">
           {groupedTestimonials[3].map((testimonial) => (
             <div
               key={testimonial.id}
