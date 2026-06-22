@@ -75,11 +75,14 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
 
   const updateSquares = useCallback(
     (squares: Float32Array, deltaTime: number) => {
+      const updatedIndices: number[] = [];
       for (let i = 0; i < squares.length; i++) {
         if (Math.random() < flickerChance * deltaTime) {
           squares[i] = Math.random() * maxOpacity;
+          updatedIndices.push(i);
         }
       }
+      return updatedIndices;
     },
     [flickerChance, maxOpacity],
   );
@@ -114,6 +117,30 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
     [memoizedColor, squareSize, gridGap],
   );
 
+  const drawUpdatedSquares = useCallback(
+    (
+      ctx: CanvasRenderingContext2D,
+      rows: number,
+      squares: Float32Array,
+      dpr: number,
+      updatedIndices: number[],
+    ) => {
+      for (const idx of updatedIndices) {
+        const i = Math.floor(idx / rows);
+        const j = idx % rows;
+        const opacity = squares[idx];
+        const x = i * (squareSize + gridGap) * dpr;
+        const y = j * (squareSize + gridGap) * dpr;
+        const size = squareSize * dpr;
+        
+        ctx.clearRect(x, y, size, size);
+        ctx.fillStyle = `${memoizedColor}${opacity})`;
+        ctx.fillRect(x, y, size, size);
+      }
+    },
+    [memoizedColor, squareSize, gridGap],
+  );
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -130,6 +157,16 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       const newHeight = height || container.clientHeight;
       setCanvasSize({ width: newWidth, height: newHeight });
       gridParams = setupCanvas(canvas, newWidth, newHeight);
+      
+      drawGrid(
+        ctx,
+        canvas.width,
+        canvas.height,
+        gridParams.cols,
+        gridParams.rows,
+        gridParams.squares,
+        gridParams.dpr,
+      );
     };
 
     updateCanvasSize();
@@ -141,15 +178,13 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       const deltaTime = (time - lastTime) / 1000;
       lastTime = time;
 
-      updateSquares(gridParams.squares, deltaTime);
-      drawGrid(
+      const updatedIndices = updateSquares(gridParams.squares, deltaTime);
+      drawUpdatedSquares(
         ctx,
-        canvas.width,
-        canvas.height,
-        gridParams.cols,
         gridParams.rows,
         gridParams.squares,
         gridParams.dpr,
+        updatedIndices
       );
       animationFrameId = requestAnimationFrame(animate);
     };

@@ -9,7 +9,7 @@
     "dev": "tsx src/index.ts",
     "seed:pro-modules": "tsx scripts/seed-pro-modules.ts",
     "build": "prisma generate && tsc",
-    "postinstall": "[ -f prisma/schema.prisma ] && prisma generate || true"
+    "postinstall": "node -e \"const fs = require('fs'); if (fs.existsSync('prisma/schema.prisma')) { require('child_process').execSync('prisma generate', { stdio: 'inherit' }); }\""
   },
   "keywords": [],
   "author": "Ajeet Pratpa Singh",

@@ -35,27 +35,59 @@ export function ShineBorder({
   style,
   ...props
 }: ShineBorderProps) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = React.useState(true);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { rootMargin: "150px" }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const gradientColor = Array.isArray(shineColor) ? shineColor.join(",") : shineColor;
+
   return (
-    <div
-      style={
-        {
-          "--border-width": `${borderWidth}px`,
-          "--duration": `${duration}s`,
-          backgroundImage: `radial-gradient(transparent,transparent, ${Array.isArray(shineColor) ? shineColor.join(",") : shineColor},transparent,transparent)`,
-          backgroundSize: "300% 300%",
-          mask: `linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)`,
-          WebkitMask: `linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)`,
-          WebkitMaskComposite: "xor",
-          maskComposite: "exclude",
-          padding: "var(--border-width)",
-          ...style,
-        } as React.CSSProperties
-      }
-      className={cn(
-        "pointer-events-none absolute inset-0 size-full rounded-[inherit] will-change-[background-position] motion-safe:animate-shine",
-        className,
-      )}
-      {...props}
-    />
+    <>
+      <style>{`
+        @keyframes shine-transform {
+          0% { transform: translate(-33.33%, -33.33%); }
+          50% { transform: translate(33.33%, 33.33%); }
+          100% { transform: translate(-33.33%, -33.33%); }
+        }
+      `}</style>
+      <div
+        ref={containerRef}
+        style={
+          {
+            "--border-width": `${borderWidth}px`,
+            mask: `linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)`,
+            WebkitMask: `linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)`,
+            WebkitMaskComposite: "xor",
+            maskComposite: "exclude",
+            padding: "var(--border-width)",
+            ...style,
+          } as React.CSSProperties
+        }
+        className={cn(
+          "pointer-events-none absolute inset-0 size-full rounded-[inherit] overflow-hidden",
+          className,
+        )}
+        {...props}
+      >
+        <div
+          className="absolute inset-0 w-[300%] h-[300%] -left-[100%] -top-[100%] will-change-transform transform-gpu"
+          style={{
+            backgroundImage: `radial-gradient(transparent, transparent, ${gradientColor}, transparent, transparent)`,
+            animation: `shine-transform ${duration}s infinite linear`,
+            animationPlayState: isVisible ? "running" : "paused",
+          }}
+        />
+      </div>
+    </>
   );
 }

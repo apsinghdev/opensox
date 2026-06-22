@@ -352,8 +352,8 @@ const Pricing = () => {
               </div>
             </div>
           </div>
-          <div className="relative border-b border-[#252525] lg:pb-10">
-            <div className="flex flex-col gap-5 lg:gap-10 py-4 bg-[#151515]/20 backdrop-blur-xl h-full relative w-full overflow-hidden  px-4 lg:px-10">
+          <div className="relative border-b border-[#252525] lg:pb-10 isolate" style={{ contain: 'layout paint' }}>
+            <div className="flex flex-col gap-5 lg:gap-10 py-4 bg-[#151515]/20 h-full relative w-full overflow-hidden  px-4 lg:px-10">
               <div className="absolute inset-0 -top-72">
                 <Image
                   src="/assets/layer1.svg"
@@ -470,7 +470,10 @@ const PricingCard = () => {
                 })}
               </div>
             </div>
-            <div className="bg-white mix-blend-plus-lighter absolute h-[120px] w-full blur-[60px] right-0 -bottom-20 opacity-80"></div>
+            <div 
+              className="absolute h-[250px] w-[150%] left-1/2 -translate-x-1/2 -bottom-24 opacity-60 pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 60%)' }}
+            ></div>
           </div>
         </div>
       </div>
@@ -626,7 +629,10 @@ const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
                 })}
               </div>
             </div>
-            <div className="bg-white mix-blend-plus-lighter absolute h-[120px] w-full blur-[60px] right-0 -bottom-20 opacity-80"></div>
+            <div 
+              className="absolute h-[250px] w-[150%] left-1/2 -translate-x-1/2 -bottom-24 opacity-60 pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 60%)' }}
+            ></div>
           </div>
         </div>
       </div>

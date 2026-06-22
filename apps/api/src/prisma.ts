@@ -23,38 +23,38 @@ const basePrisma = new PrismaClient({
 const prisma = basePrisma.$extends({
   query: {
     account: {
-      async create({ args, query }) {
+      async create({ args, query }: any) {
         args.data = encryptAccountTokens(args.data);
         const result = await query(args);
         return decryptAccountTokens(result);
       },
-      async update({ args, query }) {
+      async update({ args, query }: any) {
         args.data = encryptAccountTokens(args.data);
         const result = await query(args);
         return decryptAccountTokens(result);
       },
-      async upsert({ args, query }) {
+      async upsert({ args, query }: any) {
         args.create = encryptAccountTokens(args.create);
         args.update = encryptAccountTokens(args.update);
         const result = await query(args);
         return decryptAccountTokens(result);
       },
-      async findUnique({ args, query }) {
+      async findUnique({ args, query }: any) {
         const result = await query(args);
         return decryptAccountTokens(result);
       },
-      async findFirst({ args, query }) {
+      async findFirst({ args, query }: any) {
         const result = await query(args);
         return decryptAccountTokens(result);
       },
-      async findMany({ args, query }) {
+      async findMany({ args, query }: any) {
         const result = await query(args);
         return result?.map((account: any) => decryptAccountTokens(account));
       },
     },
     user: {
       // Decrypt nested accounts in user queries
-      async findUnique({ args, query }) {
+      async findUnique({ args, query }: any) {
         const result = await query(args);
         if (result?.accounts) {
           result.accounts = Array.isArray(result.accounts)
@@ -65,7 +65,7 @@ const prisma = basePrisma.$extends({
         }
         return result;
       },
-      async findFirst({ args, query }) {
+      async findFirst({ args, query }: any) {
         const result = await query(args);
         if (result?.accounts) {
           result.accounts = Array.isArray(result.accounts)
@@ -76,7 +76,7 @@ const prisma = basePrisma.$extends({
         }
         return result;
       },
-      async findMany({ args, query }) {
+      async findMany({ args, query }: any) {
         const result = await query(args);
         return result?.map((user: any) => {
           if (user?.accounts) {
