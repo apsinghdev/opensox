@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -35,10 +36,9 @@ type RouteConfig = {
   path: string;
   label: string;
   icon: React.ReactNode;
-  badge?: string; // optional badge text (e.g., "New", "Beta")
+  badge?: string;
 };
 
-// free features only
 const FREE_ROUTES: RouteConfig[] = [
   {
     path: "/dashboard/home",
@@ -62,7 +62,6 @@ const FREE_ROUTES: RouteConfig[] = [
   },
 ];
 
-// premium features under Opensox Pro
 const PREMIUM_ROUTES: RouteConfig[] = [
   {
     path: "/dashboard/pro/sessions",
@@ -90,6 +89,9 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
   const { isPaidUser } = useSubscription();
   const [proSectionExpanded, setProSectionExpanded] = useState(true);
   const { trackLinkClick, trackButtonClick } = useAnalytics();
+
+  // 🟣 New state for hover expand
+  const [isHovered, setIsHovered] = useState(false);
 
   // auto-expand pro section if user is on a premium route
   useEffect(() => {
@@ -124,7 +126,18 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
     }
   };
 
-  const desktopWidth = isCollapsed ? 80 : 288;
+  // 🟣 Hover handlers
+  const handleMouseEnter = () => {
+    if (isCollapsed) setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (isHovered) setTimeout(() => setIsHovered(false), 150);
+  };
+
+  // compute dynamic width
+  const isSidebarExpanded = !isCollapsed || isHovered;
+  const desktopWidth = isSidebarExpanded ? 288 : 80;
   const mobileWidth = desktopWidth;
 
   return (
@@ -132,11 +145,14 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
       className={`h-screen flex flex-col bg-dash-surface border-r border-dash-border z-50 ${
         overlay ? "fixed left-0 top-0 bottom-0 xl:hidden" : ""
       }`}
-      initial={
-        overlay ? { x: -400, width: mobileWidth } : { width: desktopWidth }
-      }
-      animate={overlay ? { x: 0, width: mobileWidth } : { width: desktopWidth }}
-      exit={overlay ? { x: -400, width: mobileWidth } : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      initial={{
+        width: overlay ? mobileWidth : desktopWidth,
+      }}
+      animate={{
+        width: overlay ? mobileWidth : desktopWidth,
+      }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
       style={{ width: overlay ? mobileWidth : desktopWidth }}
     >
@@ -157,7 +173,7 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
 
       {/* Desktop header with collapse */}
       <div className="hidden xl:flex items-center justify-between px-4 py-4 border-b border-dash-border bg-dash-surface">
-        {!isCollapsed && (
+        {!isSidebarExpanded ? null : (
           <Link
             href="/"
             className="text-text-secondary font-semibold tracking-wide select-none text-xl hover:text-brand-purple transition-colors cursor-pointer"
@@ -167,17 +183,18 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
         )}
         <IconWrapper
           onClick={toggleCollapsed}
-          className={isCollapsed ? "w-full flex justify-center" : ""}
+          className={isSidebarExpanded ? "" : "w-full flex justify-center"}
         >
-          {isCollapsed ? (
-            <ChevronRightIcon className="size-5 text-brand-purple" />
-          ) : (
+          {isSidebarExpanded ? (
             <ChevronLeftIcon className="size-5 text-brand-purple" />
+          ) : (
+            <ChevronRightIcon className="size-5 text-brand-purple" />
           )}
         </IconWrapper>
       </div>
 
-      <div className="sidebar-body flex-grow flex-col overflow-y-auto px-3 py-4 space-y-1">
+      {/* Sidebar content */}
+      <div className="sidebar-body flex-grow flex-col overflow-y-auto px-3 py-4 space-y-1 transition-all duration-300">
         {/* free features section */}
         {FREE_ROUTES.map((route) => {
           const isActive =
@@ -209,7 +226,7 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
                 >
                   {route.icon}
                 </span>
-                {!isCollapsed && (
+                {isSidebarExpanded && (
                   <div className="flex items-center gap-1.5 flex-1 min-w-0">
                     <h1
                       className={`text-xs font-medium transition-colors ${
@@ -233,14 +250,14 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
         })}
 
         {/* divider */}
-        {!isCollapsed && (
+        {isSidebarExpanded && (
           <div className="my-3 px-3">
             <div className="border-t border-dash-border" />
           </div>
         )}
 
         {/* premium section */}
-        {!isCollapsed ? (
+        {isSidebarExpanded ? (
           <div className="space-y-1">
             {(() => {
               const isPremiumRouteActive = PREMIUM_ROUTES.some(
@@ -455,7 +472,7 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
         )}
 
         {/* divider */}
-        {!isCollapsed && (
+        {isSidebarExpanded && (
           <div className="my-3 px-3">
             <div className="border-t border-dash-border" />
           </div>
@@ -466,12 +483,12 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
           itemName="Request a feature"
           onclick={reqFeatureHandler}
           icon={<SparklesIcon className="size-5" />}
-          collapsed={isCollapsed}
+          collapsed={!isSidebarExpanded}
         />
       </div>
 
       {/* Bottom profile */}
-      <ProfileMenu isCollapsed={isCollapsed} />
+      <ProfileMenu isCollapsed={!isSidebarExpanded} />
     </motion.div>
   );
 }
@@ -524,7 +541,9 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
               </span>
             </div>
             <ChevronLeftIcon
-              className={`size-4 text-text-muted transition-transform ${open ? "rotate-90" : "-rotate-90"}`}
+              className={`size-4 text-text-muted transition-transform ${
+                open ? "rotate-90" : "-rotate-90"
+              }`}
             />
           </div>
         )}
