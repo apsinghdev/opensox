@@ -1,10 +1,11 @@
 "use client";
 import Header from "@/components/ui/header";
-import { Check, X } from "lucide-react";
+import PrimaryButton from "@/components/ui/custom-button";
+import { Check, Terminal, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { trpc } from "@/lib/trpc";
@@ -114,6 +115,7 @@ interface PlanTier {
   key: TierKey;
   name: string;
   price: string;
+  originalPrice?: string;
   period: string;
   planId?: string;
   paymentDescription?: string;
@@ -143,6 +145,7 @@ const Pricing = () => {
       key: "pro1",
       name: "Pro",
       price: "$49",
+      originalPrice: "$89",
       period: "/ year",
       planId: yearlyPlanId,
       paymentDescription: "Annual Subscription",
@@ -151,6 +154,7 @@ const Pricing = () => {
       key: "pro4",
       name: "Pro Plus",
       price: "$99",
+      originalPrice: "$199",
       period: "/ 4 years",
       planId: fourYearPlanId,
       paymentDescription: "4 Year Subscription",
@@ -184,9 +188,7 @@ const Pricing = () => {
     <>
       <main className="w-full overflow-hidden flex flex-col items-center justify-center relative">
         {/* SECTION 1 - hero */}
-        <section className="relative flex w-full items-center overflow-hidden border-b border-border lg:min-h-[calc(100svh-73px)]">
-          {/* same violet texture that sits at the bottom of the pricing cards,
-              faded out toward the top so it blends in instead of reading as a blob */}
+        <section className="relative flex w-full items-center overflow-hidden border-b border-border lg:min-h-screen">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-1/2 lg:h-2/5"
@@ -194,6 +196,7 @@ const Pricing = () => {
               maskImage: "linear-gradient(to top, black 0%, transparent 85%)",
               WebkitMaskImage:
                 "linear-gradient(to top, black 0%, transparent 85%)",
+              filter: "blur(10px)",
             }}
           >
             <Image
@@ -202,25 +205,6 @@ const Pricing = () => {
               fill
               loading="lazy"
               className="h-full w-full object-cover object-bottom opacity-50"
-            />
-          </div>
-          {/* mirrored texture fading in from the top */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-1/2 lg:h-2/5"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, black 0%, transparent 85%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, black 0%, transparent 85%)",
-            }}
-          >
-            <Image
-              src="/assets/card_bg.svg"
-              alt=""
-              fill
-              loading="lazy"
-              className="h-full w-full -scale-y-100 object-cover object-bottom opacity-50"
             />
           </div>
           <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-16">
@@ -305,14 +289,51 @@ const Pricing = () => {
 
 export default Pricing;
 
-const PRICING_GRID =
-  "grid grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(72px,1fr))] gap-x-4 lg:gap-x-8";
+const FEATURE_LABEL_WIDTH = "w-[9.5rem] shrink-0";
+
+const FEATURE_ROW_LAYOUT =
+  "flex items-start gap-4 border-b border-border py-3.5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-12";
+
+const MOBILE_TABLE_SCROLL =
+  "-mx-4 overflow-x-auto overscroll-x-contain px-4 lg:mx-0 lg:overflow-visible lg:px-0";
+
+const PLAN_COLUMNS_GAP = "gap-6 lg:gap-10";
+
+const PlanColumns = ({
+  children,
+  className = "",
+  align = "end",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  align?: "start" | "end";
+}) => (
+  <div
+    className={`flex shrink-0 ${align === "start" ? "ml-0 justify-start pl-0 pr-0" : "ml-auto justify-end pl-8 pr-4 lg:pl-12 lg:pr-6"} ${PLAN_COLUMNS_GAP} ${className}`}
+  >
+    {children}
+  </div>
+);
+
+const PlanColumn = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <div
+    className={`flex shrink-0 flex-col items-center px-3 sm:px-4 w-[8rem] sm:w-[10rem] ${className}`}
+  >
+    {children}
+  </div>
+);
 
 const FeatureCell = ({ value }: { value: FeatureValue }) => {
   if (value === true) {
     return (
       <Check
-        className="mx-auto h-3.5 w-3.5 text-brand-purple-light"
+        className="h-3.5 w-3.5 text-brand-purple-light"
         strokeWidth={2}
         aria-label="Included"
       />
@@ -322,7 +343,7 @@ const FeatureCell = ({ value }: { value: FeatureValue }) => {
   if (value === false) {
     return (
       <X
-        className="mx-auto h-3.5 w-3.5 text-text-muted"
+        className="h-3.5 w-3.5 text-text-muted"
         strokeWidth={2}
         aria-label="Not included"
       />
@@ -330,76 +351,74 @@ const FeatureCell = ({ value }: { value: FeatureValue }) => {
   }
 
   return (
-    <span className="block text-center text-xs text-text-secondary">
-      {value}
-    </span>
+    <span className="text-center text-xs text-text-secondary">{value}</span>
   );
 };
+
+const PRICING_BUTTON_CLASS = "w-full !py-2 !text-xs";
 
 const PlanColumnHeader = ({
   tier,
   callbackUrl,
-  variant,
 }: {
   tier: PlanTier;
   callbackUrl: string;
-  variant: "primary" | "outline" | "none";
 }) => {
+  const router = useRouter();
   const planIdOk = typeof tier.planId === "string" && tier.planId.length > 0;
   const isPaid = tier.key !== "free";
 
-  const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
-    { planId: tier.planId ?? "" },
-    { enabled: planIdOk },
-  );
-
-  const primaryButtonClass =
-    "!rounded-full !border-none !bg-text-primary !from-transparent !to-transparent !px-4 !py-2 !text-xs !font-medium !text-surface-primary !shadow-none hover:!opacity-90 w-full";
-  const outlineButtonClass =
-    "!rounded-full !border !border-border !bg-transparent !from-transparent !to-transparent !px-4 !py-2 !text-xs !font-medium !text-text-primary !shadow-none hover:!bg-surface-hover w-full";
-
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      <p className="text-xs font-medium text-text-muted">{tier.name}</p>
-      <div className="flex flex-col items-center gap-0.5">
-        <p className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
-          {tier.price}
-          {!isPaid ? null : (
-            <span className="text-sm font-normal text-text-muted">
-              {tier.period}
+    <div className="flex h-full w-full flex-col justify-between text-center">
+      <div className="flex flex-col items-center">
+        <p className="px-3 py-1.5 text-lg font-medium tracking-wide text-text-muted">
+          {tier.name}
+        </p>
+        <div className="flex flex-col items-center gap-0.5">
+          {isPaid ? (
+            <p className="flex flex-wrap items-baseline justify-center gap-x-1.5 text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
+              <span>{tier.price}</span>
+              <span className="text-sm font-normal text-text-muted">
+                {tier.period}
+              </span>
+            </p>
+          ) : (
+            <p className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
+              {tier.price}
+            </p>
+          )}
+          {tier.originalPrice ? (
+            <span className="text-sm font-normal text-text-muted line-through">
+              {tier.originalPrice}
+            </span>
+          ) : (
+            <span className="text-sm invisible select-none" aria-hidden>
+              &nbsp;
             </span>
           )}
-        </p>
-        {isPaid && publicPlan ? (
-          <p className="text-[11px] text-text-muted">
-            {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
-          </p>
-        ) : !isPaid ? (
-          <p className="text-[11px] text-text-muted">{tier.period}</p>
+        </div>
+      </div>
+      <div className="w-full pt-4">
+        {!isPaid ? (
+          <PrimaryButton
+            classname={PRICING_BUTTON_CLASS}
+            onClick={() => router.push("/dashboard/home")}
+          >
+            <Terminal className="h-3.5 w-3.5" />
+            Start Free
+          </PrimaryButton>
         ) : (
-          <p className="text-[11px] text-transparent select-none">.</p>
+          <PaymentFlow
+            planId={planIdOk ? (tier.planId as string) : ""}
+            planName="Opensox Pro"
+            description={tier.paymentDescription}
+            buttonText={planIdOk ? "Invest" : "Unavailable"}
+            buttonClassName={`${PRICING_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
+            callbackUrl={callbackUrl}
+            buttonLocation="pricing_page"
+          />
         )}
       </div>
-      {variant === "none" ? (
-        <Link
-          href="/dashboard/home"
-          className="w-full rounded-full border border-border px-4 py-2 text-center text-xs font-medium text-text-primary transition-colors hover:bg-surface-hover"
-        >
-          Get Started
-        </Link>
-      ) : isPaid ? (
-        <PaymentFlow
-          planId={planIdOk ? (tier.planId as string) : ""}
-          planName="Opensox Pro"
-          description={tier.paymentDescription}
-          buttonText={planIdOk ? "Get Started" : "Unavailable"}
-          buttonClassName={`${
-            variant === "primary" ? primaryButtonClass : outlineButtonClass
-          } ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
-          callbackUrl={callbackUrl}
-          buttonLocation="pricing_page"
-        />
-      ) : null}
     </div>
   );
 };
@@ -416,52 +435,90 @@ const PricingComparison = ({
   const proPlusTier = tiers.find((t) => t.key === "pro4")!;
 
   return (
-    <div className="flex flex-col gap-10 lg:gap-14">
-      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end lg:gap-12">
-        <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-6 lg:gap-14">
+      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-stretch lg:gap-12">
+        <div className="flex flex-col gap-3 pt-4">
           <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
-            Choose your <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">plan.</span>
+            Choose your{" "}
+            <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
+              plan.
+            </span>
           </h2>
           <p className="max-w-sm text-sm text-text-muted">
             Start free, or go Pro to join the ecosystem.
           </p>
         </div>
 
-        <div className="overflow-x-auto">
-          <div className={`${PRICING_GRID} min-w-[320px] items-end`}>
-            <div className="hidden lg:block" />
-            <PlanColumnHeader
-              tier={freeTier}
-              callbackUrl={callbackUrl}
-              variant="none"
-            />
-            <PlanColumnHeader
-              tier={proTier}
-              callbackUrl={callbackUrl}
-              variant="primary"
-            />
-            <PlanColumnHeader
-              tier={proPlusTier}
-              callbackUrl={callbackUrl}
-              variant="outline"
-            />
-          </div>
-        </div>
+        <PlanColumns className="h-full items-stretch">
+          <PlanColumn className="h-full">
+            <PlanColumnHeader tier={freeTier} callbackUrl={callbackUrl} />
+          </PlanColumn>
+          <PlanColumn className="h-full">
+            <PlanColumnHeader tier={proTier} callbackUrl={callbackUrl} />
+          </PlanColumn>
+          <PlanColumn className="h-full">
+            <PlanColumnHeader tier={proPlusTier} callbackUrl={callbackUrl} />
+          </PlanColumn>
+        </PlanColumns>
       </div>
 
-      <div className="overflow-x-auto border-t border-border">
-        <div className="min-w-[520px]">
-          {comparisonFeatures.map((feature) => (
-            <div
-              key={feature.name}
-              className={`${PRICING_GRID} items-center border-b border-border py-3.5`}
-            >
-              <p className="text-xs text-text-muted">{feature.name}</p>
-              <FeatureCell value={feature.free} />
-              <FeatureCell value={feature.pro} />
-              <FeatureCell value={feature.proPlus} />
-            </div>
-          ))}
+      <div className="flex flex-col gap-3 pt-4 lg:hidden">
+        <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
+          Choose your{" "}
+          <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
+            plan.
+          </span>
+        </h2>
+        <p className="max-w-sm text-sm text-text-muted">
+          Start free, or go Pro to join the ecosystem.
+        </p>
+      </div>
+
+      <div className={MOBILE_TABLE_SCROLL}>
+        <div className="min-w-[40rem] lg:min-w-0">
+          <div className="flex items-stretch pb-6 lg:hidden">
+            <div className={FEATURE_LABEL_WIDTH} aria-hidden />
+            <PlanColumns align="start" className="items-stretch">
+              <PlanColumn className="h-full">
+                <PlanColumnHeader tier={freeTier} callbackUrl={callbackUrl} />
+              </PlanColumn>
+              <PlanColumn className="h-full">
+                <PlanColumnHeader tier={proTier} callbackUrl={callbackUrl} />
+              </PlanColumn>
+              <PlanColumn className="h-full">
+                <PlanColumnHeader
+                  tier={proPlusTier}
+                  callbackUrl={callbackUrl}
+                />
+              </PlanColumn>
+            </PlanColumns>
+          </div>
+
+          <div className="border-t border-border">
+            {comparisonFeatures.map((feature) => (
+              <div key={feature.name} className={FEATURE_ROW_LAYOUT}>
+                <p
+                  className={`${FEATURE_LABEL_WIDTH} min-w-0 pr-2 text-xs text-text-muted lg:w-auto lg:pr-0`}
+                >
+                  {feature.name}
+                </p>
+                <PlanColumns
+                  align="start"
+                  className="items-start lg:ml-auto lg:justify-end lg:pl-12 lg:pr-6 lg:items-center"
+                >
+                  <PlanColumn className="items-start lg:items-center">
+                    <FeatureCell value={feature.free} />
+                  </PlanColumn>
+                  <PlanColumn className="items-start lg:items-center">
+                    <FeatureCell value={feature.pro} />
+                  </PlanColumn>
+                  <PlanColumn className="items-start lg:items-center">
+                    <FeatureCell value={feature.proPlus} />
+                  </PlanColumn>
+                </PlanColumns>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

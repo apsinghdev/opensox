@@ -29,7 +29,7 @@ const PrimaryButton = ({
         "[box-shadow:0px_-2px_0px_0px_#2c04b1_inset]",
         "hover:opacity-90 transition-opacity duration-100",
         "text-white font-medium",
-        classname
+        classname,
       )}
       transition={animate ? transition : undefined}
     >

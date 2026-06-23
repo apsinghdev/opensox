@@ -182,12 +182,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
-        heading: [
-          "Helvetica Neue",
-          "Helvetica",
-          "Arial",
-          "sans-serif",
-        ],
+        heading: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         mono: [
           "var(--font-dm-mono)",
           "Menlo",
