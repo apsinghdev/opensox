@@ -84,6 +84,10 @@ const ProProjectsPage = (): JSX.Element | null => {
           <p className="text-text-secondary text-sm md:text-base mt-2">
             Hand-picked open source projects worth contributing to.
           </p>
+          <p className="text-text-muted text-xs md:text-sm mt-3">
+            Note: the qualities might change over a period of time so the more
+            latest the project is the more accurate the qualities.
+          </p>
         </div>
 
         <ProjectsContent

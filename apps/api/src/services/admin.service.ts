@@ -65,7 +65,7 @@ export const adminService = {
     const now = new Date();
 
     try {
-      const [paidUsers, revenue, latestProPayment] = await Promise.all([
+      const [paidUsers, revenue, latestProSubscription] = await Promise.all([
         withRetry(
           () =>
             db.user.count({
@@ -90,9 +90,12 @@ export const adminService = {
         ),
         withRetry(
           () =>
-            db.payment.findFirst({
-              where: { status: PAYMENT_STATUS.CAPTURED },
-              orderBy: { createdAt: "desc" },
+            db.subscription.findFirst({
+              where: {
+                status: SUBSCRIPTION_STATUS.ACTIVE,
+                endDate: { gte: now },
+              },
+              orderBy: { startDate: "desc" },
               select: {
                 user: {
                   select: { email: true },
@@ -107,7 +110,7 @@ export const adminService = {
         paidUsers,
         totalRevenuePaise: revenue._sum.amount ?? 0,
         currency: "INR",
-        latestProMemberEmail: latestProPayment?.user.email ?? null,
+        latestProMemberEmail: latestProSubscription?.user.email ?? null,
       };
     } catch (error) {
       if (isTransientDbError(error)) {
