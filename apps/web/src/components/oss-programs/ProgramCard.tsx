@@ -12,7 +12,11 @@ function ProgramCard({ program }: ProgramCardProps) {
     <Link
       href={`/dashboard/oss-programs/${program.slug}`}
       onClick={() => {
-        sessionStorage.setItem("oss-program-scroll", String(window.scrollY));
+        const scrollContainer = document.getElementById("dashboard-scroll-container");
+        sessionStorage.setItem(
+          "oss-programs-scroll",
+          String(scrollContainer?.scrollTop ?? window.scrollY)
+        );
       }}
       className="group block w-full min-w-0"
     >
