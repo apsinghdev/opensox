@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { Globe } from "lucide-react";
 import { Twitter, Email, Discord, Youtube, Github, OnlyFans } from "../icons/icons";
 import Link from "next/link";
 import Image from "next/image";
@@ -36,7 +37,16 @@ const Footer = () => {
                 Opensox AI
               </h4>
             </div>
-            <div className="flex items-center gap-2">
+            <Link
+              href="https://www.jackedaj.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                handleSocialClick("https://www.jackedaj.com/", "jackedAJ")
+              }
+              className="flex items-center gap-2 text-[#b1b1b1] hover:text-white transition-colors"
+              aria-label="jackedAJ website (opens in a new tab)"
+            >
               <Image
                 src="/ajeetunc.webp"
                 alt="ajeetunc"
@@ -44,10 +54,8 @@ const Footer = () => {
                 height={32}
                 className="rounded-full object-cover object-[center_20%] aspect-square w-8 h-8"
               />
-              <span className="text-[#b1b1b1] text-xs font-mono">
-                by jackedAJ
-              </span>
-            </div>
+              <span className="text-xs font-mono">by jackedAJ</span>
+            </Link>
           </div>
 
           {/* Grid Layout - Right */}
@@ -150,6 +158,20 @@ const Footer = () => {
                 Socials
               </h3>
               <div className="flex flex-col gap-2">
+                <Link
+                  href="https://www.jackedaj.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    handleSocialClick("https://www.jackedaj.com/", "jackedAJ")
+                  }
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs flex items-center gap-1.5"
+                >
+                  <span className="w-3.5 flex items-center justify-center">
+                    <Globe className="size-3.5" aria-hidden="true" />
+                  </span>
+                  jackedAJ
+                </Link>
                 <Link
                   href="https://x.com/jackedAJ"
                   target="_blank"

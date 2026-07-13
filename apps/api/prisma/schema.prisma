@@ -201,3 +201,19 @@ model ProRef {
   @@index([category])
   @@index([order])
 }
+
+model ProProject {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  // Free-form, multi-line text (tagline + bullet points). Rendered verbatim.
+  qualities String
+  // Admin-controlled position set by drag-reordering in the CMS (lower shows
+  // first). The "#n" users see is derived from this position, not stored.
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+  @@index([createdAt])
+}

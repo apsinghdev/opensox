@@ -8,8 +8,6 @@ import {
 
 type Db = ExtendedPrismaClient | PrismaClient;
 
-const PRO_PLAN_NAMES = ["Pro", "Pro+"];
-
 function isTransientDbError(error: unknown): boolean {
   if (
     error instanceof PrismaClientKnownRequestError &&
@@ -67,7 +65,7 @@ export const adminService = {
     const now = new Date();
 
     try {
-      const [paidUsers, revenue] = await Promise.all([
+      const [paidUsers, revenue, latestProPayment] = await Promise.all([
         withRetry(
           () =>
             db.user.count({
@@ -76,7 +74,6 @@ export const adminService = {
                   some: {
                     status: SUBSCRIPTION_STATUS.ACTIVE,
                     endDate: { gte: now },
-                    plan: { name: { in: PRO_PLAN_NAMES } },
                   },
                 },
               },
@@ -91,12 +88,26 @@ export const adminService = {
             }),
           "admin revenue aggregate"
         ),
+        withRetry(
+          () =>
+            db.payment.findFirst({
+              where: { status: PAYMENT_STATUS.CAPTURED },
+              orderBy: { createdAt: "desc" },
+              select: {
+                user: {
+                  select: { email: true },
+                },
+              },
+            }),
+          "admin latest pro member"
+        ),
       ]);
 
       return {
         paidUsers,
         totalRevenuePaise: revenue._sum.amount ?? 0,
         currency: "INR",
+        latestProMemberEmail: latestProPayment?.user.email ?? null,
       };
     } catch (error) {
       if (isTransientDbError(error)) {
@@ -108,6 +119,7 @@ export const adminService = {
           paidUsers: 0,
           totalRevenuePaise: 0,
           currency: "INR",
+          latestProMemberEmail: null,
         };
       }
 

@@ -22,13 +22,12 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
       ],
       "@types/*": [
-        "types/*"
+        "./types/*"
       ],
       "@opensox/shared/*": [
         "../../packages/shared/src/*"

@@ -19,6 +19,7 @@ import {
   PlayIcon,
   Squares2X2Icon,
   BookOpenIcon,
+  CubeIcon,
   ChevronDownIcon,
   LockClosedIcon,
   AcademicCapIcon,
@@ -91,6 +92,12 @@ const PREMIUM_ROUTES: RouteConfig[] = [
     path: "/dashboard/pro/refs",
     label: "Pro Refs",
     icon: <BookOpenIcon className="size-5" />,
+    badge: "New",
+  },
+  {
+    path: "/dashboard/pro/projects",
+    label: "Pro Projects",
+    icon: <CubeIcon className="size-5" />,
     badge: "New",
   },
 ];
