@@ -37,25 +37,31 @@ const Footer = () => {
                 Opensox AI
               </h4>
             </div>
-            <Link
-              href="https://www.jackedaj.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() =>
-                handleSocialClick("https://www.jackedaj.com/", "jackedAJ")
-              }
-              className="flex items-center gap-2 text-[#b1b1b1] hover:text-white transition-colors"
-              aria-label="jackedAJ website (opens in a new tab)"
-            >
-              <Image
-                src="/ajeetunc.webp"
-                alt="ajeetunc"
-                width={32}
-                height={32}
-                className="rounded-full object-cover object-[center_20%] aspect-square w-8 h-8"
-              />
-              <span className="text-xs font-mono">by jackedAJ</span>
-            </Link>
+            <p className="text-sm font-mono text-text-muted">
+              Designed, Built and Backed by{" "}
+              <Link
+                href="https://www.jackedaj.com/jackedaj_labs"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() =>
+                  handleSocialClick(
+                    "https://www.jackedaj.com/jackedaj_labs",
+                    "JackedAJ Labs"
+                  )
+                }
+                className="inline-flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors underline underline-offset-2"
+                aria-label="JackedAJ Labs (opens in a new tab)"
+              >
+                <Image
+                  src="/assets/jackedaj-labs.png"
+                  alt=""
+                  width={18}
+                  height={18}
+                  className="rounded-sm object-cover shrink-0"
+                />
+                JackedAJ Labs
+              </Link>
+            </p>
           </div>
 
           {/* Grid Layout - Right */}
