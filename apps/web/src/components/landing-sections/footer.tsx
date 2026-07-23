@@ -3,7 +3,6 @@ import React from "react";
 import { Globe } from "lucide-react";
 import { Twitter, Email, Discord, Youtube, Github, OnlyFans } from "../icons/icons";
 import Link from "next/link";
-import Image from "next/image";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Footer = () => {
@@ -49,16 +48,9 @@ const Footer = () => {
                     "JackedAJ Labs"
                   )
                 }
-                className="inline-flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors underline underline-offset-2"
+                className="text-text-muted hover:text-text-primary transition-colors underline underline-offset-2"
                 aria-label="JackedAJ Labs (opens in a new tab)"
               >
-                <Image
-                  src="/assets/jackedaj-labs.png"
-                  alt=""
-                  width={18}
-                  height={18}
-                  className="rounded-sm object-cover shrink-0"
-                />
                 JackedAJ Labs
               </Link>
             </p>
