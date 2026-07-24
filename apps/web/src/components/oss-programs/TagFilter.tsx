@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, memo } from "react";
 import { X, ChevronDown } from "lucide-react";
 
 interface TagFilterProps {
@@ -9,11 +9,11 @@ interface TagFilterProps {
   onTagsChange: (tags: string[]) => void;
 }
 
-export default function TagFilter({
+const TagFilter = ({
   tags,
   selectedTags,
   onTagsChange,
-}: TagFilterProps) {
+}: TagFilterProps) => {
   const [filterInput, setFilterInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -136,3 +136,5 @@ export default function TagFilter({
     </div>
   );
 }
+
+export default memo(TagFilter)
