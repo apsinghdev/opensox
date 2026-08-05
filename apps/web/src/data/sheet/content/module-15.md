@@ -1,15 +1,9 @@
 ---
 id: "module-15"
-name: "Get/pick your second issue assigned (medium)"
-videoUrl: ""
-comingSoon: true
+name: "Types of Licenses in Open Source"
+videoUrl: "https://youtu.be/SNgtbiQx4Xc"
+comingSoon: false
+isNew: true
 ---
 
-Get/pick your second issue assigned (medium)
-
-Get/pick your second issue assigned (medium)
-
-Learn how to get your second issue assigned, focusing on medium difficulty issues.
-
-Learn how to get your second issue assigned, focusing on medium difficulty issues.
-
+This module explains Types of Licenses in Open Source. Enjoy! This is Ajeet for you.
