@@ -142,19 +142,8 @@ app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
     }
 
     if (!discordService.isAutomationEnabled()) {
-      // Get Discord invite URL from environment (legacy mode)
-      const discordInviteUrl = process.env.DISCORD_INVITE_URL;
-      if (!discordInviteUrl) {
-        console.error("DISCORD_INVITE_URL not configured");
-        return res
-          .status(500)
-          .json({ error: "Community invite not configured" });
-      }
-
-      return res.status(200).json({
-        mode: "legacy",
-        discordInviteUrl,
-        message: "Subscription verified. You can join the community.",
+      return res.status(400).json({
+        error: "Discord automation is not enabled",
       });
     }
 
@@ -241,7 +230,7 @@ app.get(
     try {
       if (!discordService.isAutomationEnabled()) {
         return res.status(200).json({
-          mode: "legacy",
+          mode: "disabled",
           connected: false,
           joined: false,
         });
