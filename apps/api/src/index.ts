@@ -12,6 +12,7 @@ import helmet from "helmet";
 import ipBlocker from "./middleware/ipBlock.js";
 import crypto from "crypto";
 import { paymentService } from "./services/payment.service.js";
+import { userService } from "./services/user.service.js";
 import { verifyToken } from "./utils/auth.js";
 import { SUBSCRIPTION_STATUS } from "./constants/subscription.js";
 import { discordService } from "./services/discord.service.js";
@@ -129,37 +130,20 @@ app.get("/join-community", apiLimiter, async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Unauthorized - Invalid token" });
     }
 
-    // Check if user has an active subscription
-    const subscription = await prismaModule.prisma.subscription.findFirst({
-      where: {
-        userId: user.id,
-        status: SUBSCRIPTION_STATUS.ACTIVE,
-        endDate: {
-          gte: new Date(),
-        },
-      },
-    });
+    const { isPaidUser } = await userService.checkSubscriptionStatus(
+      prismaModule.prisma,
+      user.id
+    );
 
-    if (!subscription) {
+    if (!isPaidUser) {
       return res.status(403).json({
         error: "Forbidden - Active subscription required to join community",
       });
     }
 
     if (!discordService.isAutomationEnabled()) {
-      // Get Discord invite URL from environment (legacy mode)
-      const discordInviteUrl = process.env.DISCORD_INVITE_URL;
-      if (!discordInviteUrl) {
-        console.error("DISCORD_INVITE_URL not configured");
-        return res
-          .status(500)
-          .json({ error: "Community invite not configured" });
-      }
-
-      return res.status(200).json({
-        mode: "legacy",
-        discordInviteUrl,
-        message: "Subscription verified. You can join the community.",
+      return res.status(400).json({
+        error: "Discord automation is not enabled",
       });
     }
 
@@ -218,6 +202,17 @@ app.get("/discord/connect-url", apiLimiter, async (req: Request, res: Response) 
     } catch {
       return res.status(401).json({ error: "Unauthorized - Invalid token" });
     }
+
+    const { isPaidUser } = await userService.checkSubscriptionStatus(
+      prismaModule.prisma,
+      user.id
+    );
+    if (!isPaidUser) {
+      return res.status(403).json({
+        error: "Forbidden - Active subscription required to join community",
+      });
+    }
+
     const state = createDiscordOAuthState(user.id);
     const authUrl = discordService.buildAuthorizationUrl(state);
 
@@ -235,7 +230,7 @@ app.get(
     try {
       if (!discordService.isAutomationEnabled()) {
         return res.status(200).json({
-          mode: "legacy",
+          mode: "disabled",
           connected: false,
           joined: false,
         });
@@ -302,6 +297,14 @@ app.get("/auth/discord/callback", apiLimiter, async (req: Request, res: Response
     const statePayload = verifyDiscordOAuthState(state);
     if (!statePayload) {
       return res.redirect(`${failureBaseUrl}?discord=invalid_state`);
+    }
+
+    const { isPaidUser } = await userService.checkSubscriptionStatus(
+      prismaModule.prisma,
+      statePayload.userId
+    );
+    if (!isPaidUser) {
+      return res.redirect(`${failureBaseUrl}?discord=subscription_required`);
     }
 
     const tokenResponse = await discordService.exchangeCodeForToken(code);
