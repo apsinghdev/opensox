@@ -14,7 +14,11 @@ export const ClientTweetCard = ({
   fetchOptions,
   ...props
 }: TweetProps & { className?: string }) => {
-  const { data, error, isLoading } = useTweet(id, apiUrl, fetchOptions);
+  const { data, error, isLoading } = useTweet(
+    id,
+    apiUrl ?? (id ? `/api/tweet/${id}` : undefined),
+    fetchOptions
+  );
 
   if (isLoading) {
     return <TweetSkeleton {...props} />;

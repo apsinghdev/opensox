@@ -8,6 +8,7 @@ import Link from "next/link";
 import { trpc } from "@/lib/trpc";
 import { imageTestimonials } from "@/data/testimonials";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getSocialHandle } from "@/lib/social-handle";
 
 type TestimonialBase = {
   id: string;
@@ -131,6 +132,7 @@ const TestimonialsPage = () => {
         content: t.content,
         user: {
           name: t.name,
+          username: getSocialHandle(t.socialLink) ?? undefined,
           avatar: t.avatar,
           socialLink: t.socialLink,
         },
