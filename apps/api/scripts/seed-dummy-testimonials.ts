@@ -2,8 +2,10 @@
  * insert 10 dummy text testimonials so the landing marquee can be tested.
  * re-running upserts the same dummy emails and does not touch real rows.
  *
+ * requires an explicit local-only opt-in and will abort in production.
+ *
  * usage (from apps/api):
- *   pnpm tsx scripts/seed-dummy-testimonials.ts
+ *   ALLOW_DUMMY_TESTIMONIAL_SEED=1 pnpm tsx scripts/seed-dummy-testimonials.ts
  */
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
@@ -86,6 +88,15 @@ const DUMMIES = [
 ];
 
 async function main() {
+  const optedIn = process.env.ALLOW_DUMMY_TESTIMONIAL_SEED === "1";
+  const isProduction = process.env.NODE_ENV === "production";
+  if (!optedIn || isProduction) {
+    console.error(
+      "refusing to seed dummy testimonials. run locally with ALLOW_DUMMY_TESTIMONIAL_SEED=1 (not production)."
+    );
+    process.exit(1);
+  }
+
   for (const [index, dummy] of DUMMIES.entries()) {
     const user = await prisma.user.upsert({
       where: { email: dummy.email },

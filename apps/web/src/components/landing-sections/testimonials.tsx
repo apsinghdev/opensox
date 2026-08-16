@@ -7,7 +7,7 @@ import TestimonialGrid from "../ui/testimonial-grid";
 import { trpc } from "@/lib/trpc";
 
 const Testimonials = () => {
-  const { data } = trpc.testimonial.getAll.useQuery();
+  const { data, isLoading } = trpc.testimonial.getAll.useQuery();
 
   const testimonials = (data ?? []).map(
     (t: {
@@ -49,11 +49,17 @@ const Testimonials = () => {
           }}
           className="w-[30px] lg:w-[50px] absolute right-0 top-0 border-l border-border"
         />
-        <TestimonialGrid
-          testimonials={testimonials}
-          speed="slow"
-          className="h-full"
-        />
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-text-muted text-sm">Loading testimonials...</p>
+          </div>
+        ) : (
+          <TestimonialGrid
+            testimonials={testimonials}
+            speed="slow"
+            className="h-full"
+          />
+        )}
       </div>
     </div>
   );

@@ -78,7 +78,7 @@ export function JackedAJNewsletterSignup({
             autoComplete="email"
             placeholder="your email"
             aria-label="your email"
-            className="w-[13.5rem] px-2 py-1 text-sm font-semibold text-text-primary bg-surface-primary border border-brand-purple outline-none placeholder:font-normal placeholder:text-text-tertiary autofill:shadow-[inset_0_0_0_1000px_rgb(16,16,16)]"
+            className="w-[13.5rem] px-2 py-1 text-sm font-semibold text-text-primary bg-surface-primary border border-brand-purple outline-none placeholder:font-normal placeholder:text-text-tertiary autofill:shadow-[inset_0_0_0_1000px_theme(colors.surface.primary)]"
           />
           <button
             type="submit"
