@@ -35,6 +35,11 @@ const ADMIN_SECTIONS = [
     title: "Pro projects",
     description: "Manage open source projects shown to Pro members.",
   },
+  {
+    href: "/admin/email-list",
+    title: "Email list",
+    description: "Confirmed jackedAJ newsletter subscribers.",
+  },
 ] as const;
 
 const AdminHomePage = (): JSX.Element => {
@@ -102,6 +107,11 @@ const AdminHomePage = (): JSX.Element => {
             Paid users:{" "}
             <span className="text-text-secondary">
               {stats?.paidUsers ?? "—"}
+            </span>
+            <span className="mx-2 text-dash-border">·</span>
+            Newsletter:{" "}
+            <span className="text-text-secondary">
+              {stats?.newsletterSubscribers ?? "—"}
             </span>
             <span className="mx-2 text-dash-border">·</span>
             Total revenue:{" "}

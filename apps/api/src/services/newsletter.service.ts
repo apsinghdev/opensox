@@ -189,4 +189,30 @@ export const newsletterService = {
 
     return { ok: true };
   },
+
+  async adminCount(db: Db): Promise<number> {
+    return db.newsletterSubscriber.count({
+      where: { unsubscribedAt: null },
+    });
+  },
+
+  async adminList(db: Db) {
+    const where = { unsubscribedAt: null };
+
+    const [count, subscribers] = await Promise.all([
+      db.newsletterSubscriber.count({ where }),
+      db.newsletterSubscriber.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          source: true,
+          createdAt: true,
+        },
+      }),
+    ]);
+
+    return { count, subscribers };
+  },
 };

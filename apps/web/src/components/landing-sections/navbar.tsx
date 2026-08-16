@@ -12,8 +12,8 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 const Navbar = () => {
   const { scrollYProgress } = useScroll();
   const pathname = usePathname();
-  const isPricingPage = pathname === "/pricing";
-  const [showNavbar, setShowNavbar] = useState(isPricingPage ? true : false);
+  const isPinnedNav = pathname === "/pricing" || pathname === "/newsletter";
+  const [showNavbar, setShowNavbar] = useState(isPinnedNav ? true : false);
   const [isOpen, setIsOpen] = useState(false);
   const { trackButtonClick } = useAnalytics();
 
@@ -33,8 +33,14 @@ const Navbar = () => {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
+  React.useEffect(() => {
+    if (isPinnedNav) {
+      setShowNavbar(true);
+    }
+  }, [isPinnedNav]);
+
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (!isPricingPage) {
+    if (!isPinnedNav) {
       setShowNavbar(latest > 0);
     }
   });
@@ -43,6 +49,7 @@ const Navbar = () => {
     { name: "Pricing", href: "/pricing" },
     { name: "Testimonials", href: "/testimonials" },
     { name: "Blogs", href: "/blog" },
+    { name: "Newsletter", href: "/newsletter" },
   ];
 
   return (
@@ -52,7 +59,7 @@ const Navbar = () => {
       transition={{ duration: 0.3 }}
       className={cn(
         " z-40  flex items-center justify-between px-4 py-3  bg-neutral-900/5 backdrop-blur-xl  border-white/10",
-        isPricingPage
+        isPinnedNav
           ? "relative h-max md:w-full top-0 border-b"
           : "fixed rounded-3xl top-4 border w-[94%] md:w-[80%] mx-auto left-1/2 -translate-x-1/2"
       )}

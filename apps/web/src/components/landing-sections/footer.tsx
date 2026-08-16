@@ -95,6 +95,12 @@ const Footer = () => {
                   Blog
                 </Link>
                 <Link
+                  href="/newsletter"
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs"
+                >
+                  Newsletter
+                </Link>
+                <Link
                   href="https://github.com/apsinghdev/opensox/graphs/contributors?all=1"
                   target="_blank"
                   rel="noopener noreferrer"

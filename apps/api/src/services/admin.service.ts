@@ -5,6 +5,7 @@ import {
   PAYMENT_STATUS,
   SUBSCRIPTION_STATUS,
 } from "../constants/subscription.js";
+import { newsletterService } from "./newsletter.service.js";
 
 type Db = ExtendedPrismaClient | PrismaClient;
 
@@ -65,7 +66,8 @@ export const adminService = {
     const now = new Date();
 
     try {
-      const [paidUsers, revenue, latestProSubscription] = await Promise.all([
+      const [paidUsers, newsletterSubscribers, revenue, latestProSubscription] =
+        await Promise.all([
         withRetry(
           () =>
             db.user.count({
@@ -79,6 +81,10 @@ export const adminService = {
               },
             }),
           "admin paid user count"
+        ),
+        withRetry(
+          () => newsletterService.adminCount(db),
+          "admin newsletter subscriber count"
         ),
         withRetry(
           () =>
@@ -108,6 +114,7 @@ export const adminService = {
 
       return {
         paidUsers,
+        newsletterSubscribers,
         totalRevenuePaise: revenue._sum.amount ?? 0,
         currency: "INR",
         latestProMemberEmail: latestProSubscription?.user.email ?? null,
@@ -120,6 +127,7 @@ export const adminService = {
         );
         return {
           paidUsers: 0,
+          newsletterSubscribers: 0,
           totalRevenuePaise: 0,
           currency: "INR",
           latestProMemberEmail: null,
