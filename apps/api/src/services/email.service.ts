@@ -190,7 +190,7 @@ Ajeet from Opensox.ai`;
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p style="color: #333; line-height: 1.8; font-size: 16px;">
-          Confirm your signup for the jackedAJ newsletter.
+          Please confirm your signup to get into big leagues!.
         </p>
         <div style="margin: 30px 0; text-align: center;">
           <a href="${safeUrl}"
@@ -207,7 +207,7 @@ Ajeet from Opensox.ai`;
       </div>
     `;
 
-    const textBody = `Confirm your signup for the jackedAJ newsletter.
+    const textBody = `Please confirm your signup to get into big leagues!.
 
 ${confirmUrl}`;
 
