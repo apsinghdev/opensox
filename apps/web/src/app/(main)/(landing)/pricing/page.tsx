@@ -411,6 +411,14 @@ const PlanColumnHeader = ({
     },
   );
 
+  const { data: memberCountData } = trpc.payment.getProMemberCount.useQuery(
+    { planId: tier.planId as string },
+    {
+      enabled: isPaid && planIdOk,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
   return (
     <div className="flex h-full w-full flex-col justify-between text-center">
       <div className="flex flex-col items-center">
@@ -463,15 +471,22 @@ const PlanColumnHeader = ({
             Start free
           </PrimaryButton>
         ) : (
-          <PaymentFlow
-            planId={planIdOk ? (tier.planId as string) : ""}
-            planName={`Opensox ${tier.name}`}
-            description={tier.paymentDescription}
-            buttonText={planIdOk ? "Invest" : "Unavailable"}
-            buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
-            callbackUrl={callbackUrl}
-            buttonLocation="pricing_page"
-          />
+          <>
+            <PaymentFlow
+              planId={planIdOk ? (tier.planId as string) : ""}
+              planName={`Opensox ${tier.name}`}
+              description={tier.paymentDescription}
+              buttonText={planIdOk ? "Invest" : "Unavailable"}
+              buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
+              callbackUrl={callbackUrl}
+              buttonLocation="pricing_page"
+            />
+            {typeof memberCountData?.count === "number" ? (
+              <p className="mt-2 font-heading text-sm font-semibold tracking-tighter text-success-text">
+                {memberCountData.count} invested!
+              </p>
+            ) : null}
+          </>
         )}
       </div>
     </div>
