@@ -33,59 +33,64 @@ const dmMono = localFont({
 // Geist Sans - Primary font for body text and UI
 const geistSans = GeistSans;
 
+const SITE_URL = "https://opensox.ai";
+const SITE_NAME = "Opensox";
+const SOCIAL_DESCRIPTION =
+  "achieve in 1 year what took me 3 years in open source.";
+const SEO_DESCRIPTION =
+  "How to get started with open source and how to contribute. Find projects, tools, and a path to an open source career.";
+const OG_IMAGE = {
+  url: "/images/open-source-tool.png",
+  width: 1024,
+  height: 467,
+  alt: "open source tool",
+} as const;
+
 export const metadata: Metadata = {
-  title: "Opensox",
-  description: "Find the perfect open source project to contribute",
+  title: `${SITE_NAME} | How to get started with open source`,
+  description: SEO_DESCRIPTION,
+  applicationName: SITE_NAME,
+  category: "Open Source",
+  authors: [{ name: "Ajeet Pratap Singh", url: SITE_URL }],
+  creator: "Ajeet Pratap Singh",
+  publisher: SITE_NAME,
   icons: {
     icon: "/images/os-image.ico",
   },
   keywords: [
-    "opensox",
-    "Opensox",
-    "Opensox AI",
-    "Open Source Projects",
-    "Search Open Source Projects",
-    "Gsoc Organizations",
-    "Open source Startups",
-    "trpc",
-    "nextjs",
+    "how to get started with open source",
+    "how to contribute to open source",
+    "contributing to open source",
     "open source",
-    "Tailwind CSS",
-    "TypeScript",
-    "React",
-    "GSOC mentorship",
-    "GSOC proposal",
-    "LFX Mentorship",
-    "Outreachy",
+    "open source contribution",
+    "open source career",
+    "what is open source",
+    "why open source",
+    "open source tools",
+    "open source software",
+    "open source ai",
+    "open source alternative",
+    "opensox",
   ],
-  metadataBase: new URL("https://opensox.ai"),
+  metadataBase: new URL(SITE_URL),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: new URL("https://opensox.ai"),
-    siteName: "Opensox",
-    title: "Opensox | find the perfect open source project to contribute",
-    description:
-      "Discover curated open source projects in seconds, Filter by stack, personalized recommendations, and more.",
-    images: [
-      {
-        url: "/images/opensox_og.webp",
-        width: 1200,
-        height: 630,
-        alt: "Opensox product preview",
-      },
-    ],
+    url: new URL(SITE_URL),
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | How to get started with open source`,
+    description: SOCIAL_DESCRIPTION,
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     site: "@opensox",
-    title: "Opensox | find the perfect open source project to contribute",
-    description:
-      "Discover curated open source projects in seconds, Filter by stack, personalized recommendations, and more.",
-    images: ["/images/opensox_og.webp"],
+    title: `${SITE_NAME} | How to get started with open source`,
+    description: SOCIAL_DESCRIPTION,
+    images: [OG_IMAGE.url],
     creator: "@ajeetunc",
   },
   robots: {
@@ -101,6 +106,14 @@ export const metadata: Metadata = {
   },
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SEO_DESCRIPTION,
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -113,6 +126,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.className} ${dmMono.variable} antialiased bg-background`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <PostHogProvider>
           <ThemeProvider
             attribute="class"
