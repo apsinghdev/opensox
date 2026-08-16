@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --experimental-strip-types --test src/app/api/tweet/*.test.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",

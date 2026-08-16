@@ -26,6 +26,7 @@ import {
   UserGroupIcon,
   NewspaperIcon,
   EnvelopeIcon,
+  CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -78,6 +79,12 @@ const FREE_ROUTES: RouteConfig[] = [
 
 // premium features under Opensox Pro
 const PREMIUM_ROUTES: RouteConfig[] = [
+  {
+    path: "/dashboard/pro/plan",
+    label: "Pro Plan",
+    icon: <CalendarDaysIcon className="size-5" />,
+    badge: "New",
+  },
   {
     path: "/dashboard/pro/community",
     label: "Pro Community",

@@ -100,14 +100,14 @@ const comparisonFeatures: ComparisonFeature[] = [
   { name: "Daily stand-ups", free: false, pro: true, proPlus: true },
   { name: "Pro References", free: false, pro: true, proPlus: true },
   {
-    name: "First principles mega-module (20+ modules)",
+    name: "Build in Public Tool (worth $39)",
     upcoming: true,
     free: false,
     pro: false,
     proPlus: true,
   },
   {
-    name: "Build in public mega-module (20+ modules)",
+    name: "Discount on Merch",
     upcoming: true,
     free: false,
     pro: false,
@@ -411,8 +411,16 @@ const PlanColumnHeader = ({
     },
   );
 
+  const { data: memberCountData } = trpc.payment.getProMemberCount.useQuery(
+    { planId: tier.planId as string },
+    {
+      enabled: isPaid && planIdOk,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
   return (
-    <div className="flex h-full w-full flex-col justify-between text-center">
+    <div className="flex h-full w-full flex-col text-center">
       <div className="flex flex-col items-center">
         <p
           className={`px-3 py-1.5 text-lg font-medium tracking-wide ${isPaid ? "text-brand-purple-light" : "text-text-muted"}`}
@@ -441,17 +449,15 @@ const PlanColumnHeader = ({
               &nbsp;
             </span>
           )}
-          {isPaid && planIdOk ? (
-            publicPlan ? (
-              <span className="text-sm font-semibold text-text-primary">
-                {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
-              </span>
-            ) : (
-              <span className="text-sm invisible select-none" aria-hidden>
-                &nbsp;
-              </span>
-            )
-          ) : null}
+          {isPaid && planIdOk && publicPlan ? (
+            <span className="text-sm font-semibold text-text-primary">
+              {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
+            </span>
+          ) : (
+            <span className="text-sm invisible select-none" aria-hidden>
+              &nbsp;
+            </span>
+          )}
         </div>
       </div>
       <div className="w-full pt-4">
@@ -472,6 +478,15 @@ const PlanColumnHeader = ({
             callbackUrl={callbackUrl}
             buttonLocation="pricing_page"
           />
+        )}
+        {isPaid && typeof memberCountData?.count === "number" ? (
+          <p className="mt-2 font-heading text-sm font-semibold tracking-tighter text-success-text">
+            {memberCountData.count} invested!
+          </p>
+        ) : (
+          <p className="mt-2 text-sm invisible select-none" aria-hidden>
+            &nbsp;
+          </p>
         )}
       </div>
     </div>
