@@ -20,6 +20,12 @@ import {
   createDiscordOAuthState,
   verifyDiscordOAuthState,
 } from "./utils/discord-oauth-state.js";
+import { subscribeInputSchema } from "./routers/newsletter.js";
+import {
+  newsletterService,
+  newsletterConfirmRedirectUrl,
+  newsletterUnsubscribedRedirectUrl,
+} from "./services/newsletter.service.js";
 
 dotenv.config();
 
@@ -31,7 +37,7 @@ if (!CRON_SECRET) {
 const app = express();
 const PORT = process.env.PORT || 4000;
 const CORS_ORIGINS = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(",")
+  ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean)
   : ["http://localhost:3000", "http://localhost:5000"];
 
 // Security headers
@@ -69,6 +75,18 @@ const apiLimiter = rateLimit({
     console.log(`[RATE LIMIT] IP ${req.ip} hit API rate limit`);
     res.status(429).json({ error: "Too many requests from this IP" });
   }
+});
+
+const newsletterSubscribeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: "Too many subscribe attempts, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    console.log(`[RATE LIMIT] IP ${req.ip} hit newsletter subscribe rate limit`);
+    res.status(429).json({ error: "Too many subscribe attempts, please try again later" });
+  },
 });
 
 // Request size limits (except for webhook - needs raw body)
@@ -525,7 +543,75 @@ app.post("/webhook/razorpay", async (req: Request, res: Response) => {
 // Connect to database
 prismaModule.connectDB();
 
+app.post(
+  "/newsletter/subscribe",
+  newsletterSubscribeLimiter,
+  async (req: Request, res: Response) => {
+    const parsed = subscribeInputSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ ok: false, error: "Invalid input" });
+    }
+
+    try {
+      const result = await newsletterService.subscribe(
+        prismaModule.prisma,
+        parsed.data
+      );
+      return res.status(200).json(result);
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Newsletter subscribe error:", error);
+      }
+      return res.status(500).json({ ok: false, error: "Something went wrong" });
+    }
+  }
+);
+
+app.get(
+  "/newsletter/confirm",
+  apiLimiter,
+  async (req: Request, res: Response) => {
+    const token = req.query.token;
+    if (typeof token !== "string" || token.length === 0) {
+      return res.redirect(newsletterConfirmRedirectUrl("expired"));
+    }
+
+    try {
+      const result = await newsletterService.confirm(
+        prismaModule.prisma,
+        token
+      );
+      return res.redirect(newsletterConfirmRedirectUrl(result.status));
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Newsletter confirm error:", error);
+      }
+      return res.redirect(newsletterConfirmRedirectUrl("expired"));
+    }
+  }
+);
+
+app.get(
+  "/newsletter/unsubscribe",
+  apiLimiter,
+  async (req: Request, res: Response) => {
+    const token = req.query.token;
+    if (typeof token === "string" && token.length > 0) {
+      try {
+        await newsletterService.unsubscribe(prismaModule.prisma, token);
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.error("Newsletter unsubscribe error:", error);
+        }
+      }
+    }
+
+    return res.redirect(newsletterUnsubscribedRedirectUrl());
+  }
+);
+
 // Apply rate limiting to tRPC endpoints
+app.use("/trpc/newsletter.subscribe", newsletterSubscribeLimiter);
 app.use("/trpc", apiLimiter);
 
 // tRPC middleware

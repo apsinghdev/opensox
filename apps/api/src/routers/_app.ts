@@ -10,6 +10,7 @@ import { modulesRouter } from "./modules.js";
 import { refsRouter } from "./refs.js";
 import { proProjectsRouter } from "./proProjects.js";
 import { adminRouter } from "./admin.js";
+import { newsletterRouter } from "./newsletter.js";
 import { z } from "zod";
 
 const testRouter = router({
@@ -33,6 +34,7 @@ export const appRouter = router({
   refs: refsRouter,
   proProjects: proProjectsRouter,
   admin: adminRouter,
+  newsletter: newsletterRouter,
 });
 
 export type AppRouter = typeof appRouter;
