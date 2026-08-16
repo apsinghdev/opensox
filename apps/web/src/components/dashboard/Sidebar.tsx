@@ -25,6 +25,7 @@ import {
   AcademicCapIcon,
   UserGroupIcon,
   NewspaperIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -67,6 +68,11 @@ const FREE_ROUTES: RouteConfig[] = [
     path: "/blog",
     label: "Blogs",
     icon: <NewspaperIcon className="size-5" />,
+  },
+  {
+    path: "/newsletter",
+    label: "Newsletter",
+    icon: <EnvelopeIcon className="size-5" />,
   },
 ];
 

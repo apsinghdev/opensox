@@ -104,6 +104,11 @@ const AdminHomePage = (): JSX.Element => {
               {stats?.paidUsers ?? "—"}
             </span>
             <span className="mx-2 text-dash-border">·</span>
+            Newsletter:{" "}
+            <span className="text-text-secondary">
+              {stats?.newsletterSubscribers ?? "—"}
+            </span>
+            <span className="mx-2 text-dash-border">·</span>
             Total revenue:{" "}
             <span className="text-text-secondary">
               {stats
