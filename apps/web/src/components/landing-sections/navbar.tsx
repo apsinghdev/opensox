@@ -34,10 +34,8 @@ const Navbar = () => {
   }, [isOpen]);
 
   React.useEffect(() => {
-    if (isPinnedNav) {
-      setShowNavbar(true);
-    }
-  }, [isPinnedNav]);
+    setShowNavbar(isPinnedNav || scrollYProgress.get() > 0);
+  }, [isPinnedNav, scrollYProgress]);
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!isPinnedNav) {

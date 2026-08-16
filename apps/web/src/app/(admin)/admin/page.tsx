@@ -35,11 +35,6 @@ const ADMIN_SECTIONS = [
     title: "Pro projects",
     description: "Manage open source projects shown to Pro members.",
   },
-  {
-    href: "/admin/email-list",
-    title: "Email list",
-    description: "Confirmed jackedAJ newsletter subscribers.",
-  },
 ] as const;
 
 const AdminHomePage = (): JSX.Element => {
