@@ -217,3 +217,14 @@ model ProProject {
   @@index([order])
   @@index([createdAt])
 }
+
+model NewsletterSubscriber {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  source           String    // jackedaj | opensox | labs | ...
+  unsubscribeToken String    @unique @default(cuid())
+  unsubscribedAt   DateTime?
+  createdAt        DateTime  @default(now())
+
+  @@index([createdAt])
+}

@@ -7,6 +7,7 @@ declare module "zeptomail" {
       subject: string;
       htmlbody: string;
       textbody?: string;
+      reply_to?: Array<{ address: string; name: string }>;
     }): Promise<any>;
   }
 }

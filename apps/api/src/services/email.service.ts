@@ -10,6 +10,8 @@ interface SendEmailInput {
   subject: string;
   htmlBody: string;
   textBody?: string;
+  from?: EmailRecipient;
+  replyTo?: EmailRecipient;
 }
 
 const escapeHtml = (s: string): string =>
@@ -48,9 +50,14 @@ export const emailService = {
   async sendEmail(input: SendEmailInput): Promise<boolean> {
     try {
       const client = initializeEmailClient();
-      const fromAddress = process.env.ZEPTOMAIL_FROM_ADDRESS || "hi@opensox.ai";
+      const fromAddress =
+        input.from?.address ||
+        process.env.ZEPTOMAIL_FROM_ADDRESS ||
+        "hi@opensox.ai";
       const fromName =
-        process.env.ZEPTOMAIL_FROM_NAME || "Ajeet from Opensox AI";
+        input.from?.name ||
+        process.env.ZEPTOMAIL_FROM_NAME ||
+        "Ajeet from Opensox AI";
 
       await client.sendMail({
         from: {
@@ -66,6 +73,14 @@ export const emailService = {
         subject: input.subject,
         htmlbody: input.htmlBody,
         ...(input.textBody && { textbody: input.textBody }),
+        ...(input.replyTo && {
+          reply_to: [
+            {
+              address: input.replyTo.address,
+              name: input.replyTo.name,
+            },
+          ],
+        }),
       });
 
       return true;
@@ -160,6 +175,49 @@ Ajeet from Opensox.ai`;
       subject: "Congratulations! You are in.",
       htmlBody,
       textBody,
+    });
+  },
+
+  async sendNewsletterConfirmEmail(
+    email: string,
+    confirmUrl: string
+  ): Promise<boolean> {
+    const fromAddress =
+      process.env.JACKEDAJ_FROM_ADDRESS || "hi@jackedaj.com";
+    const fromName = process.env.JACKEDAJ_FROM_NAME || "Ajeet (jackedAJ)";
+    const safeUrl = escapeHtml(confirmUrl);
+
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Confirm your signup for the jackedAJ newsletter.
+        </p>
+        <div style="margin: 30px 0; text-align: center;">
+          <a href="${safeUrl}"
+             style="background-color: #111; color: white; padding: 14px 32px;
+                    text-decoration: none; border-radius: 6px; display: inline-block;
+                    font-weight: 600; font-size: 16px;">
+            Confirm signup
+          </a>
+        </div>
+        <p style="color: #666; line-height: 1.8; font-size: 14px;">
+          Or paste this link into your browser:<br/>
+          <a href="${safeUrl}" style="color: #111;">${safeUrl}</a>
+        </p>
+      </div>
+    `;
+
+    const textBody = `Confirm your signup for the jackedAJ newsletter.
+
+${confirmUrl}`;
+
+    return this.sendEmail({
+      to: [{ address: email, name: fromName }],
+      subject: "Confirm your jackedAJ newsletter signup",
+      htmlBody,
+      textBody,
+      from: { address: fromAddress, name: fromName },
+      replyTo: { address: fromAddress, name: fromName },
     });
   },
 };
