@@ -91,7 +91,7 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} | How to get started with open source`,
     description: SOCIAL_DESCRIPTION,
     images: [OG_IMAGE.url],
-    creator: "@ajeetunc",
+    creator: "@jackedAJ",
   },
   robots: {
     index: true,
