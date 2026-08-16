@@ -92,21 +92,27 @@ test("classifies abort errors as 504", async () => {
 });
 
 test("passes a bounded abort signal to getTweet", async () => {
-  let fetchOptions: RequestInit | undefined;
-  const getTweet: GetTweetFn = async (_id, options) => {
-    fetchOptions = options;
-    return { id: "1234567890" };
-  };
+  const controlledSignal = new AbortController().signal;
+  let timeoutMs: number | undefined;
+  const originalTimeout = AbortSignal.timeout;
 
-  const result = await loadTweetProxy("1234567890", getTweet);
-  assert.equal(result.status, 200);
-  assert.ok(fetchOptions?.signal);
-  assert.equal(fetchOptions.signal.aborted, false);
+  AbortSignal.timeout = ((ms: number) => {
+    timeoutMs = ms;
+    return controlledSignal;
+  }) as typeof AbortSignal.timeout;
 
-  const timeoutSignal = AbortSignal.timeout(TWEET_FETCH_TIMEOUT_MS);
-  assert.equal(
-    typeof timeoutSignal.aborted,
-    "boolean",
-    "AbortSignal.timeout is available for the bounded fetch"
-  );
+  try {
+    let fetchOptions: RequestInit | undefined;
+    const getTweet: GetTweetFn = async (_id, options) => {
+      fetchOptions = options;
+      return { id: "1234567890" };
+    };
+
+    const result = await loadTweetProxy("1234567890", getTweet);
+    assert.equal(result.status, 200);
+    assert.equal(timeoutMs, TWEET_FETCH_TIMEOUT_MS);
+    assert.equal(fetchOptions?.signal, controlledSignal);
+  } finally {
+    AbortSignal.timeout = originalTimeout;
+  }
 });
