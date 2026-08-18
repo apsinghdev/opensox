@@ -49,9 +49,7 @@ export const paymentRouter = router({
         });
       }
 
-      const count = await paymentService.countActiveProMembersForPlan(
-        input.planId
-      );
+      const count = await paymentService.countProMembersForPlan(input.planId);
       return { count };
     }),
 
