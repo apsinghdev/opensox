@@ -135,9 +135,9 @@ export const paymentService = {
   },
 
   /**
-   * distinct users with an active subscription for the given plan (pro members)
+   * distinct users who have ever subscribed to the given plan (including expired)
    */
-  async countActiveProMembersForPlan(planId: string): Promise<number> {
+  async countProMembersForPlan(planId: string): Promise<number> {
     const maxRetries = 2;
     const baseDelayMs = 100;
     let lastError: unknown;
@@ -149,8 +149,6 @@ export const paymentService = {
             subscriptions: {
               some: {
                 planId,
-                status: SUBSCRIPTION_STATUS.ACTIVE,
-                endDate: { gte: new Date() },
               },
             },
           },
@@ -169,7 +167,7 @@ export const paymentService = {
             JSON.stringify({
               level: "error",
               service: "paymentService",
-              operation: "countActiveProMembersForPlan",
+              operation: "countProMembersForPlan",
               event: "prisma.user.count_failed",
               planId,
               timestamp: new Date().toISOString(),
@@ -181,7 +179,7 @@ export const paymentService = {
                 error instanceof Error ? error.message : String(error),
             })
           );
-          throw new Error("Failed to count active pro members for plan");
+          throw new Error("Failed to count pro members for plan");
         }
 
         const delayMs = baseDelayMs * Math.pow(2, attempt);
@@ -189,7 +187,7 @@ export const paymentService = {
           JSON.stringify({
             level: "warn",
             service: "paymentService",
-            operation: "countActiveProMembersForPlan",
+            operation: "countProMembersForPlan",
             event: "prisma.user.count_retry",
             planId,
             timestamp: new Date().toISOString(),
@@ -201,7 +199,7 @@ export const paymentService = {
       }
     }
 
-    throw new Error("Failed to count active pro members for plan");
+    throw new Error("Failed to count pro members for plan");
   },
 
   /**

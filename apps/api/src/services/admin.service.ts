@@ -68,49 +68,46 @@ export const adminService = {
     try {
       const [paidUsers, newsletterSubscribers, revenue, latestProSubscription] =
         await Promise.all([
-        withRetry(
-          () =>
-            db.user.count({
-              where: {
-                subscriptions: {
-                  some: {
-                    status: SUBSCRIPTION_STATUS.ACTIVE,
-                    endDate: { gte: now },
+          withRetry(
+            () =>
+              db.user.count({
+                where: {
+                  subscriptions: {
+                    some: {},
                   },
                 },
-              },
-            }),
-          "admin paid user count"
-        ),
-        withRetry(
-          () => newsletterService.adminCount(db),
-          "admin newsletter subscriber count"
-        ),
-        withRetry(
-          () =>
-            db.payment.aggregate({
-              where: { status: PAYMENT_STATUS.CAPTURED },
-              _sum: { amount: true },
-            }),
-          "admin revenue aggregate"
-        ),
-        withRetry(
-          () =>
-            db.subscription.findFirst({
-              where: {
-                status: SUBSCRIPTION_STATUS.ACTIVE,
-                endDate: { gte: now },
-              },
-              orderBy: { startDate: "desc" },
-              select: {
-                user: {
-                  select: { email: true },
+              }),
+            "admin paid user count"
+          ),
+          withRetry(
+            () => newsletterService.adminCount(db),
+            "admin newsletter subscriber count"
+          ),
+          withRetry(
+            () =>
+              db.payment.aggregate({
+                where: { status: PAYMENT_STATUS.CAPTURED },
+                _sum: { amount: true },
+              }),
+            "admin revenue aggregate"
+          ),
+          withRetry(
+            () =>
+              db.subscription.findFirst({
+                where: {
+                  status: SUBSCRIPTION_STATUS.ACTIVE,
+                  endDate: { gte: now },
                 },
-              },
-            }),
-          "admin latest pro member"
-        ),
-      ]);
+                orderBy: { startDate: "desc" },
+                select: {
+                  user: {
+                    select: { email: true },
+                  },
+                },
+              }),
+            "admin latest pro member"
+          ),
+        ]);
 
       return {
         paidUsers,
