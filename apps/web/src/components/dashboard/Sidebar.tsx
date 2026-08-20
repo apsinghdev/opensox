@@ -173,33 +173,33 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
       style={{ width: overlay ? mobileWidth : desktopWidth }}
     >
       {/* Mobile header */}
-      <div className="flex justify-between items-center h-16 px-4 border-b border-dash-border xl:hidden bg-dash-surface">
-        <div className="flex items-center">
+      <div className="flex justify-between items-center h-16 px-4 border-b border-dash-border xl:hidden bg-dash-surface min-w-0">
+        <div className="flex items-center min-w-0 flex-1 overflow-hidden">
           <Link
             href="/"
-            className="text-xl font-semibold text-text-primary hover:text-brand-purple transition-colors cursor-pointer"
+            className="text-xl font-semibold text-text-primary hover:text-brand-purple transition-colors cursor-pointer truncate block min-w-0"
           >
             Opensox AI
           </Link>
         </div>
-        <IconWrapper onClick={() => setShowSidebar(false)}>
+        <IconWrapper onClick={() => setShowSidebar(false)} className="shrink-0">
           <XMarkIcon className="size-5 text-brand-purple" />
         </IconWrapper>
       </div>
 
       {/* Desktop header with collapse */}
-      <div className="hidden xl:flex items-center justify-between px-4 py-4 border-b border-dash-border bg-dash-surface">
+      <div className="hidden xl:flex items-center justify-between px-4 py-4 border-b border-dash-border bg-dash-surface min-w-0">
         {!isCollapsed && (
           <Link
             href="/"
-            className="text-text-secondary font-semibold tracking-wide select-none text-xl hover:text-brand-purple transition-colors cursor-pointer"
+            className="text-text-secondary font-semibold tracking-wide select-none text-xl hover:text-brand-purple transition-colors cursor-pointer min-w-0 flex-1 truncate mr-2"
           >
             Opensox AI
           </Link>
         )}
         <IconWrapper
           onClick={toggleCollapsed}
-          className={isCollapsed ? "w-full flex justify-center" : ""}
+          className={`shrink-0 ${isCollapsed ? "w-full flex justify-center" : ""}`}
         >
           {isCollapsed ? (
             <ChevronRightIcon className="size-5 text-brand-purple" />
