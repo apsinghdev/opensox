@@ -3,17 +3,17 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { X, ChevronDown, Filter } from "lucide-react";
 
-interface TagFilterProps {
-  tags: string[];
-  selectedTags: string[];
-  onTagsChange: (tags: string[]) => void;
+interface StatusFilterProps {
+  statuses: string[];
+  selectedStatuses: string[];
+  onStatusesChange: (statuses: string[]) => void;
 }
 
-export default function TagFilter({
-  tags,
-  selectedTags,
-  onTagsChange,
-}: TagFilterProps) {
+export default function StatusFilter({
+  statuses,
+  selectedStatuses,
+  onStatusesChange,
+}: StatusFilterProps) {
   const [filterInput, setFilterInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -39,31 +39,31 @@ export default function TagFilter({
   }, [isDropdownOpen]);
 
   const availableTags = useMemo(() => {
-    return tags.filter(
-      (tag) =>
-        !selectedTags.includes(tag) &&
-        tag.toLowerCase().includes(filterInput.toLowerCase())
+    return statuses.filter(
+      (status) =>
+        !selectedStatuses.includes(status) &&
+        status.toLowerCase().includes(filterInput.toLowerCase())
     );
-  }, [tags, selectedTags, filterInput]);
+  }, [statuses, selectedStatuses, filterInput]);
 
   const addTag = (tag: string) => {
-    onTagsChange([...selectedTags, tag]);
+    onStatusesChange([...selectedStatuses, tag]);
     setFilterInput("");
     setIsDropdownOpen(true);
     inputRef.current?.focus();
   };
 
   const removeTag = (tagToRemove: string) => {
-    onTagsChange(selectedTags.filter((tag) => tag !== tagToRemove));
+    onStatusesChange(selectedStatuses.filter((status) => status !== tagToRemove));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (
       e.key === "Backspace" &&
       filterInput === "" &&
-      selectedTags.length > 0
+      selectedStatuses.length > 0
     ) {
-      removeTag(selectedTags[selectedTags.length - 1]);
+      removeTag(selectedStatuses[selectedStatuses.length - 1]);
     }
   };
 
@@ -78,18 +78,18 @@ export default function TagFilter({
       >
         <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
           <Filter className="w-4 h-4 text-text-secondary" />
-          {selectedTags.map((tag) => (
+          {selectedStatuses.map((status) => (
             <span
-              key={tag}
-              className="flex items-center gap-1 bg-brand-purple/20 text-brand-purple-light px-2 py-0.5 rounded-full text-sm flex-shrink-0"
+              key={status}
+              className="flex items-center gap-1 bg-brand-purple/20 text-brand-purple-light px-3 py-1 rounded-full text-sm flex-shrink-0"
             >
-              {tag}
+              {status}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  removeTag(tag);
+                  removeTag(status);
                 }}
-                aria-label={`Remove ${tag}`}
+                aria-label={`Remove ${status}`}
                 className="hover:text-white"
               >
                 <X className="w-3 h-3" />
@@ -99,8 +99,8 @@ export default function TagFilter({
           <input
             ref={inputRef}
             type="text"
-            placeholder={selectedTags.length === 0 ? "Tags..." : ""}
-            aria-label="Tag filter"
+            placeholder={selectedStatuses.length === 0 ? "Status..." : ""}
+            aria-label="Filter statuses"
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);
@@ -119,17 +119,17 @@ export default function TagFilter({
         <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-dash-surface border border-dash-border rounded-xl shadow-xl max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
           {availableTags.length === 0 ? (
             <div className="p-4 text-gray-500 text-center">
-              No matching tags found
+              No matching statuses found
             </div>
           ) : (
-            availableTags.map((tag) => (
+            availableTags.map((status) => (
               <button
-                key={tag}
-                onClick={() => addTag(tag)}
-                aria-label={`Add tag ${tag}`}
+                key={status}
+                onClick={() => addTag(status)}
+                aria-label={`Add status ${status}`}
                 className="w-full text-left px-4 py-3 hover:bg-dash-hover text-gray-300 hover:text-white transition-colors flex items-center justify-between"
               >
-                {tag}
+                {status}
               </button>
             ))
           )}
