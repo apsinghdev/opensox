@@ -5,7 +5,7 @@ import { authService } from "../services/auth.service.js";
 import { generateToken } from "../utils/auth.js";
 
 const googleAuthSchema = z.object({
-  email: z.email("Invalid email format"),
+  email: z.string().email("Invalid email format"),
   firstName: z.string().optional(),
   authMethod: z.string().optional(),
   providerAccountId: z.string().optional(),
