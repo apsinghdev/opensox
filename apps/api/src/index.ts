@@ -35,6 +35,25 @@ if (!CRON_SECRET) {
 }
 
 const app = express();
+
+// added trust proxy
+const rawTrustProxy = process.env.TRUST_PROXY;
+let TRUST_PROXY: boolean | number | string;
+
+if (!rawTrustProxy) {
+ TRUST_PROXY = 1; 
+} else if (rawTrustProxy === "false") {
+  TRUST_PROXY = false; 
+} else if (rawTrustProxy === "true") {
+  TRUST_PROXY = true; 
+} else if (!isNaN(Number(rawTrustProxy))) {
+  TRUST_PROXY = Number(rawTrustProxy); 
+} else {
+  TRUST_PROXY = rawTrustProxy; 
+}
+
+app.set("trust proxy", TRUST_PROXY);
+
 const PORT = process.env.PORT || 4000;
 const CORS_ORIGINS = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean)
