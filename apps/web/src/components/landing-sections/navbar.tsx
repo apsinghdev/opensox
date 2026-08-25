@@ -43,6 +43,13 @@ const Navbar = () => {
     }
   });
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    })
+  }
+
   const links = [
     { name: "Pricing", href: "/pricing" },
     { name: "Testimonials", href: "/testimonials" },
@@ -71,7 +78,7 @@ const Navbar = () => {
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
-        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
+        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2 cursor-pointer" onClick={scrollToTop}>
           <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
             <Image
               src="/assets/logo.svg"
