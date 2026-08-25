@@ -17,6 +17,12 @@ export default async function SheetModulePage({ params }: PageProps) {
     notFound();
   }
 
+  // Create module info for navigation (without docContent)
+  const modulesInfo = sheetModules.map((m) => ({
+    id: m.id,
+    name: m.name,
+  }));
+
   return (
     <>
       <div className="min-h-screen bg-surface-primary">
@@ -24,6 +30,8 @@ export default async function SheetModulePage({ params }: PageProps) {
           <SheetModuleHeader
             moduleName={sheetModule.name}
             docContent={sheetModule.docContent}
+            currentModuleId={moduleId}
+            modules={modulesInfo}
           />
           <article>
             <header className="mb-8">
