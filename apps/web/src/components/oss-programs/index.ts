@@ -4,3 +4,4 @@ export { default as ProgramCard } from './ProgramCard';
 export { default as ProgramHeader } from './ProgramHeader';
 export { default as ProgramMetadata } from './ProgramMetadata';
 export { default as ProgramSection } from './ProgramSection';
+export { default as ProgramCardSkeleton} from './ProgramCardSkeleton'
