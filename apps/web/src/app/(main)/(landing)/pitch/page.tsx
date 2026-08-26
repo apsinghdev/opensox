@@ -258,8 +258,8 @@ const Pitch = () => {
                   .
                 </p>
                 <p>how small?</p>
-                <p className="text-brand-purple-light">177 people. a month. only.</p>
-                <p>but why 177?</p>
+                <p className="text-brand-purple-light">83 people. a month. only.</p>
+                <p>but why 83?</p>
                 <p>
                   as per the calculations on the number of current members in
                   the opensox pro community,
@@ -270,7 +270,7 @@ const Pitch = () => {
                 <p>and the rest 20% join as a hobby.</p>
                 <p>they&apos;re already professionals in something else.</p>
                 <p>
-                  so 177 is the number i can manage. and give you my personal
+                  so 83 is the number i can manage. and give you my personal
                   attention.
                 </p>
               </div>
