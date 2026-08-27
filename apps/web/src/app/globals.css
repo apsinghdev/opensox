@@ -275,3 +275,7 @@ html {
   color: var(--blog-fg);
 }
 
+/* Overrides Next.js default 404 Page during light mode */
+.next-error-h1 {
+  border-color: hsl(var(--foreground)) !important;
+}
