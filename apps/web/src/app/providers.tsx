@@ -5,6 +5,11 @@ import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import PostHogPageView from "./PostHogPageView";
+import {
+  clearPurchaseAuthContext,
+  getPurchaseAuthContext,
+  track,
+} from "@/lib/analytics";
 
 // Session storage key to track if sign-in was initiated
 const SIGN_IN_INITIATED_KEY = "posthog_sign_in_initiated";
@@ -20,14 +25,14 @@ export function PostHogAuthTracker() {
   const { data: session, status } = useSession();
   const hasTrackedSignIn = useRef(false);
   const previousStatus = useRef<string | null>(null);
+  const capturedPurchaseAuthRef = useRef<
+    ReturnType<typeof getPurchaseAuthContext> | undefined
+  >(undefined);
 
   useEffect(() => {
     if (status === "loading") return;
 
     try {
-      // Check if PostHog is initialized using documented pattern
-      if (!posthog || typeof posthog.capture !== "function") return;
-
       // Detect transition from unauthenticated to authenticated
       const wasSignInInitiated =
         sessionStorage.getItem(SIGN_IN_INITIATED_KEY) === "true";
@@ -36,13 +41,30 @@ export function PostHogAuthTracker() {
         | "github"
         | null;
 
-      if (status === "authenticated" && session?.user) {
-        // Check if this is a fresh sign-in (not just a page refresh)
-        const isNewSignIn =
-          wasSignInInitiated ||
+      const isNewSignIn =
+        status === "authenticated" &&
+        !!session?.user &&
+        (wasSignInInitiated ||
           (previousStatus.current === "unauthenticated" &&
-            !hasTrackedSignIn.current);
+            !hasTrackedSignIn.current));
 
+      if (status === "unauthenticated") {
+        capturedPurchaseAuthRef.current = undefined;
+      }
+
+      // always drop invest-flow context after sign-in completes, even if
+      // posthog is unavailable and we skip analytics below.
+      if (isNewSignIn && !hasTrackedSignIn.current) {
+        if (capturedPurchaseAuthRef.current === undefined) {
+          capturedPurchaseAuthRef.current = getPurchaseAuthContext();
+        }
+        clearPurchaseAuthContext();
+      }
+
+      // Check if PostHog is initialized using documented pattern
+      if (!posthog || typeof posthog.capture !== "function") return;
+
+      if (status === "authenticated" && session?.user) {
         if (isNewSignIn && !hasTrackedSignIn.current) {
           hasTrackedSignIn.current = true;
 
@@ -78,6 +100,17 @@ export function PostHogAuthTracker() {
             posthog.capture("sign_up_completed", {
               provider: provider,
             });
+
+            // invest-attributed oauth created a new account. nextauth has no
+            // separate signup start, so this is an outcome event, not signup_started.
+            const purchaseAuth = capturedPurchaseAuthRef.current;
+            if (purchaseAuth) {
+              track("purchase_attributed_account_created", {
+                button_location: purchaseAuth.button_location,
+                plan_id: purchaseAuth.plan_id,
+                is_authenticated: true,
+              });
+            }
           }
 
           if (process.env.NODE_ENV === "development") {
@@ -95,10 +128,12 @@ export function PostHogAuthTracker() {
           // Clear the sign-in tracking flags
           sessionStorage.removeItem(SIGN_IN_INITIATED_KEY);
           sessionStorage.removeItem(SIGN_IN_PROVIDER_KEY);
+          capturedPurchaseAuthRef.current = undefined;
         }
       } else if (status === "unauthenticated") {
         // Reset tracking flag for next sign-in
         hasTrackedSignIn.current = false;
+        capturedPurchaseAuthRef.current = undefined;
 
         if (process.env.NODE_ENV === "development") {
           console.log("[PostHog] User unauthenticated");

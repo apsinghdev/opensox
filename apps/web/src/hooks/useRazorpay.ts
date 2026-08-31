@@ -59,12 +59,14 @@ export const useRazorpay = ({
 
         // Open Razorpay checkout
         await openRazorpayCheckout(options);
+        return true;
       } catch (err) {
         const error = err as Error;
         setError(error.message);
         if (onFailure) {
           onFailure(error);
         }
+        return false;
       } finally {
         setIsLoading(false);
       }

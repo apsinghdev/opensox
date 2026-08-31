@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import PrimaryButton from "../ui/custom-button";
@@ -6,12 +7,13 @@ import { Google, Github } from "../icons/icons";
 import Image from "next/image";
 import Overlay from "../ui/overlay";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { sanitizeCallbackUrl } from "@/lib/analytics";
+import { getPurchaseAuthContext, sanitizeCallbackUrl } from "@/lib/analytics";
 
 const SignInPage = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/home";
-  const { trackSignInStarted } = useAnalytics();
+  const { trackSignInStarted, trackLoginStarted } = useAnalytics();
+  const purchaseAuthTracked = useRef(false);
 
   const getSafeCallbackUrl = (url: string): string => {
     if (!url || url.trim() === "") {
@@ -41,6 +43,18 @@ const SignInPage = () => {
 
     // Track sign-in attempt with sanitized callback (no query params or fragments)
     trackSignInStarted(provider, sanitizedCallback);
+
+    // purchase-attributed auth: user clicked invest, then started oauth on /login.
+    // nextauth has no separate signup entry, so this is login_started only.
+    const purchaseAuth = getPurchaseAuthContext();
+    if (purchaseAuth && !purchaseAuthTracked.current) {
+      purchaseAuthTracked.current = true;
+      trackLoginStarted(
+        purchaseAuth.button_location,
+        false,
+        purchaseAuth.plan_id
+      );
+    }
 
     // Store only provider and boolean flag for post-callback tracking
     // Do NOT store the full callback URL to avoid leaking tokens/PII

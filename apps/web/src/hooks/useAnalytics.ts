@@ -36,6 +36,22 @@ interface UseAnalyticsReturn {
         isAuthenticated: boolean,
         planId?: string
     ) => void;
+    trackLoginStarted: (
+        buttonLocation: string,
+        isAuthenticated: boolean,
+        planId?: string
+    ) => void;
+    trackPurchaseAttributedAccountCreated: (
+        buttonLocation: string,
+        isAuthenticated: boolean,
+        planId?: string
+    ) => void;
+    trackCheckoutOpened: (
+        buttonLocation: string,
+        isAuthenticated: boolean,
+        planId?: string,
+        planName?: string
+    ) => void;
     trackButtonClick: (
         buttonName: string,
         buttonLocation: ButtonClickedProperties["button_location"]
@@ -136,6 +152,53 @@ export function useAnalytics(): UseAnalyticsReturn {
                 button_location: buttonLocation,
                 is_authenticated: isAuthenticated,
                 plan_id: planId,
+            });
+        },
+        [track]
+    );
+
+    const trackLoginStarted = useCallback(
+        (
+            buttonLocation: string,
+            isAuthenticated: boolean,
+            planId?: string
+        ): void => {
+            track("login_started", {
+                button_location: buttonLocation,
+                is_authenticated: isAuthenticated,
+                plan_id: planId,
+            });
+        },
+        [track]
+    );
+
+    const trackPurchaseAttributedAccountCreated = useCallback(
+        (
+            buttonLocation: string,
+            isAuthenticated: boolean,
+            planId?: string
+        ): void => {
+            track("purchase_attributed_account_created", {
+                button_location: buttonLocation,
+                is_authenticated: isAuthenticated,
+                plan_id: planId,
+            });
+        },
+        [track]
+    );
+
+    const trackCheckoutOpened = useCallback(
+        (
+            buttonLocation: string,
+            isAuthenticated: boolean,
+            planId?: string,
+            planName?: string
+        ): void => {
+            track("checkout_opened", {
+                button_location: buttonLocation,
+                is_authenticated: isAuthenticated,
+                plan_id: planId,
+                plan_name: planName,
             });
         },
         [track]
@@ -246,6 +309,9 @@ export function useAnalytics(): UseAnalyticsReturn {
         getDistinctId,
         // Event-specific helpers
         trackInvestButtonClick,
+        trackLoginStarted,
+        trackPurchaseAttributedAccountCreated,
+        trackCheckoutOpened,
         trackButtonClick,
         trackPaymentInitiated,
         trackPaymentCompleted,
