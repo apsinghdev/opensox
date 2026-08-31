@@ -9,6 +9,7 @@ import PrimaryButton from "@/components/ui/custom-button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { persistPurchaseAuthContext } from "@/lib/analytics";
 
 const isTemporaryVerificationDelay = (error: unknown): boolean => {
   if (!(error instanceof TRPCClientError)) {
@@ -66,6 +67,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     orderId: string;
     amount: number; // Stored for display purposes only
   } | null>(null);
+  const checkoutOpenedForOrderRef = useRef<string | null>(null);
 
   const utils = trpc.useUtils();
   const createOrderMutation = (trpc.payment as any).createOrder.useMutation();
@@ -80,6 +82,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     trackPaymentCompleted,
     trackPaymentFailed,
     trackSubscriptionStarted,
+    trackCheckoutOpened,
   } = useAnalytics();
 
   const { initiatePayment, isLoading, error } = useRazorpay({
@@ -173,6 +176,10 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       }
 
       if (sessionStatus === "unauthenticated" || !session) {
+        persistPurchaseAuthContext({
+          button_location: buttonLocation,
+          plan_id: planId,
+        });
         const redirectUrl = callbackUrl || "/pricing";
         router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
         return;
@@ -180,6 +187,10 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
       const accessToken = (session as { accessToken?: string })?.accessToken;
       if (!accessToken || accessToken.trim().length === 0) {
+        persistPurchaseAuthContext({
+          button_location: buttonLocation,
+          plan_id: planId,
+        });
         const redirectUrl = callbackUrl || "/pricing";
         router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
         return;
@@ -231,7 +242,15 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
         },
       };
 
-      await initiatePayment(options);
+      const checkoutOpened = await initiatePayment(options);
+
+      if (
+        checkoutOpened &&
+        checkoutOpenedForOrderRef.current !== order.id
+      ) {
+        checkoutOpenedForOrderRef.current = order.id;
+        trackCheckoutOpened(buttonLocation, isAuthenticated, planId, planName);
+      }
     } catch (error: any) {
       const errorMessage = error?.message || "Failed to create order";
       const isTRPCAuthError =
@@ -244,6 +263,10 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       if (isTRPCAuthError) {
         trackPaymentFailed(planId, "auth_token_expired", errorMessage);
         setIsProcessing(false);
+        persistPurchaseAuthContext({
+          button_location: buttonLocation,
+          plan_id: planId,
+        });
         const redirectUrl = callbackUrl || "/pricing";
         router.push(`/login?callbackUrl=${encodeURIComponent(redirectUrl)}`);
         return;

@@ -5,6 +5,11 @@ import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import PostHogPageView from "./PostHogPageView";
+import {
+  clearPurchaseAuthContext,
+  getPurchaseAuthContext,
+  track,
+} from "@/lib/analytics";
 
 // Session storage key to track if sign-in was initiated
 const SIGN_IN_INITIATED_KEY = "posthog_sign_in_initiated";
@@ -78,6 +83,17 @@ export function PostHogAuthTracker() {
             posthog.capture("sign_up_completed", {
               provider: provider,
             });
+
+            // invest-attributed oauth created a new account. nextauth has no
+            // separate signup start, so this is an outcome event, not signup_started.
+            const purchaseAuth = getPurchaseAuthContext();
+            if (purchaseAuth) {
+              track("purchase_attributed_account_created", {
+                button_location: purchaseAuth.button_location,
+                plan_id: purchaseAuth.plan_id,
+                is_authenticated: true,
+              });
+            }
           }
 
           if (process.env.NODE_ENV === "development") {
@@ -95,6 +111,7 @@ export function PostHogAuthTracker() {
           // Clear the sign-in tracking flags
           sessionStorage.removeItem(SIGN_IN_INITIATED_KEY);
           sessionStorage.removeItem(SIGN_IN_PROVIDER_KEY);
+          clearPurchaseAuthContext();
         }
       } else if (status === "unauthenticated") {
         // Reset tracking flag for next sign-in

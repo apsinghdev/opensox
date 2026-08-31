@@ -19,10 +19,13 @@ export type AnalyticsEventName =
     | "payment_completed"
     | "payment_failed"
     | "subscription_started"
+    | "checkout_opened"
     // Authentication Events
     | "sign_in_started"
     | "sign_in_completed"
     | "sign_up_completed"
+    | "login_started"
+    | "purchase_attributed_account_created"
     // Navigation Events
     | "link_clicked"
     | "page_viewed";
@@ -63,6 +66,28 @@ export interface PaymentFailedProperties {
 /** Properties for subscription_started event */
 export interface SubscriptionStartedProperties {
     plan_id: string;
+}
+
+/** Properties for checkout_opened event */
+export interface CheckoutOpenedProperties {
+    button_location: string;
+    plan_id?: string;
+    plan_name?: string;
+    is_authenticated: boolean;
+}
+
+/** Properties for login_started event (purchase-attributed) */
+export interface LoginStartedProperties {
+    button_location: string;
+    plan_id?: string;
+    is_authenticated: boolean;
+}
+
+/** Properties for purchase_attributed_account_created event */
+export interface PurchaseAttributedAccountCreatedProperties {
+    button_location: string;
+    plan_id?: string;
+    is_authenticated: boolean;
 }
 
 /** Properties for sign_in_started event */
@@ -108,9 +133,12 @@ export interface AnalyticsEventPropertiesMap {
     payment_completed: PaymentCompletedProperties;
     payment_failed: PaymentFailedProperties;
     subscription_started: SubscriptionStartedProperties;
+    checkout_opened: CheckoutOpenedProperties;
     sign_in_started: SignInStartedProperties;
     sign_in_completed: SignInCompletedProperties;
     sign_up_completed: SignUpCompletedProperties;
+    login_started: LoginStartedProperties;
+    purchase_attributed_account_created: PurchaseAttributedAccountCreatedProperties;
     link_clicked: LinkClickedProperties;
     page_viewed: PageViewedProperties;
 }
@@ -166,6 +194,79 @@ export function sanitizeCallbackUrl(url: string): string {
     } catch {
         // If parsing fails, return default
         return "/dashboard/home";
+    }
+}
+
+const PURCHASE_AUTH_STORAGE_KEY = "posthog_purchase_auth";
+const PURCHASE_AUTH_TTL_MS = 60 * 60 * 1000;
+
+export interface PurchaseAuthContext {
+    button_location: string;
+    plan_id?: string;
+    created_at: number;
+}
+
+/**
+ * persist invest-click context so login/signup events can be attributed
+ * to the purchase flow after the /login redirect.
+ */
+export function persistPurchaseAuthContext(
+    context: Omit<PurchaseAuthContext, "created_at">
+): void {
+    if (typeof window === "undefined") return;
+
+    try {
+        const payload: PurchaseAuthContext = {
+            button_location: context.button_location,
+            plan_id: context.plan_id,
+            created_at: Date.now(),
+        };
+        sessionStorage.setItem(PURCHASE_AUTH_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+        // ignore storage failures (private mode, quota, etc.)
+    }
+}
+
+/**
+ * read purchase-flow auth context if it is still valid.
+ */
+export function getPurchaseAuthContext(): Omit<PurchaseAuthContext, "created_at"> | null {
+    if (typeof window === "undefined") return null;
+
+    try {
+        const raw = sessionStorage.getItem(PURCHASE_AUTH_STORAGE_KEY);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw) as PurchaseAuthContext;
+        if (
+            !parsed ||
+            typeof parsed.button_location !== "string" ||
+            typeof parsed.created_at !== "number" ||
+            Date.now() - parsed.created_at > PURCHASE_AUTH_TTL_MS
+        ) {
+            sessionStorage.removeItem(PURCHASE_AUTH_STORAGE_KEY);
+            return null;
+        }
+
+        return {
+            button_location: parsed.button_location,
+            plan_id: parsed.plan_id,
+        };
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * clear purchase-flow auth context after it has been consumed.
+ */
+export function clearPurchaseAuthContext(): void {
+    if (typeof window === "undefined") return;
+
+    try {
+        sessionStorage.removeItem(PURCHASE_AUTH_STORAGE_KEY);
+    } catch {
+        // ignore storage failures
     }
 }
 
@@ -257,6 +358,53 @@ export function trackInvestButtonClick(
         button_location: buttonLocation,
         is_authenticated: isAuthenticated,
         plan_id: planId,
+    });
+}
+
+/**
+ * Track login started from the purchase flow.
+ */
+export function trackLoginStarted(
+    buttonLocation: string,
+    isAuthenticated: boolean,
+    planId?: string
+): void {
+    track("login_started", {
+        button_location: buttonLocation,
+        is_authenticated: isAuthenticated,
+        plan_id: planId,
+    });
+}
+
+/**
+ * Track a new account created via invest-attributed oauth.
+ */
+export function trackPurchaseAttributedAccountCreated(
+    buttonLocation: string,
+    isAuthenticated: boolean,
+    planId?: string
+): void {
+    track("purchase_attributed_account_created", {
+        button_location: buttonLocation,
+        is_authenticated: isAuthenticated,
+        plan_id: planId,
+    });
+}
+
+/**
+ * Track Razorpay checkout actually opening.
+ */
+export function trackCheckoutOpened(
+    buttonLocation: string,
+    isAuthenticated: boolean,
+    planId?: string,
+    planName?: string
+): void {
+    track("checkout_opened", {
+        button_location: buttonLocation,
+        is_authenticated: isAuthenticated,
+        plan_id: planId,
+        plan_name: planName,
     });
 }
 
@@ -373,6 +521,9 @@ export const analytics = {
     isReady: isPostHogReady,
     // Event-specific helpers
     trackInvestButtonClick,
+    trackLoginStarted,
+    trackPurchaseAttributedAccountCreated,
+    trackCheckoutOpened,
     trackButtonClick,
     trackPaymentInitiated,
     trackPaymentCompleted,
@@ -386,6 +537,9 @@ export const analytics = {
     sanitizeAmount,
     truncateId,
     sanitizeCallbackUrl,
+    persistPurchaseAuthContext,
+    getPurchaseAuthContext,
+    clearPurchaseAuthContext,
 };
 
 export default analytics;
