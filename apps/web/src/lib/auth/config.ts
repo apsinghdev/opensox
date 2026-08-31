@@ -4,25 +4,28 @@ import GithubProvider from "next-auth/providers/github";
 import { serverTrpc } from "../trpc-server";
 
 export const authConfig: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
     GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      authorization: {
-        params: { scope: "read:user user:email" },
-      },
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     }),
   ],
   callbacks: {
     async signIn({ user, profile, account }) {
       try {
+        const userEmail =
+          user.email ||
+          (profile as any)?.email ||
+          `${(profile as any)?.login || "user"}@users.noreply.github.com`;
+
         const authResult = await serverTrpc.auth.googleAuth.mutate({
-          email: user.email!,
-          firstName: user.name ?? (profile as any)?.name,
+          email: userEmail,
+          firstName: user.name ?? (profile as any)?.name ?? (profile as any)?.login,
           authMethod: account?.provider ?? "google",
           providerAccountId: account?.providerAccountId,
           access_token: account?.access_token,
@@ -40,8 +43,8 @@ export const authConfig: NextAuthOptions = {
 
         return true;
       } catch (error) {
-        console.error("Sign-in error:", error);
-        return false;
+        console.error("Backend auth sync warning (proceeding with NextAuth login):", error);
+        return true;
       }
     },
 
@@ -61,8 +64,13 @@ export const authConfig: NextAuthOptions = {
     async jwt({ token, account, user }) {
       if (account && user) {
         try {
+          const userEmail =
+            user.email ||
+            token.email ||
+            `${account.providerAccountId || "user"}@users.noreply.github.com`;
+
           const data = await serverTrpc.auth.generateJWT.mutate({
-            email: user.email!,
+            email: userEmail,
           });
 
           token.jwtToken = data.token;

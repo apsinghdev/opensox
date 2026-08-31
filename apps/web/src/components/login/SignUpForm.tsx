@@ -6,43 +6,41 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Google, Github } from "../icons/icons";
 import PrimaryButton from "../ui/custom-button";
 
-interface LoginFormProps {
+interface SignUpFormProps {
   callbackUrl?: string;
   authError?: string | null;
   onOAuthSignIn: (provider: "google" | "github") => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const SignUpForm: React.FC<SignUpFormProps> = ({
   callbackUrl = "/dashboard/home",
   authError,
   onOAuthSignIn,
 }) => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{
+    name?: string;
     email?: string;
     password?: string;
+    confirmPassword?: string;
     general?: string;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [signupHref, setSignupHref] = useState("/signup");
+  const [loginHref, setLoginHref] = useState("/login");
 
   useEffect(() => {
     if (authError) {
-      if (authError === "OAuthSignin") {
+      if (authError === "OAuthSignin" || authError === "OAuthCallback") {
         setErrors((prev) => ({
           ...prev,
           general:
-            "OAuth authentication failed. Please verify GOOGLE_CLIENT_ID or GITHUB_CLIENT_ID are configured in environment variables.",
-        }));
-      } 
-      else if (authError === "OAuthCallback") {
-        setErrors((prev) => ({
-          ...prev,
-          general:
-            "OAuth authentication failed. Please verify GOOGLE_CLIENT_SECRET or GITHUB_CLIENT_SECRET are configured in environment variables.",
+            "OAuth authentication failed. Please verify GOOGLE_CLIENT_ID / GITHUB_CLIENT_ID are configured in environment variables.",
         }));
       } else {
         setErrors((prev) => ({
@@ -55,14 +53,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   useEffect(() => {
     if (callbackUrl && callbackUrl !== "/dashboard/home") {
-      setSignupHref(`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      setLoginHref(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     } else {
-      setSignupHref("/signup");
+      setLoginHref("/login");
     }
   }, [callbackUrl]);
 
   const validate = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: {
+      name?: string;
+      email?: string;
+      password?: string;
+      confirmPassword?: string;
+    } = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+    }
 
     if (!email.trim()) {
       newErrors.email = "Email is required";
@@ -72,6 +79,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
     if (!password) {
       newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     setErrors(newErrors);
@@ -89,15 +104,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     setIsLoading(true);
 
     try {
-      // Simulate/attempt authentication
+      // Simulate/attempt registration
       await new Promise((resolve) => setTimeout(resolve, 800));
-      // Backend credentials authentication is pending backend implementation
+      // Backend registration endpoint with credentials is pending backend implementation
       setInfoMessage(
-        "Email/password authentication is currently in preview. Please continue with Google or GitHub to sign in immediately."
+        "Direct registration with email/password is currently in preview. Please continue with Google or GitHub to create your account immediately."
       );
     } catch {
       setErrors({
-        general: "Failed to sign in. Please check your credentials.",
+        general: "Failed to create account. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -118,17 +133,49 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" noValidate>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3" noValidate>
+        {/* Name Field */}
+        <div className="flex flex-col gap-1.5 text-left">
+          <label
+            htmlFor="signup-name"
+            className="text-xs font-medium text-text-secondary"
+          >
+            Name
+          </label>
+          <input
+            id="signup-name"
+            type="text"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+            }}
+            placeholder="Enter your name"
+            autoComplete="name"
+            disabled={isLoading}
+            className={`w-full px-3.5 py-2.5 rounded-xl text-sm text-text-primary bg-[#161616] border ${
+              errors.name
+                ? "border-red-500/80 focus:border-red-500"
+                : "border-[#282828] focus:border-brand-purple"
+            } outline-none placeholder:text-text-muted transition-colors disabled:opacity-50`}
+          />
+          {errors.name && (
+            <span className="text-xs text-red-400 font-normal">
+              {errors.name}
+            </span>
+          )}
+        </div>
+
         {/* Email Field */}
         <div className="flex flex-col gap-1.5 text-left">
           <label
-            htmlFor="email"
+            htmlFor="signup-email"
             className="text-xs font-medium text-text-secondary"
           >
             Email
           </label>
           <input
-            id="email"
+            id="signup-email"
             type="email"
             value={email}
             onChange={(e) => {
@@ -153,28 +200,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {/* Password Field */}
         <div className="flex flex-col gap-1.5 text-left">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="password"
-              className="text-xs font-medium text-text-secondary"
-            >
-              Password
-            </label>
-            <button
-              type="button"
-              onClick={() =>
-                setInfoMessage(
-                  "Password reset functionality will be available soon. Please use OAuth for instant access."
-                )
-              }
-              className="text-xs text-text-muted hover:text-brand-purple-light transition-colors font-normal"
-            >
-              Forgot password?
-            </button>
-          </div>
+          <label
+            htmlFor="signup-password"
+            className="text-xs font-medium text-text-secondary"
+          >
+            Password
+          </label>
           <div className="relative">
             <input
-              id="password"
+              id="signup-password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => {
@@ -182,8 +216,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 if (errors.password)
                   setErrors((prev) => ({ ...prev, password: undefined }));
               }}
-              placeholder="Enter your password"
-              autoComplete="current-password"
+              placeholder="Create a password"
+              autoComplete="new-password"
               disabled={isLoading}
               className={`w-full px-3.5 py-2.5 pr-10 rounded-xl text-sm text-text-primary bg-[#161616] border ${
                 errors.password
@@ -212,6 +246,54 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           )}
         </div>
 
+        {/* Confirm Password Field */}
+        <div className="flex flex-col gap-1.5 text-left">
+          <label
+            htmlFor="signup-confirm-password"
+            className="text-xs font-medium text-text-secondary"
+          >
+            Confirm password
+          </label>
+          <div className="relative">
+            <input
+              id="signup-confirm-password"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (errors.confirmPassword)
+                  setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+              }}
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+              disabled={isLoading}
+              className={`w-full px-3.5 py-2.5 pr-10 rounded-xl text-sm text-text-primary bg-[#161616] border ${
+                errors.confirmPassword
+                  ? "border-red-500/80 focus:border-red-500"
+                  : "border-[#282828] focus:border-brand-purple"
+              } outline-none placeholder:text-text-muted transition-colors disabled:opacity-50`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              tabIndex={-1}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors focus:outline-none"
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            >
+              {showConfirmPassword ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+          {errors.confirmPassword && (
+            <span className="text-xs text-red-400 font-normal">
+              {errors.confirmPassword}
+            </span>
+          )}
+        </div>
+
         {/* Submit Button */}
         <PrimaryButton
           type="submit"
@@ -222,10 +304,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {isLoading ? (
             <span className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
-              Signing in...
+              Creating account...
             </span>
           ) : (
-            "Sign in"
+            "Create account"
           )}
         </PrimaryButton>
       </form>
@@ -270,19 +352,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </PrimaryButton>
       </div>
 
-      {/* Navigation to Signup */}
+      {/* Navigation to Login */}
       <div className="text-center text-xs text-text-secondary mt-2">
-        <span>Don&apos;t have an account?</span>{" "}
+        <span>Already have an account?</span>{" "}
         <Link
-          href={signupHref}
+          href={loginHref}
           suppressHydrationWarning
           className="text-brand-purple-light hover:underline font-semibold transition-colors"
         >
-          Create account
+          Sign in
         </Link>
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default SignUpForm;

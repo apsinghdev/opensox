@@ -9,11 +9,15 @@ const PrimaryButton = ({
   animate = true,
   classname,
   onClick,
+  type = "button",
+  disabled = false,
 }: {
   children: React.ReactNode;
   animate?: boolean;
   classname?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }) => {
   const transition = {
     duration: 0.1,
@@ -21,6 +25,8 @@ const PrimaryButton = ({
   };
   return (
     <motion.button
+      type={type}
+      disabled={disabled}
       onClick={onClick}
       className={cn(
         "flex gap-2 items-center justify-center px-5 py-3 rounded-[16px] relative",

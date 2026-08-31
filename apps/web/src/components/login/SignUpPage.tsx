@@ -6,9 +6,9 @@ import Image from "next/image";
 import Overlay from "../ui/overlay";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { sanitizeCallbackUrl } from "@/lib/analytics";
-import LoginForm from "./LoginForm";
+import SignUpForm from "./SignUpForm";
 
-const SignInPage = () => {
+const SignUpPage = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/home";
   const { trackSignInStarted } = useAnalytics();
@@ -34,7 +34,7 @@ const SignInPage = () => {
 
   const safeCallbackUrl = getSafeCallbackUrl(callbackUrl);
 
-  const handleSignIn = async (provider: "google" | "github") => {
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
     try {
       const sanitizedCallback = sanitizeCallbackUrl(safeCallbackUrl);
       trackSignInStarted(provider, sanitizedCallback);
@@ -58,7 +58,7 @@ const SignInPage = () => {
         fill
         className="object-cover w-full h-full opacity-60 scale-150 pointer-events-none"
       />
-      
+
       {/* Header / Branding */}
       <div className="flex items-center justify-center flex-col text-[#f5f5f5] gap-3 z-20 text-center">
         <div className="w-14 h-14 aspect-square overflow-hidden relative">
@@ -72,22 +72,22 @@ const SignInPage = () => {
         </div>
         <div className="flex flex-col gap-1">
           <h1 className="tracking-tighter font-semibold text-2xl leading-tight text-text-primary">
-            Welcome back to OpenSox AI
+            Create your OpenSox AI account
           </h1>
           <p className="text-sm text-text-secondary font-normal">
-            Sign in to continue to your OpenSox account
+            Get started with OpenSox
           </p>
         </div>
       </div>
 
-      {/* Login Form */}
-      <LoginForm
+      {/* Signup Form */}
+      <SignUpForm
         callbackUrl={safeCallbackUrl}
         authError={authError}
-        onOAuthSignIn={handleSignIn}
+        onOAuthSignIn={handleOAuthSignIn}
       />
     </div>
   );
 };
 
-export default SignInPage;
+export default SignUpPage;
