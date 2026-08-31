@@ -233,12 +233,12 @@ const Pricing = () => {
               <p className="text-2xl font-medium tracking-tight text-text-secondary sm:text-3xl">
                 a small and effective ecosystem for{" "}
                 <a
-                  href="/blog/scale-is-the-problem"
+                  href="/pitch#my-scale"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline decoration-brand-purple-light decoration-1 underline-offset-4 transition-colors hover:decoration-brand-purple"
                 >
-                  limited
+                  30
                 </a>{" "}
                 people.
               </p>
