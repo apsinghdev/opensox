@@ -51,6 +51,8 @@ export const projectService = {
     queryParts.push(`is:organization`);
     queryParts.push(`is:public`);
     queryParts.push(`fork:true`);
+    queryParts.push(`archived:false`);
+  
 
     const searchQueryString = queryParts.join(" ");
 
