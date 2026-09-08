@@ -74,17 +74,13 @@ html {
 
 /* page titles: /blog index h1 + individual post article title */
 .blog-heading {
-
   @apply text-4xl lg:text-5xl font-bold tracking-tight leading-tight;
-
   font-family: Helvetica, Arial, sans-serif;
 }
 
 /* post titles on /blog list only */
 .blog-list-title {
-
   @apply text-2xl lg:text-3xl font-bold tracking-tight leading-tight;
-
   font-family: Helvetica, Arial, sans-serif;
 }
 
@@ -132,7 +128,7 @@ html {
   @apply bg-transparent p-0;
 }
 .prose-blog hr {
-  @apply border-border my-8;
+  @apply my-8;
 }
 .prose-blog img {
   @apply rounded-lg my-6 max-w-full;
@@ -149,6 +145,7 @@ html {
   --blog-link: #60a5fa;
   --blog-link-hover: #93c5fd;
   --blog-purple: #5519f7;
+  --blog-accent: #a58dff;
 }
 [data-blog-theme="sepia"] .blog-page {
   --blog-bg: #f4ecd8;
@@ -160,6 +157,7 @@ html {
   --blog-link: #60a5fa;
   --blog-link-hover: #93c5fd;
   --blog-purple: #7a4e1e;
+  --blog-accent: #7a4e1e;
 }
 [data-blog-theme="green"] .blog-page {
   --blog-bg: #d7e8d4;
@@ -171,6 +169,7 @@ html {
   --blog-link: #60a5fa;
   --blog-link-hover: #93c5fd;
   --blog-purple: #2d5a27;
+  --blog-accent: #2d5a27;
 }
 /* dark is the default blog theme; other themes override via data-blog-theme on <html> */
 .blog-page {
@@ -183,6 +182,7 @@ html {
   --blog-link: #60a5fa;
   --blog-link-hover: #93c5fd;
   --blog-purple: #5519f7;
+  --blog-accent: #a58dff;
 
   background-color: var(--blog-bg) !important;
   color: var(--blog-fg) !important;
@@ -195,6 +195,10 @@ html {
 }
 .blog-page .blog-border {
   border-color: var(--blog-border);
+}
+.blog-page hr.blog-border {
+  border: none;
+  border-top: 1px solid var(--blog-border);
 }
 .blog-page .blog-link {
   color: var(--blog-muted);
@@ -213,6 +217,26 @@ html {
   opacity: 0.85;
 }
 
+.blog-page .blog-discuss-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--blog-accent);
+  color: var(--blog-accent);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  font-weight: 500;
+  width: fit-content;
+  text-decoration: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+.blog-page a.blog-discuss-badge:hover {
+  background-color: var(--blog-accent);
+  color: var(--blog-fg);
+}
+
 /* Prose overrides for blog themes */
 .blog-page .prose-blog {
   color: var(--blog-text);
@@ -223,7 +247,7 @@ html {
 }
 .blog-page .prose-blog h2,
 .blog-page .prose-blog h3 {
-  color: var(--blog-fg);
+  color: var(--blog-accent);
 }
 .blog-page .prose-blog strong {
   color: var(--blog-fg);
@@ -236,6 +260,15 @@ html {
 }
 .blog-page .prose-blog a:hover {
   color: var(--blog-link-hover);
+}
+.blog-page .blog-cta-link {
+  color: var(--blog-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s;
+}
+.blog-page .blog-cta-link:hover {
+  opacity: 0.8;
 }
 .blog-page .prose-blog blockquote {
   border-color: var(--blog-border);
