@@ -209,8 +209,8 @@ html {
   border-color: var(--blog-muted);
 }
 .blog-page .blog-tag-active {
-  color: var(--blog-purple);
-  border-color: var(--blog-purple);
+  color: var(--blog-accent);
+  border-color: var(--blog-accent);
 }
 .blog-page .group:hover .blog-title {
   color: var(--blog-fg);
