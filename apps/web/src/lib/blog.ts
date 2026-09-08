@@ -37,7 +37,7 @@ function withExternalLinkTargets(html: string): string {
   });
 }
 
-export type BlogTag = "engineering" | "startup" | "distribution" | "misc";
+export type BlogTag = "open-source" | "build-in-public" | "learning";
 
 export interface BlogFrontmatter {
   title: string;

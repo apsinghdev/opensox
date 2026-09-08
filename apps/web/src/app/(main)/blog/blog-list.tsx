@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import type { KeyboardEvent } from "react";
 import Link from "next/link";
 import type { BlogMeta, BlogTag } from "@/lib/blog";
 import BlogThemeSelector from "./blog-theme";
 import BlogSocials from "./blog-socials";
 
-const tags: BlogTag[] = ["engineering", "startup", "distribution", "misc"];
+type BlogFilter = BlogTag | "all";
 
-function formatDate(dateStr: string): string {
+const FILTERS: { id: BlogFilter; label: string }[] = [
+  { id: "open-source", label: "Open source" },
+  { id: "build-in-public", label: "Build in public" },
+  { id: "learning", label: "Learning" },
+  { id: "all", label: "All" },
+];
+
+const formatDate = (dateStr: string): string => {
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-US", {
     month: "short",
@@ -16,14 +24,29 @@ function formatDate(dateStr: string): string {
     year: "numeric",
     timeZone: "UTC",
   });
-}
+};
 
 export default function BlogList({ posts }: { posts: BlogMeta[] }) {
-  const [activeTag, setActiveTag] = useState<BlogTag | null>(null);
+  const [activeFilter, setActiveFilter] = useState<BlogFilter>("open-source");
 
-  const filtered = activeTag
-    ? posts.filter((p) => p.tag === activeTag)
-    : posts;
+  const filtered =
+    activeFilter === "all"
+      ? posts
+      : posts.filter((p) => p.tag === activeFilter);
+
+  const handleFilterClick = (filter: BlogFilter) => {
+    setActiveFilter(filter);
+  };
+
+  const handleFilterKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    filter: BlogFilter
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setActiveFilter(filter);
+    }
+  };
 
   return (
     <main className="blog-page min-h-screen">
@@ -46,30 +69,26 @@ export default function BlogList({ posts }: { posts: BlogMeta[] }) {
           </p>
         </header>
 
-        <div className="flex gap-2 mb-10 flex-wrap">
-          <button
-            onClick={() => setActiveTag(null)}
-            aria-pressed={activeTag === null}
-            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-              activeTag === null
-                ? "blog-tag-active"
-                : "blog-link"
-            }`}
-          >
-            All
-          </button>
-          {tags.map((tag) => (
+        <div
+          className="flex gap-2 mb-10 flex-wrap"
+          role="tablist"
+          aria-label="Filter blog posts"
+        >
+          {FILTERS.map((filter) => (
             <button
-              key={tag}
-              onClick={() => setActiveTag(tag)}
-              aria-pressed={activeTag === tag}
-              className={`px-3 py-1 text-sm rounded-full border transition-colors capitalize ${
-                activeTag === tag
-                  ? "blog-tag-active"
-                  : "blog-link"
+              key={filter.id}
+              type="button"
+              role="tab"
+              tabIndex={0}
+              onClick={() => handleFilterClick(filter.id)}
+              onKeyDown={(event) => handleFilterKeyDown(event, filter.id)}
+              aria-pressed={activeFilter === filter.id}
+              aria-selected={activeFilter === filter.id}
+              className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                activeFilter === filter.id ? "blog-tag-active" : "blog-link"
               }`}
             >
-              {tag}
+              {filter.label}
             </button>
           ))}
         </div>

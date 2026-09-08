@@ -1,4 +1,11 @@
 import Link from "next/link";
+import type { BlogTag } from "@/lib/blog";
+
+const TAG_LABELS: Record<BlogTag, string> = {
+  "open-source": "Open source",
+  "build-in-public": "Build in public",
+  learning: "Learning",
+};
 
 const XIcon = () => (
   <svg
@@ -17,21 +24,23 @@ export default function BlogBadge({
   tag,
 }: {
   tweetUrl?: string;
-  tag: string;
+  tag: BlogTag;
 }) {
+  const label = TAG_LABELS[tag] ?? tag;
+
   if (tweetUrl) {
     return (
       <Link
         href={tweetUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Discussed on Twitter, ${tag} (opens in a new tab)`}
+        aria-label={`Discussed on Twitter, ${label} (opens in a new tab)`}
         className="blog-discuss-badge"
       >
         <XIcon />
         <span>Discussed on Twitter</span>
         <span aria-hidden="true">&middot;</span>
-        <span className="capitalize">{tag}</span>
+        <span>{label}</span>
         <span aria-hidden="true">&rarr;</span>
       </Link>
     );
@@ -39,7 +48,7 @@ export default function BlogBadge({
 
   return (
     <span className="blog-discuss-badge">
-      <span className="capitalize">{tag}</span>
+      <span>{label}</span>
     </span>
   );
 }
