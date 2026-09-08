@@ -46,7 +46,6 @@ export default function BlogList({ posts }: { posts: BlogMeta[] }) {
           </p>
         </header>
 
-        {/* Tag filters */}
         <div className="flex gap-2 mb-10 flex-wrap">
           <button
             onClick={() => setActiveTag(null)}
@@ -75,7 +74,6 @@ export default function BlogList({ posts }: { posts: BlogMeta[] }) {
           ))}
         </div>
 
-        {/* Blog list */}
         <div className="flex flex-col">
           {filtered.length === 0 ? (
             <p className="blog-text-muted py-8">No posts found.</p>

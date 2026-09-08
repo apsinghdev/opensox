@@ -54,14 +54,6 @@ export default function BlogSocials() {
           {s.icon}
         </Link>
       ))}
-      <Link
-        href="/pricing#pro-price-card"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-xs font-semibold px-3 py-1.5 rounded-full border hover:border-brand-purple hover:text-brand-purple transition-colors text-brand-purple-light border-brand-purple-light"
-      >
-        opensox pro
-      </Link>
     </div>
   );
 }
