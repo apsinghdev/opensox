@@ -184,4 +184,4 @@ don't wait for "perfect timing" — just fork, clone, and begin.
 
 you'll figure things out as you go, and that's where the real growth happens.
 
-this is ajeetunc. see you in the next module
+this is jackedAJ. see you in the next module

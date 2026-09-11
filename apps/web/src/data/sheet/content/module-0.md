@@ -15,7 +15,7 @@ so my name is Ajeet and these are some of my achievements so far:
 
 im telling you this not to show off but to make a point that what we can achieve through OPEN SOURCE in 3 years.
 
-especially in my case, [the background](https://x.com/ajeetunc/status/1989355142081065468?s=20) i come from and the college i come from achieving all of this in 3 years was i mean at least for me was next to impossible because i had never thought that i will ever be able to do all of that.
+especially in my case, [the background](https://x.com/jackedAJ/status/1989355142081065468?s=20) i come from and the college i come from achieving all of this in 3 years was i mean at least for me was next to impossible because i had never thought that i will ever be able to do all of that.
 
 if i be honest with you then my initial plan was to get around 4 to 5 LPA job at any company because at that time i was very desperate to get into tech and i was thinking that okay i will just get into tech and then i will go for something bigger.
 

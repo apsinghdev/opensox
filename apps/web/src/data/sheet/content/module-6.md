@@ -171,4 +171,4 @@ in the next one, we'll actually implement the fix, test it, and raise our first 
 
 until then — keep exploring, keep breaking things, and keep building your open source story
 
-this is ajeetunc. see you in the next module
+this is jackedAJ. see you in the next module
