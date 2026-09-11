@@ -117,6 +117,33 @@ interface FulfillPaymentInput {
 }
 
 const DEFAULT_PREMIUM_EMAIL_NAME = "there";
+const IST_OFFSET = "+05:30";
+
+function padMonthOrDay(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+function getCurrentMonthBoundsIst(now = new Date()): { start: Date; end: Date } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "numeric",
+  }).formatToParts(now);
+
+  const year = Number(parts.find((part) => part.type === "year")?.value);
+  const month = Number(parts.find((part) => part.type === "month")?.value);
+
+  const start = new Date(
+    `${year}-${padMonthOrDay(month)}-01T00:00:00${IST_OFFSET}`
+  );
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+  const end = new Date(
+    `${nextYear}-${padMonthOrDay(nextMonth)}-01T00:00:00${IST_OFFSET}`
+  );
+
+  return { start, end };
+}
 
 export const paymentService = {
   /**
@@ -135,12 +162,12 @@ export const paymentService = {
   },
 
   /**
-   * distinct users who have ever subscribed to the given plan (including expired)
+   * distinct users who started a pro subscription in the current calendar month (ist)
    */
-  async countProMembersForPlan(planId: string): Promise<number> {
+  async countProMembersJoinedThisMonth(): Promise<number> {
+    const { start, end } = getCurrentMonthBoundsIst();
     const maxRetries = 2;
     const baseDelayMs = 100;
-    let lastError: unknown;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
@@ -148,13 +175,15 @@ export const paymentService = {
           where: {
             subscriptions: {
               some: {
-                planId,
+                startDate: {
+                  gte: start,
+                  lt: end,
+                },
               },
             },
           },
         });
       } catch (error) {
-        lastError = error;
         const transient = isTransientDbError(error);
         const lastAttempt = attempt === maxRetries;
 
@@ -167,9 +196,8 @@ export const paymentService = {
             JSON.stringify({
               level: "error",
               service: "paymentService",
-              operation: "countProMembersForPlan",
+              operation: "countProMembersJoinedThisMonth",
               event: "prisma.user.count_failed",
-              planId,
               timestamp: new Date().toISOString(),
               attempt: attempt + 1,
               maxAttempts: maxRetries + 1,
@@ -179,7 +207,7 @@ export const paymentService = {
                 error instanceof Error ? error.message : String(error),
             })
           );
-          throw new Error("Failed to count pro members for plan");
+          throw new Error("Failed to count pro members joined this month");
         }
 
         const delayMs = baseDelayMs * Math.pow(2, attempt);
@@ -187,9 +215,8 @@ export const paymentService = {
           JSON.stringify({
             level: "warn",
             service: "paymentService",
-            operation: "countProMembersForPlan",
+            operation: "countProMembersJoinedThisMonth",
             event: "prisma.user.count_retry",
-            planId,
             timestamp: new Date().toISOString(),
             attempt: attempt + 1,
             retryInMs: delayMs,
@@ -199,7 +226,7 @@ export const paymentService = {
       }
     }
 
-    throw new Error("Failed to count pro members for plan");
+    throw new Error("Failed to count pro members joined this month");
   },
 
   /**

@@ -38,20 +38,10 @@ export const paymentRouter = router({
       };
     }),
 
-  getProMemberCount: publicProcedure
-    .input(z.object({ planId: z.string().min(1, "Plan ID is required") }))
-    .query(async ({ input }) => {
-      const plan = await paymentService.getPlan(input.planId);
-      if (!plan) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Plan not found",
-        });
-      }
-
-      const count = await paymentService.countProMembersForPlan(input.planId);
-      return { count };
-    }),
+  getMonthlyJoinCount: publicProcedure.query(async () => {
+    const count = await paymentService.countProMembersJoinedThisMonth();
+    return { count };
+  }),
 
   createOrder: protectedProcedure
     .input(createOrderSchema)

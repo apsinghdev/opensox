@@ -411,14 +411,6 @@ const PlanColumnHeader = ({
     },
   );
 
-  const { data: memberCountData } = trpc.payment.getProMemberCount.useQuery(
-    { planId: tier.planId as string },
-    {
-      enabled: isPaid && planIdOk,
-      staleTime: 5 * 60 * 1000,
-    },
-  );
-
   return (
     <div className="flex h-full w-full flex-col text-center">
       <div className="flex flex-col items-center">
@@ -479,17 +471,39 @@ const PlanColumnHeader = ({
             buttonLocation="pricing_page"
           />
         )}
-        {isPaid && typeof memberCountData?.count === "number" ? (
-          <p className="mt-2 font-heading text-sm font-semibold tracking-tighter text-success-text">
-            {memberCountData.count} invested!
-          </p>
-        ) : (
-          <p className="mt-2 text-sm invisible select-none" aria-hidden>
-            &nbsp;
-          </p>
-        )}
       </div>
     </div>
+  );
+};
+
+const MONTHLY_JOIN_COUNT_CLASS =
+  "mt-1 font-heading text-base font-semibold tracking-tighter text-success-text";
+
+const PlanSectionIntro = () => {
+  const { data: monthlyJoinData } = trpc.payment.getMonthlyJoinCount.useQuery(
+    undefined,
+    {
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  return (
+    <>
+      <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
+        Choose your{" "}
+        <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
+          plan.
+        </span>
+      </h2>
+      <p className="max-w-sm text-sm text-text-muted">
+        Go Pro or Pro+ to join the ecosystem.
+      </p>
+      {typeof monthlyJoinData?.count === "number" ? (
+        <p className={MONTHLY_JOIN_COUNT_CLASS}>
+          {monthlyJoinData.count} joined this month so far
+        </p>
+      ) : null}
+    </>
   );
 };
 
@@ -508,15 +522,7 @@ const PricingComparison = ({
     <div className="flex flex-col gap-6 lg:gap-14">
       <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_1fr] lg:items-stretch lg:gap-6">
         <div className="flex flex-col gap-3 pt-4">
-          <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
-            Choose your{" "}
-            <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
-              plan.
-            </span>
-          </h2>
-          <p className="max-w-sm text-sm text-text-muted">
-            Go Pro or Pro+ to join the ecosystem.
-          </p>
+          <PlanSectionIntro />
         </div>
 
         <PlanColumns className="h-full items-stretch">
@@ -533,15 +539,7 @@ const PricingComparison = ({
       </div>
 
       <div className="flex flex-col gap-3 pt-4 lg:hidden">
-        <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
-          Choose your{" "}
-          <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
-            plan.
-          </span>
-        </h2>
-        <p className="max-w-sm text-sm text-text-muted">
-          Go Pro or Pro+ to join the ecosystem.
-        </p>
+        <PlanSectionIntro />
       </div>
 
       <div className={MOBILE_TABLE_SCROLL}>
