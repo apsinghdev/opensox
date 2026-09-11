@@ -131,4 +131,4 @@ even though the issue got closed before we could raise a PR, we still learned a 
 
 in the next module, we'll pick another issue — ideally one we can actually fix and raise a PR for.
 
-this is ajeetunc. see you in the next module.
+this is jackedAJ. see you in the next module.

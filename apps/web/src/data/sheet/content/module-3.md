@@ -133,4 +133,4 @@ remember — these aren't hard rules. these are just proven ways to discover gre
 
 the key is simple: don't overthink. explore, shortlist, start contributing. you'll figure things out as you go.
 
-so yeah, that's all for this module. hope it helps you discover your next favorite open source project. this is ajeetunc. see you in the next module
+so yeah, that's all for this module. hope it helps you discover your next favorite open source project. this is jackedAJ. see you in the next module

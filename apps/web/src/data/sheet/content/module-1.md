@@ -146,4 +146,4 @@ we'll dive deeper into all these beginner problems in upcoming modules — how t
 
 so yeah, that's all for this one. this module was more of a mindset and theory piece, but honestly, these are the things most people skip — and end up making mistakes that cost them their aura.
 
-if you vibed with it, share it with other (coz i dont have a marketing budget), and this is ajeetunc. see you in the next module
+if you vibed with it, share it with other (coz i dont have a marketing budget), and this is jackedAJ. see you in the next module

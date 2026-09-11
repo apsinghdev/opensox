@@ -173,4 +173,4 @@ learn, contribute, repeat.
 - [ ] understand the architecture like this [16:07](https://www.youtube.com/watch?v=wvl_SkMwbrU&t=967s)
 - [ ] go through the code flow [33:34](https://www.youtube.com/watch?v=wvl_SkMwbrU&t=2014s)
 
-this is ajeetunc. see you in the next module
+this is jackedAJ. see you in the next module

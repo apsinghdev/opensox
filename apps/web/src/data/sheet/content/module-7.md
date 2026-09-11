@@ -12,4 +12,4 @@ this module is just the implementation of an issue we picked in the previous mod
 - [ ] just watch the [video](https://youtu.be/H-zCtw5c3uQ?si=wkPNFubBaVCwMS3f)
 - [ ] and follow along with your own issue.
 
-this is ajeetunc. see you in the next module
+this is jackedAJ. see you in the next module
