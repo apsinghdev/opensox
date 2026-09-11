@@ -28,7 +28,7 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="pt-8 border-t border-[#252525] space-y-8">
         {/* Top Row - Profile Picture and Navigation */}
-        <div className="relative flex items-start justify-between gap-6 lg:gap-0">
+        <div className="relative flex flex-col sm:flex-row items-start justify-between gap-8 lg:gap-6">
           {/* Profile Picture - Left */}
           <div className="flex flex-col gap-4">
             <div>
@@ -55,7 +55,6 @@ const Footer = () => {
               </Link>
             </p>
           </div>
-
           {/* Grid Layout - Right */}
           <div className="grid grid-cols-3 gap-6 lg:gap-8">
             {/* Sitemap Column */}
