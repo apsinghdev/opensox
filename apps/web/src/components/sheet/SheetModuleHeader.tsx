@@ -1,20 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Download, Share2, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, Share2, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
+interface ModuleInfo {
+  id: string;
+  name: string;
+}
 
 interface SheetModuleHeaderProps {
   moduleName: string;
   docContent: string;
+  currentModuleId?: string;
+  modules?: ModuleInfo[];
 }
 
 export function SheetModuleHeader({
   moduleName,
   docContent,
+  currentModuleId,
+  modules = [],
 }: SheetModuleHeaderProps) {
   const [copied, setCopied] = useState(false);
+
+  // Compute next module
+  const nextModule = useMemo(() => {
+    if (!currentModuleId || modules.length === 0) return null;
+
+    const sortedModules = [...modules].sort((a, b) => {
+      const aNum = parseInt(a.id.replace("module-", "")) || 0;
+      const bNum = parseInt(b.id.replace("module-", "")) || 0;
+      return aNum - bNum;
+    });
+
+    const currentIndex = sortedModules.findIndex(
+      (m) => m.id === currentModuleId
+    );
+
+    if (currentIndex === -1 || currentIndex >= sortedModules.length - 1) {
+      return null;
+    }
+
+    return sortedModules[currentIndex + 1];
+  }, [currentModuleId, modules]);
 
   const handleShare = async () => {
     try {
@@ -110,13 +140,24 @@ export function SheetModuleHeader({
 
   return (
     <div className="flex items-center justify-between mb-8">
-      <Link
-        href="/dashboard/sheet"
-        className="inline-flex items-center gap-2 text-brand-purple-light hover:text-brand-purple transition-colors text-sm font-medium"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Sheet
-      </Link>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/dashboard/sheet"
+          className="inline-flex items-center gap-2 text-brand-purple-light hover:text-brand-purple transition-colors text-sm font-medium"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Sheet
+        </Link>
+        {nextModule && (
+          <Link
+            href={`/sheet/${nextModule.id}`}
+            className="inline-flex items-center gap-2 text-brand-purple-light hover:text-brand-purple transition-colors text-sm font-medium"
+          >
+            Next: {nextModule.name}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        )}
+      </div>
 
       <div className="flex items-center gap-2">
         {copied && (
