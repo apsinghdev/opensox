@@ -36,6 +36,7 @@ model User {
   email          String         @unique
   firstName      String
   authMethod     String
+  passwordHash   String?
   discordUserId  String?        @unique
   createdAt      DateTime       @default(now())
   lastLogin      DateTime       @updatedAt

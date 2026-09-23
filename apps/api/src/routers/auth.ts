@@ -76,4 +76,24 @@ export const authRouter = router({
     .mutation(({ input }) => {
       return { token: generateToken(input.email) };
     }),
+  reviewLogin: publicProcedure
+    .input(
+      z.object({
+        email: z.email("Invalid email format"),
+        password: z.string().min(1),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await authService.handleReviewLogin(ctx.db.prisma, input);
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.error("Review login error:", error);
+        }
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid credentials",
+        });
+      }
+    }),
 });
