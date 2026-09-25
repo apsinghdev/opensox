@@ -3,9 +3,25 @@ import { getSheetModules } from "@/data/sheet";
 import { SheetModuleHeader } from "@/components/sheet/SheetModuleHeader";
 import { SheetContentRenderer } from "@/components/sheet/SheetContentRenderer";
 import styles from "./sheet-content.module.css";
+import { Metadata } from "next";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ moduleId: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { moduleId } = await params;
+
+  const sheetModules = getSheetModules();
+  const sheetModule = sheetModules.find((m) => m.id === moduleId);
+
+  return {
+    title: `${capitalizeFirstLetter(sheetModule?.id || "Modules")}: ${sheetModule?.name || ""} `,
+    description: `This module describes how to ${sheetModule?.name.toLowerCase()}`,
+  };
 }
 
 export default async function SheetModulePage({ params }: PageProps) {
