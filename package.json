@@ -5,7 +5,10 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "setup:windows": "powershell -ExecutionPolicy Bypass -File ./setup/setup-windows.ps1",
+    "setup:linux": "bash ./setup/setup-linux.sh",
+    "setup:mac": "bash ./setup/setup-mac.sh"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
