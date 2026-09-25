@@ -10,6 +10,16 @@ import { cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Navbar = () => {
+    // Scroll to top of hero section
+    const handleLogoClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.preventDefault();
+      const hero = document.getElementById('hero');
+      if (hero) {
+        hero.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
   const { scrollYProgress } = useScroll();
   const pathname = usePathname();
   const isPinnedNav = pathname === "/pricing" || pathname === "/newsletter";
@@ -71,7 +81,12 @@ const Navbar = () => {
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
-        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
+        <div
+          className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2 cursor-pointer"
+          onClick={handleLogoClick}
+          aria-label="Scroll to top"
+          style={{ userSelect: 'none' }}
+        >
           <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
             <Image
               src="/assets/logo.svg"
