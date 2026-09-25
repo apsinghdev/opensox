@@ -42,7 +42,7 @@ export default function FiltersContainer() {
         setProjectsNotFound(true);
         return;
       }
-      const modifiedProjects = convertApiOutputToUserOutput(projects, filters);
+      const modifiedProjects = convertApiOutputToUserOutput(projects);
       setData(modifiedProjects);
       setRenderProjects(true);
       resetFilters();
