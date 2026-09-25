@@ -35,7 +35,7 @@ if (!CRON_SECRET) {
 }
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 const CORS_ORIGINS = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean)
   : ["http://localhost:3000", "http://localhost:5000"];
