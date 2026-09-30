@@ -58,17 +58,17 @@ export const FEATURE_ICON_MAP: Record<FeatureIconName, HeroIcon> = {
 };
 
 const FEATURE_IMAGES = {
-  onboarding: "/assets/features/1onboardingcall.png",
-  community: "/assets/features/2community.png",
-  weeklySessions: "/assets/features/3weeklysessions.png",
-  unlimitedQna: "/assets/features/4unlimitedqna.png",
-  proModules: "/assets/features/5promodules.png",
-  weeklyContests: "/assets/features/6weeklycontests.png",
-  handPickedProjects: "/assets/features/7hand-pickedossprojects.png",
-  proRecordings: "/assets/features/8prorecordings.png",
-  privateThreads: "/assets/features/9pvtthreads.png",
-  updates: "/assets/features/10updates-n-opportunities.png",
-  prorefs: "/assets/features/11prorefs.png",
+  onboarding: "/assets/features/1onboardingcall.webp",
+  community: "/assets/features/2community.webp",
+  weeklySessions: "/assets/features/3weeklysessions.webp",
+  unlimitedQna: "/assets/features/4unlimitedqna.webp",
+  proModules: "/assets/features/5promodules.webp",
+  weeklyContests: "/assets/features/6weeklycontests.webp",
+  handPickedProjects: "/assets/features/7hand-pickedossprojects.webp",
+  proRecordings: "/assets/features/8prorecordings.webp",
+  privateThreads: "/assets/features/9pvtthreads.webp",
+  updates: "/assets/features/10updates-n-opportunities.webp",
+  prorefs: "/assets/features/11prorefs.webp",
 } as const;
 
 export const FEATURES_DATA: FeatureData[] = [
