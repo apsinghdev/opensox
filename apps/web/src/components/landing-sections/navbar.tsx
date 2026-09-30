@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import PrimaryButton from "../ui/custom-button";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { Terminal, Menu, X } from "lucide-react";
 import Link from "next/link";
@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 const Navbar = () => {
-  const { scrollYProgress } = useScroll();
   const pathname = usePathname();
   const isPinnedNav = pathname === "/pricing" || pathname === "/newsletter";
-  const [showNavbar, setShowNavbar] = useState(isPinnedNav ? true : false);
+  const [showNavbar, setShowNavbar] = useState(isPinnedNav);
+  const visibleRef = React.useRef(isPinnedNav);
   const [isOpen, setIsOpen] = useState(false);
   const { trackButtonClick } = useAnalytics();
 
@@ -34,14 +34,18 @@ const Navbar = () => {
   }, [isOpen]);
 
   React.useEffect(() => {
-    setShowNavbar(isPinnedNav || scrollYProgress.get() > 0);
-  }, [isPinnedNav, scrollYProgress]);
+    const updateVisibility = () => {
+      const nextVisible = isPinnedNav || window.scrollY > 0;
+      if (visibleRef.current !== nextVisible) {
+        visibleRef.current = nextVisible;
+        setShowNavbar(nextVisible);
+      }
+    };
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (!isPinnedNav) {
-      setShowNavbar(latest > 0);
-    }
-  });
+    updateVisibility();
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    return () => window.removeEventListener("scroll", updateVisibility);
+  }, [isPinnedNav]);
 
   const links = [
     { name: "Pricing", href: "/pricing" },

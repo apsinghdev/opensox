@@ -102,21 +102,14 @@ export default function Features({
     const carouselRef = useRef<HTMLUListElement>(null);
     const ref = useRef(null);
     const isInView = useInView(ref, {
-        once: true,
-        amount: 0.5,
+        amount: 0.1,
     });
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (isInView) {
-                setCurrentIndex(0);
-            } else {
-                setCurrentIndex(-1);
-            }
-        }, 100);
-
-        return () => clearTimeout(timer);
-    }, [isInView]);
+        if (isInView && currentIndex === -1 && data.length > 0) {
+            setCurrentIndex(0);
+        }
+    }, [isInView, currentIndex, data.length]);
 
     const scrollToIndex = (index: number) => {
         if (carouselRef.current) {
@@ -138,26 +131,28 @@ export default function Features({
     };
 
     useEffect(() => {
+        if (!isInView || data.length === 0) return;
         const timer = setInterval(() => {
             setCurrentIndex((prevIndex) =>
-                prevIndex !== undefined ? (prevIndex + 1) % data.length : 0
+                (prevIndex + 1) % data.length
             );
         }, collapseDelay);
 
         return () => clearInterval(timer);
-    }, [collapseDelay, currentIndex, data.length]);
+    }, [collapseDelay, currentIndex, data.length, isInView]);
 
     useEffect(() => {
+        if (!isInView || currentIndex < 0 || data.length === 0) return;
         const handleAutoScroll = () => {
             const nextIndex =
-                (currentIndex !== undefined ? currentIndex + 1 : 0) % data.length;
+                (currentIndex + 1) % data.length;
             scrollToIndex(nextIndex);
         };
 
         const autoScrollTimer = setInterval(handleAutoScroll, collapseDelay);
 
         return () => clearInterval(autoScrollTimer);
-    }, [collapseDelay, currentIndex, data.length]);
+    }, [collapseDelay, currentIndex, data.length, isInView]);
 
     useEffect(() => {
         const carousel = carouselRef.current;

@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
+import { useInView } from "framer-motion";
 
 import Header from "../ui/header";
 import TestimonialGrid from "../ui/testimonial-grid";
 import { trpc } from "@/lib/trpc";
 
 const Testimonials = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { amount: 0.05 });
   const { data, isLoading } = trpc.testimonial.getAll.useQuery();
 
   const testimonials = (data ?? []).map(
@@ -26,7 +29,7 @@ const Testimonials = () => {
   );
 
   return (
-    <div className="flex flex-col border-b border-border">
+    <div ref={sectionRef} className="flex flex-col border-b border-border">
       <Header title="Testimonials" />
       <div className="h-[500px] lg:h-[750px] px-[30px] lg:px-[50px] relative">
         <div
@@ -57,6 +60,7 @@ const Testimonials = () => {
           <TestimonialGrid
             testimonials={testimonials}
             speed="slow"
+            paused={!isInView}
             className="h-full"
           />
         )}

@@ -85,6 +85,7 @@ type TestimonialGridProps = {
   className?: string;
   speed?: "slow" | "normal" | "fast";
   columns?: number;
+  paused?: boolean;
 };
 
 export const TestimonialGrid: React.FC<TestimonialGridProps> = ({
@@ -92,6 +93,7 @@ export const TestimonialGrid: React.FC<TestimonialGridProps> = ({
   className,
   speed = "slow",
   columns = 3,
+  paused = false,
 }) => {
   const items = testimonials ?? [];
 
@@ -138,6 +140,7 @@ export const TestimonialGrid: React.FC<TestimonialGridProps> = ({
             vertical
             reverse={colIdx % 2 === 1}
             repeat={2}
+            paused={paused}
             style={
               {
                 "--duration": getDuration(),
@@ -163,6 +166,7 @@ export const TestimonialGrid: React.FC<TestimonialGridProps> = ({
             vertical
             reverse={colIdx % 2 === 1}
             repeat={2}
+            paused={paused}
             style={
               {
                 "--duration": getDuration(),
@@ -185,6 +189,7 @@ export const TestimonialGrid: React.FC<TestimonialGridProps> = ({
         <Marquee
           vertical
           repeat={2}
+          paused={paused}
           style={
             {
               "--duration": getDuration(),

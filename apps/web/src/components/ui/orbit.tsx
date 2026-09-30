@@ -1,14 +1,15 @@
 'use client'
-import { motion } from "framer-motion"
+import { motion, useInView } from "framer-motion"
 import Image from "next/image"
 import { useRef } from "react"
 import { Analog, Cap, Lucid, Mail0, Nimbus, SupMemory } from "../icons/icons"
 
 export default function OrbitComponent() {
     const orbitRef = useRef<HTMLDivElement>(null)
+    const isInView = useInView(orbitRef, { amount: 0.1 })
 
     return (
-        <div className="relative w-[420px] aspect-square mx-auto" ref={orbitRef}>
+        <div className={`relative w-[420px] aspect-square mx-auto ${isInView ? "" : "orbit-paused"}`} ref={orbitRef}>
             {/* Orbit rings */}
             <motion.div
                 initial={{ y: 40, opacity: 0 }}

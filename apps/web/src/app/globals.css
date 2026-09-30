@@ -308,3 +308,15 @@ html {
   color: var(--blog-fg);
 }
 
+.orbit-paused .animate-spin-slow,
+.orbit-paused .animate-spin-slow-reverse {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-spin-slow-reverse {
+    animation: none;
+  }
+}
+
