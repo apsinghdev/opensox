@@ -4,6 +4,7 @@ import Navbar from "@/components/landing-sections/navbar";
 import Footer from "@/components/landing-sections/footer";
 import { Twitter, Linkedin, Instagram, Youtube, Home } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { trpc } from "@/lib/trpc";
 import { imageTestimonials } from "@/data/testimonials";
@@ -30,6 +31,8 @@ type ImageTestimonial = TestimonialBase & {
   type: "image";
   imageUrl: string;
   alt: string;
+  width: number;
+  height: number;
 };
 
 type Testimonial = TextTestimonial | ImageTestimonial;
@@ -61,9 +64,12 @@ const TestimonialCard = ({ item }: { item: Testimonial }) => {
     return (
       <div className="mb-4 break-inside-avoid rounded-xl border border bg-neutral-900/50 overflow-hidden hover:border-neutral-700 transition-colors p-2">
         <div className="relative w-full">
-          <img
+          <Image
             src={item.imageUrl}
             alt={item.alt}
+            width={item.width}
+            height={item.height}
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="w-full h-auto object-contain"
             loading="lazy"
           />
