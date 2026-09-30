@@ -249,6 +249,9 @@ html {
 .blog-page .prose-blog h3 {
   color: var(--blog-accent);
 }
+.blog-page .prose-blog .blog-intro {
+  color: var(--blog-accent);
+}
 .blog-page .prose-blog strong {
   color: var(--blog-fg);
 }

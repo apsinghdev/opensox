@@ -95,6 +95,10 @@ export function getPostBySlug(slug: string): { frontmatter: BlogFrontmatter; htm
       ...(sanitizeHtml as any).defaults.allowedAttributes,
       a: ["href", "name", "target", "rel"],
       img: ["src", "alt", "title", "width", "height", "loading"],
+      p: ["class"],
+    },
+    allowedClasses: {
+      p: ["blog-intro"],
     },
   });
   const html = withExternalLinkTargets(safeHtml);
