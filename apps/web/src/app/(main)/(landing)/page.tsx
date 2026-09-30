@@ -1,4 +1,3 @@
-'use client'
 import Bento from '@/components/landing-sections/Bento'
 import Brands from '@/components/landing-sections/Brands'
 import CTA from '@/components/landing-sections/CTA'

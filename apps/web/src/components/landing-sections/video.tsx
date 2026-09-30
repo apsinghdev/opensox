@@ -53,7 +53,7 @@ const Video = () => {
                 alt="Opensox Demo Thumbnail"
                 fill
                 className="object-cover"
-                priority
+                sizes="(max-width: 1024px) 100vw, 70vw"
               />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-200" />
               <div className="absolute inset-0 flex items-center justify-center">
