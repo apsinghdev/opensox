@@ -213,7 +213,8 @@ const Pricing = () => {
               src="/assets/card_bg.svg"
               alt=""
               fill
-              loading="lazy"
+              priority
+              sizes="100vw"
               className="h-full w-full object-cover object-bottom opacity-50"
             />
           </div>
@@ -261,8 +262,7 @@ const Pricing = () => {
                   alt="jackedAJ"
                   fill
                   priority
-                  unoptimized
-                  sizes="(max-width: 1024px) 100vw, 384px"
+                  sizes="(max-width: 640px) 100vw, 384px"
                   className="object-cover object-top"
                 />
               </div>
