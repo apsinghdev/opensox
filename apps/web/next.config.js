@@ -62,6 +62,16 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/assets/features/:image\\.png',
+        destination: '/assets/features/:image.webp',
+        permanent: true,
+      },
+      {
+        source: '/assets/blog/:image\\.png',
+        destination: '/assets/blog/:image.webp',
+        permanent: true,
+      },
+      {
         source: '/pro',
         destination: '/pricing',
         permanent: true,
@@ -75,4 +85,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

@@ -56,7 +56,6 @@ const Hero = () => {
       />
       <motion.div
         variants={containerVariants}
-        initial="hidden"
         animate="visible"
         className="relative z-20 w-full h-max lg:max-w-3xl space-y-1 text-center"
       >

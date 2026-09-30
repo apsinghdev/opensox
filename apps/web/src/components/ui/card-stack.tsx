@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useEffect, useRef, useState } from "react"
-import { easeOut, motion } from "framer-motion"
+import { easeOut, motion, useInView } from "framer-motion"
 import { Activity, ChartNoAxesColumn, TrendingDown, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Target, TechTags } from "../icons/icons"
@@ -169,10 +169,13 @@ export const CardStack = ({
     const CARD_OFFSET = offset || 10
     const SCALE_FACTOR = scaleFactor || 0.1
     const [cards, setCards] = useState<Card[]>(items)
+    const stackRef = useRef<HTMLDivElement>(null)
+    const isInView = useInView(stackRef, { amount: 0.1 })
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     const startAutoCycle = () => {
+        if (intervalRef.current) return
         intervalRef.current = setInterval(() => {
             setCards((prevCards) => {
                 const newArray = [...prevCards]
@@ -193,7 +196,7 @@ export const CardStack = ({
         if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
 
         resumeTimeoutRef.current = setTimeout(() => {
-            startAutoCycle()
+            if (isInView) startAutoCycle()
         }, 2000)
 
         setCards((prevCards) => {
@@ -206,16 +209,17 @@ export const CardStack = ({
     }
 
     useEffect(() => {
+        if (!isInView) return
         startAutoCycle()
 
         return () => {
             stopAutoCycle()
             if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
         }
-    }, [])
+    }, [isInView])
 
     return (
-        <div className="relative w-full max-w-md mx-auto h-[150px] ">
+        <div ref={stackRef} className="relative w-full max-w-md mx-auto h-[150px] ">
             {cards.map((card, index) => {
                 const isActive = index === 0
 

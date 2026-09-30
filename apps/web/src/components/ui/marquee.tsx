@@ -16,6 +16,8 @@ interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
      * @default false
      */
     pauseOnHover?: boolean;
+    /** Pause movement while the containing section is offscreen. */
+    paused?: boolean;
     /**
      * Content to be displayed in the marquee
      */
@@ -36,6 +38,7 @@ export function Marquee({
     className,
     reverse = false,
     pauseOnHover = false,
+    paused = false,
     children,
     vertical = false,
     repeat = 4,
@@ -62,6 +65,7 @@ export function Marquee({
                             "animate-marquee flex-row": !vertical,
                             "animate-marquee-vertical flex-col": vertical,
                             "group-hover:[animation-play-state:paused]": pauseOnHover,
+                            "[animation-play-state:paused]": paused,
                             "[animation-direction:reverse]": reverse,
                         })}
                     >
