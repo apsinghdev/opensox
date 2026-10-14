@@ -2,10 +2,28 @@ import React from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Program } from "@/data/oss-programs/types";
+import { getDerivedStatus } from "@/utils/date-utils";
 
 interface ProgramCardProps {
   program: Program;
 }
+
+export const getProgramStatus = (program: Program) => {
+  const status = getDerivedStatus(program.applicationStart, program.applicationEnd);
+
+  switch (status) {
+    case "TBD":
+      return <span className="text-neutral-500 p-0.5 px-2 rounded-full border border-neutral-500/20 border-0.5 text-xs">TBD</span>;
+    case "Active":
+      return <span className="text-green-500 bg-green-950 p-0.5 px-2 rounded-full border border-green-500/20 border-0.5 text-xs">Active</span>;
+    case "Upcoming":
+      return <span className="text-yellow-500 bg-yellow-950 p-0.5 px-2 rounded-full border border-yellow-500/20 border-0.5 text-xs">Upcoming</span>;
+    case "Historical":
+      return <span className="text-neutral-300 bg-neutral-700 p-0.5 px-2 rounded-full border border-neutral-500/20 border-0.5 text-xs">Historical</span>;
+    default:
+      return <span className="text-neutral-500 p-0.5 px-2 rounded-full border border-neutral-500/20 border-0.5 text-xs">TBD</span>;
+  }
+};
 
 function ProgramCard({ program }: ProgramCardProps) {
   return (
@@ -31,6 +49,13 @@ function ProgramCard({ program }: ProgramCardProps) {
             <p className="text-sm text-text-secondary capitalize">
               {program.region}
             </p>
+          </div>
+        </div>
+
+        <div className="hidden md:flex items-center gap-6 flex-shrink-0">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-wide">Status</p>
+            {getProgramStatus(program)}
           </div>
         </div>
 

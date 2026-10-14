@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Filter } from "lucide-react";
 
 interface TagFilterProps {
   tags: string[];
@@ -77,10 +77,11 @@ export default function TagFilter({
         }}
       >
         <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+          <Filter className="w-4 h-4 text-text-secondary" />
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1 bg-brand-purple/20 text-brand-purple-light px-3 py-1 rounded-full text-sm flex-shrink-0"
+              className="flex items-center gap-1 bg-brand-purple/20 text-brand-purple-light px-2 py-0.5 rounded-full text-sm flex-shrink-0"
             >
               {tag}
               <button
@@ -98,7 +99,8 @@ export default function TagFilter({
           <input
             ref={inputRef}
             type="text"
-            placeholder={selectedTags.length === 0 ? "Filter by tags..." : ""}
+            placeholder={selectedTags.length === 0 ? "Tags..." : ""}
+            aria-label="Tag filter"
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);

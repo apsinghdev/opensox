@@ -38,7 +38,7 @@ export type ProgramSectionId =
   | "how-to-prepare"
   | "application-process";
 
-export type ProgramStatus = "active" | "historical" | "unknown";
+export type ProgramStatus = "active" | "historical" | "unknown" | "upcoming";
 
 export interface ProgramSection {
   id: ProgramSectionId;
@@ -73,4 +73,7 @@ export interface Program {
     title: string;
     description: string;
   };
+
+  applicationStart?: string;
+  applicationEnd?: string;
 }
