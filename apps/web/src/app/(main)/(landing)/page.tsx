@@ -8,7 +8,6 @@ import HowItWorks from '@/components/landing-sections/how-it-works'
 import Navbar from '@/components/landing-sections/navbar'
 import Testimonials from '@/components/landing-sections/testimonials'
 import Video from '@/components/landing-sections/video'
-import React from 'react'
 import { FaqSection } from '@/components/faq/FaqSection'
 
 
