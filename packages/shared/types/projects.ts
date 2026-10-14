@@ -19,6 +19,10 @@ export type RepositoryProps = {
   primaryLanguage: {
     name: string;
   };
+  stargazerCount: number;
+  forkCount: number;
+  pushedAt: string;
+  createdAt: string;
 };
 
 export type GraphQLResponseProps = {
