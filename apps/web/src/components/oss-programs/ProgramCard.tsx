@@ -11,6 +11,13 @@ function ProgramCard({ program }: ProgramCardProps) {
   return (
     <Link
       href={`/dashboard/oss-programs/${program.slug}`}
+      onClick={() => {
+        const scrollContainer = document.getElementById("dashboard-scroll-container");
+        sessionStorage.setItem(
+          "oss-programs-scroll",
+          String(scrollContainer?.scrollTop ?? window.scrollY)
+        );
+      }}
       className="group block w-full min-w-0"
     >
       <div className="w-full bg-dash-surface border border-dash-border rounded-xl px-4 py-3 md:px-5 md:py-4 hover:border-brand-purple/50 hover:bg-dash-hover transition-all duration-200 flex items-center justify-between gap-3 md:gap-4 min-w-0">

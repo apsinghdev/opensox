@@ -45,7 +45,7 @@ export default function DashboardLayout({
                 Opensox
               </Link>
             </div>
-            <main className="flex-1 h-full overflow-auto bg-ox-content">
+            <main id="dashboard-scroll-container" className="flex-1 h-full overflow-auto bg-ox-content">
               {children}
             </main>
           </div>
@@ -64,7 +64,7 @@ export default function DashboardLayout({
               Opensox
             </Link>
           </div>
-          <main className="flex-1 h-full overflow-auto bg-ox-content">
+          <main id="dashboard-scroll-container" className="flex-1 h-full overflow-auto bg-ox-content">
             {children}
           </main>
         </div>

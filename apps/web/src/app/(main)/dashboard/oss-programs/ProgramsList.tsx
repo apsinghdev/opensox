@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Program } from "@/data/oss-programs/types";
 import { SearchInput, TagFilter, ProgramCard } from "@/components/oss-programs";
 
@@ -12,6 +12,16 @@ interface ProgramsListProps {
 export default function ProgramsList({ programs, tags }: ProgramsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem("oss-programs-scroll");
+
+    if (savedScroll) {
+      const scrollContainer = document.getElementById("dashboard-scroll-container");
+      scrollContainer?.scrollTo(0, Number(savedScroll));
+      sessionStorage.removeItem("oss-programs-scroll");
+    }
+  }, []);
 
   // Memoize handlers to prevent child re-renders
   const handleSearchChange = useCallback((value: string) => {
