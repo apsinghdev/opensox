@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Program } from "@/data/oss-programs/types";
-import { SearchInput, TagFilter, ProgramCard } from "@/components/oss-programs";
+import { SearchInput, TagFilter, ProgramCard, ProgramCardSkeleton } from "@/components/oss-programs";
 
 interface ProgramsListProps {
   programs: Program[];
@@ -12,22 +12,36 @@ interface ProgramsListProps {
 export default function ProgramsList({ programs, tags }: ProgramsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Memoize handlers to prevent child re-renders
+  // Memoized handlers
   const handleSearchChange = useCallback((value: string) => {
+    setIsLoading(true);
     setSearchQuery(value);
   }, []);
 
   const handleTagsChange = useCallback((newTags: string[]) => {
+    setIsLoading(true);
     setSelectedTags(newTags);
   }, []);
+
+  // Fake loading delay for smooth UX
+  useEffect(() => {
+    if (!isLoading) return;
+
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 200); // skeleton visible time
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   const filteredPrograms = useMemo(() => {
     return programs.filter((program) => {
       const matchesSearch =
         program.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         program.tags.some((tag) =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase())
+          tag.toLowerCase().includes(searchQuery.toLowerCase()),
         );
 
       const matchesTags =
@@ -41,9 +55,9 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
   return (
     <div className="min-h-full w-[99vw] lg:w-[80vw] bg-dash-base text-white p-4 md:p-8 lg:p-12 overflow-x-hidden">
       <div className="max-w-6xl mx-auto w-full min-w-0">
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex flex-col gap-8 mb-12 min-w-0">
-          <h1 className="text-3xl md:text-4xl font-bold text-text-primary break-words">
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary">
             OSS Programs
           </h1>
 
@@ -61,19 +75,26 @@ export default function ProgramsList({ programs, tags }: ProgramsListProps) {
           </div>
         </div>
 
-        {/* List Section */}
-        <div className="flex flex-col gap-2 md:gap-3 min-w-0">
-          {filteredPrograms.length === 0 ? (
+        {/* List */}
+        <div className="flex flex-col gap-3 min-w-0">
+          {isLoading &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <ProgramCardSkeleton key={`skeleton-${i}`} />
+            ))}
+
+          {!isLoading && filteredPrograms.length === 0 && (
             <div className="text-center py-20 text-text-muted">
               No programs found matching your criteria.
             </div>
-          ) : (
+          )}
+
+          {!isLoading &&
             filteredPrograms.map((program) => (
               <ProgramCard key={program.slug} program={program} />
-            ))
-          )}
+            ))}
         </div>
       </div>
     </div>
   );
 }
+
