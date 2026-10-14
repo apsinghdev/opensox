@@ -226,44 +226,16 @@ docker run -p 4000:4000 \
 
 Your API server will be available at `http://localhost:4000`.
 
-### Using Docker Compose (Optional)
+### Using Docker Compose for Database (Only)
 
-For a complete setup with PostgreSQL, you can create a `docker-compose.yml` file:
-
-```yaml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: opensox
-      POSTGRES_PASSWORD: opensox
-      POSTGRES_DB: opensox
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  api:
-    build: .
-    ports:
-      - "4000:4000"
-    environment:
-      DATABASE_URL: postgresql://opensox:opensox@postgres:5432/opensox?schema=public
-      JWT_SECRET: your-secret-key
-      PORT: 4000
-      NODE_ENV: production
-    depends_on:
-      - postgres
-
-volumes:
-  postgres_data:
-```
-
-Then run:
+For a DB setup with PostgreSQL, cp .env.example .env in root directory with required variables, then run docker-compose.dev.yml
 
 ```bash
-docker-compose up -d
+cp .env.example .env
+```
+Then run,
+```bash
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 ## Our contributors
