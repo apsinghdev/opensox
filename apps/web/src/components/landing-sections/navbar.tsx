@@ -71,16 +71,18 @@ const Navbar = () => {
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
-        <div className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
-          <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
-            <Image
-              src="/assets/logo.svg"
-              alt="background"
-              fill
-              className="object-cover w-full h-full"
-            />
-          </div>
-          <span>Opensox AI</span>
+        <div >
+          <Link href="/dashboard/home" className="text-xl md:text-2xl font-medium tracking-tighter flex items-center gap-2">
+             <div className="w-8 md:w-10 aspect-square overflow-hidden relative">
+                 <Image
+                     src="/assets/logo.svg"
+                     alt="background"
+                      fill
+                      className="object-cover w-full h-full cursor-pointer"
+                  />
+             </div>
+                <span>Opensox AI</span>
+          </Link>
         </div>
       </div>
       <div className="hidden min-[1115px]:flex items-center gap-5 max-[1270px]:gap-4 max-[1173px]:gap-3 tracking-tight text-lg max-[1270px]:text-base max-[1173px]:text-sm font-light max-[1173px]:font-normal text-[#d1d1d1]">
