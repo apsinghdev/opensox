@@ -9,13 +9,24 @@ import type {
 
 dotenv.config();
 
-const GH_PAT = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
+const getGithubPersonalAccessToken = () => {
+  const token = process.env.GITHUB_PERSONAL_ACCESS_TOKEN?.trim();
 
-const graphqlWithAuth = graphql.defaults({
-  headers: {
-    authorization: `token ${GH_PAT}`,
-  },
-});
+  if (!token) {
+    throw new Error(
+      "GITHUB_PERSONAL_ACCESS_TOKEN is required to fetch GitHub projects. Please configure it in apps/api/.env."
+    );
+  }
+
+  return token;
+};
+
+const createGithubClient = () =>
+  graphql.defaults({
+    headers: {
+      authorization: `token ${getGithubPersonalAccessToken()}`,
+    },
+  });
 
 export const projectService = {
   /**
@@ -53,6 +64,7 @@ export const projectService = {
     queryParts.push(`fork:true`);
 
     const searchQueryString = queryParts.join(" ");
+    const graphqlWithAuth = createGithubClient();
 
     const response: GraphQLResponseProps = await graphqlWithAuth(
       `
