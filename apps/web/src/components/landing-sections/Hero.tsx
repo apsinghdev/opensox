@@ -81,7 +81,7 @@ const Hero = () => {
         </motion.div>
         <motion.h1
           variants={itemVariants}
-          className="text-5xl text-[2.8rem] lg:text-7xl lg:text-[6rem] font-medium tracking-tighter [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
+          className="text-5xl text-[2.8rem] lg:text-7xl lg:text-[5.8rem] font-medium tracking-tighter [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
           Only platform you need to rock Open Source
         </motion.h1>
