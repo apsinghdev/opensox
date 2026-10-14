@@ -612,6 +612,7 @@ app.get(
 
 // Apply rate limiting to tRPC endpoints
 app.use("/trpc/newsletter.subscribe", newsletterSubscribeLimiter);
+app.use("/trpc/auth.reviewLogin", authLimiter);
 app.use("/trpc", apiLimiter);
 
 // tRPC middleware
