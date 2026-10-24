@@ -25,18 +25,18 @@ export default function Filter({
         <span className="text-sm font-medium text-white">{filterName}</span>
       </AccordionTrigger>
       <AccordionContent className="pt-0 pb-2">
-        <RadioGroup className="space-y-2">
+        <RadioGroup className="space-y-2 p-1">
           {filters.map((filter, index) => {
             const optionId = `${filterName}-${filter}-${index}`
               .replace(/[^a-zA-Z0-9]+/g, "-")
               .toLowerCase();
             return (
-              <div key={optionId} className="flex items-center space-x-2.5">
+              <div key={optionId} className="flex items-center space-x-2.5 py-0.5">
                 <RadioGroupItem
                   value={filter}
                   id={optionId}
                   onClick={() => recordFilterInput(filter)}
-                  className="border-[#28282c] bg-[#141418] text-ox-purple transition data-[state=checked]:border-ox-purple data-[state=checked]:bg-ox-purple/20 data-[state=checked]:ring-2 data-[state=checked]:ring-ox-purple/50"
+                  className="shrink-0 border-[#28282c] bg-[#141418] text-ox-purple transition data-[state=checked]:border-ox-purple data-[state=checked]:bg-ox-purple/20 data-[state=checked]:ring-2 data-[state=checked]:ring-ox-purple/50"
                 />
                 <Label
                   htmlFor={optionId}
