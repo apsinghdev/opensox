@@ -471,7 +471,7 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
           // collapsed sidebar: show icon only
           <div
             onClick={handleProSectionClick}
-            className="w-full h-[44px] flex items-center justify-center rounded-md cursor-pointer transition-colors hover:bg-dash-hover group"
+            className="w-full h-[44px] flex items-center justify-start pl-3 rounded-md cursor-pointer transition-colors hover:bg-dash-hover group"
             role="button"
             tabIndex={0}
             aria-label="Opensox Pro"
@@ -494,12 +494,30 @@ export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
         )}
 
         {/* utility features */}
-        <SidebarItem
-          itemName="Request a feature"
-          onclick={reqFeatureHandler}
-          icon={<SparklesIcon className="size-5" />}
-          collapsed={isCollapsed}
-        />
+        {isCollapsed ? (
+          <div
+            onClick={reqFeatureHandler}
+            className="w-full h-[44px] flex items-center justify-start pl-3 rounded-md cursor-pointer transition-colors hover:bg-dash-hover group"
+            role="button"
+            tabIndex={0}
+            aria-label="Request a feature"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                reqFeatureHandler();
+              }
+            }}
+          >
+            <SparklesIcon className="size-5 text-text-secondary group-hover:text-text-primary transition-colors" />
+          </div>
+        ) : (
+          <SidebarItem
+            itemName="Request a feature"
+            onclick={reqFeatureHandler}
+            icon={<SparklesIcon className="size-5" />}
+            collapsed={isCollapsed}
+          />
+        )}
       </div>
 
       {/* Bottom profile */}
