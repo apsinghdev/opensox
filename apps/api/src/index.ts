@@ -26,6 +26,14 @@ import {
   newsletterConfirmRedirectUrl,
   newsletterUnsubscribedRedirectUrl,
 } from "./services/newsletter.service.js";
+import {
+  talkToMeCreateOrderSchema,
+  talkToMeVerifySchema,
+} from "./routers/talk-to-me.js";
+import {
+  TALK_TO_ME_PRODUCT,
+  talkToMeService,
+} from "./services/talk-to-me.service.js";
 
 dotenv.config();
 
@@ -86,6 +94,18 @@ const newsletterSubscribeLimiter = rateLimit({
   handler: (req, res) => {
     console.log(`[RATE LIMIT] IP ${req.ip} hit newsletter subscribe rate limit`);
     res.status(429).json({ error: "Too many subscribe attempts, please try again later" });
+  },
+});
+
+const talkToMeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: "Too many payment attempts, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    console.log(`[RATE LIMIT] IP ${req.ip} hit talk-to-me rate limit`);
+    res.status(429).json({ error: "Too many payment attempts, please try again later" });
   },
 });
 
@@ -492,6 +512,40 @@ app.post("/webhook/razorpay", async (req: Request, res: Response) => {
 
       // Get user ID from order notes (should be stored when creating order)
       const notes = payment.notes || {};
+
+      // jackedAJ talk-to-me is a guest purchase (no opensox login / subscription)
+      if (notes.product === TALK_TO_ME_PRODUCT) {
+        try {
+          const result = await talkToMeService.fulfillPaidOrder({
+            db: prismaModule.prisma,
+            razorpayOrderId,
+            razorpayPaymentId,
+            amount,
+            currency,
+            sendEmail: true,
+          });
+
+          if (!result.ok) {
+            console.error(
+              `Webhook talk-to-me fulfill failed: ${result.error}`,
+              { razorpayPaymentId, razorpayOrderId }
+            );
+            // still ack so razorpay doesn't retry forever for unknown orders
+            return res.status(200).json({ status: "ok", note: result.error });
+          }
+
+          console.log(
+            `✅ Webhook: talk-to-me payment ${razorpayPaymentId} processed successfully`
+          );
+          return res.status(200).json({ status: "ok" });
+        } catch (error: any) {
+          console.error("Webhook talk-to-me processing error:", error);
+          return res
+            .status(200)
+            .json({ status: "ok", note: "Already processed" });
+        }
+      }
+
       const userId = notes.user_id;
 
       if (!userId) {
@@ -607,6 +661,69 @@ app.get(
     }
 
     return res.redirect(newsletterUnsubscribedRedirectUrl());
+  }
+);
+
+// jackedAJ /talk-to-me — guest razorpay checkout (no opensox login)
+app.get("/talk-to-me/config", apiLimiter, (_req: Request, res: Response) => {
+  const config = talkToMeService.getPublicConfig();
+  if (!config.razorpayKeyId) {
+    return res.status(503).json({ ok: false, error: "Payments unavailable" });
+  }
+  return res.status(200).json({ ok: true, ...config });
+});
+
+app.post(
+  "/talk-to-me/create-order",
+  talkToMeLimiter,
+  async (req: Request, res: Response) => {
+    const parsed = talkToMeCreateOrderSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ ok: false, error: "Invalid input" });
+    }
+
+    try {
+      const result = await talkToMeService.createOrder(
+        prismaModule.prisma,
+        parsed.data
+      );
+      if (!result.ok) {
+        return res.status(400).json(result);
+      }
+      return res.status(200).json(result);
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Talk-to-me create-order error:", error);
+      }
+      return res.status(500).json({ ok: false, error: "Something went wrong" });
+    }
+  }
+);
+
+app.post(
+  "/talk-to-me/verify",
+  talkToMeLimiter,
+  async (req: Request, res: Response) => {
+    const parsed = talkToMeVerifySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ ok: false, error: "Invalid input" });
+    }
+
+    try {
+      const result = await talkToMeService.verifyAndFulfill(
+        prismaModule.prisma,
+        parsed.data
+      );
+      if (!result.ok) {
+        return res.status(400).json(result);
+      }
+      return res.status(200).json(result);
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Talk-to-me verify error:", error);
+      }
+      return res.status(500).json({ ok: false, error: "Something went wrong" });
+    }
   }
 );
 

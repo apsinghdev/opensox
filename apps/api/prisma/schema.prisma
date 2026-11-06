@@ -228,3 +228,22 @@ model NewsletterSubscriber {
 
   @@index([createdAt])
 }
+
+// guest 1-on-1 purchases from jackedaj.com/talk-to-me (no opensox login)
+model TalkToMePurchase {
+  id                String        @id @default(cuid())
+  email             String
+  name              String
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  amount            Int // minor units (paise for INR)
+  currency          String        @default("INR")
+  status            PaymentStatus @default(created)
+  emailSentAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([status])
+}
