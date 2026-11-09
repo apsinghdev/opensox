@@ -178,6 +178,73 @@ Ajeet from Opensox.ai`;
     });
   },
 
+  async sendTalkToMeConfirmationEmail(input: {
+    email: string;
+    name: string;
+    calUrl: string;
+    durationMinutes: number;
+  }): Promise<boolean> {
+    const fromAddress =
+      process.env.JACKEDAJ_FROM_ADDRESS || "hi@jackedaj.com";
+    const fromName = process.env.JACKEDAJ_FROM_NAME || "Ajeet (jackedAJ)";
+    const safeName = escapeHtml(input.name.trim() || "there");
+    const safeCalUrl = escapeHtml(input.calUrl);
+    const duration = String(input.durationMinutes);
+
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Hi ${safeName},
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          payment confirmed. thanks for booking a ${duration}-min talk with me.
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          pick a slot on cal so we can actually talk:
+        </p>
+
+        <div style="margin: 30px 0; text-align: center;">
+          <a href="${safeCalUrl}"
+             style="background-color: #111; color: white; padding: 14px 32px;
+                    text-decoration: none; border-radius: 6px; display: inline-block;
+                    font-weight: 600; font-size: 16px;">
+            book your slot
+          </a>
+        </div>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          <strong>cal:</strong> <a href="${safeCalUrl}" style="color: #111;">${safeCalUrl}</a>
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px; margin-top: 30px;">
+          see you soon,<br/>
+          Ajeet (jackedAJ)
+        </p>
+      </div>
+    `;
+
+    const textBody = `Hi ${input.name.trim() || "there"},
+
+payment confirmed. thanks for booking a ${duration}-min talk with me.
+
+pick a slot on cal so we can actually talk:
+${input.calUrl}
+
+see you soon,
+Ajeet (jackedAJ)`;
+
+    return this.sendEmail({
+      to: [{ address: input.email, name: safeName }],
+      subject: "you're in — book your talk-to-me slot",
+      htmlBody,
+      textBody,
+      from: { address: fromAddress, name: fromName },
+      replyTo: { address: fromAddress, name: fromName },
+    });
+  },
+
   async sendNewsletterConfirmEmail(
     email: string,
     confirmUrl: string

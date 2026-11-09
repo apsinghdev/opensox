@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>talk to me — jackedAJ</title>
+    <meta
+      name="description"
+      content="book a paid 1-on-1 call with jackedAJ. no login. pay on razorpay, then pick a slot on cal."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="jackedAJ" />
+    <meta property="og:title" content="talk to me — jackedAJ" />
+    <meta
+      property="og:description"
+      content="book a paid 1-on-1 call with jackedAJ. no login. pay on razorpay, then pick a slot on cal."
+    />
+    <meta property="og:url" content="https://www.jackedaj.com/talk-to-me" />
+    <meta property="og:image" content="https://www.jackedaj.com/hero-aj.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@jackedAJ" />
+    <meta name="twitter:creator" content="@jackedAJ" />
+    <meta name="twitter:title" content="talk to me — jackedAJ" />
+    <meta
+      name="twitter:description"
+      content="book a paid 1-on-1 call with jackedAJ. no login. pay on razorpay, then pick a slot on cal."
+    />
+    <meta name="twitter:image" content="https://www.jackedaj.com/hero-aj.png" />
+
+    <link rel="icon" href="favicon.jpg" type="image/jpeg" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .ttm-meta {
+        list-style: none;
+        margin: 1.5rem 0 0;
+        padding: 0;
+      }
+
+      .ttm-meta li {
+        display: grid;
+        grid-template-columns: 5.5rem 1fr;
+        gap: 0.75rem 1rem;
+        padding: 0.45rem 0;
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.55;
+      }
+
+      .ttm-meta-label {
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ttm-buy {
+        margin-top: 2.5rem;
+      }
+
+      .ttm-buy h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 0.85rem;
+      }
+
+      .ttm-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        max-width: 22rem;
+      }
+
+      .ttm-form input {
+        width: 100%;
+        padding: 0.4rem 0.55rem;
+        font: inherit;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        outline: none;
+      }
+
+      .ttm-form input:focus {
+        border-color: rgba(255, 255, 255, 0.7);
+      }
+
+      .ttm-form input::placeholder {
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      .ttm-form button {
+        font: inherit;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--bg);
+        background: var(--text);
+        border: none;
+        padding: 0.55rem 0.9rem;
+        cursor: pointer;
+        width: fit-content;
+        margin-top: 0.25rem;
+      }
+
+      .ttm-form button:hover {
+        opacity: 0.9;
+      }
+
+      .ttm-form button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .ttm-status {
+        min-height: 1.5em;
+        margin: 0.35rem 0 0;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .ttm-price-line {
+        margin-top: 0.35rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 520px) {
+        .ttm-meta li {
+          grid-template-columns: 1fr;
+          gap: 0.1rem;
+          padding: 0.65rem 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <nav class="site-nav" aria-label="Primary">
+          <a href="index.html">home</a>
+          <a href="projects.html">projects</a>
+          <a href="blog.html">blogs</a>
+          <a href="being_jacked.html">being_jacked</a>
+          <a href="learnings.html">learnings</a>
+          <a href="newsletter.html">newsletter</a>
+          <a href="talk-to-me.html" class="is-active">talk_to_me</a>
+          <a href="jackedaj_labs.html">JackedAJ Labs</a>
+        </nav>
+      </header>
+
+      <main>
+        <article class="post post--spaced">
+          <h1 class="page-title">talk to me</h1>
+
+          <p>
+            a paid 1-on-1 call with me (jackedAJ). no opensox login. you pay,
+            get a cal link on email, pick a slot, we talk.
+          </p>
+
+          <ul class="ttm-meta" aria-label="call details">
+            <li>
+              <span class="ttm-meta-label">what</span>
+              <span
+                >straight conversation on open source, building in public,
+                career moves, pricing your work, shipping products — whatever
+                you're actually stuck on.</span
+              >
+            </li>
+            <li>
+              <span class="ttm-meta-label">why</span>
+              <span
+                >i've lived a chunk of this path already. sometimes one honest
+                call beats weeks of guessing alone.</span
+              >
+            </li>
+            <li>
+              <span class="ttm-meta-label">timing</span>
+              <span id="ttm-duration">60 minutes</span>
+            </li>
+            <li>
+              <span class="ttm-meta-label">price</span>
+              <span id="ttm-price">…</span>
+            </li>
+          </ul>
+
+          <section class="ttm-buy" aria-labelledby="ttm-buy-heading">
+            <h2 id="ttm-buy-heading">buy</h2>
+            <p class="ttm-price-line" id="ttm-price-note">
+              razorpay opens after you click. no account needed.
+            </p>
+            <form class="ttm-form" id="ttm-form">
+              <input
+                id="ttm-name"
+                name="name"
+                type="text"
+                required
+                autocomplete="name"
+                maxlength="80"
+                placeholder="your name"
+                aria-label="your name"
+              />
+              <input
+                id="ttm-email"
+                name="email"
+                type="email"
+                required
+                autocomplete="email"
+                placeholder="your email"
+                aria-label="your email"
+              />
+              <button type="submit" id="ttm-buy-btn">buy</button>
+              <p class="ttm-status" id="ttm-status" role="status"></p>
+            </form>
+          </section>
+        </article>
+      </main>
+
+      <footer class="site-footer">
+        <nav class="footer-links" aria-label="Footer">
+          <a
+            href="https://x.com/jackedAJ"
+            target="_blank"
+            rel="noopener noreferrer"
+            >twitter</a
+          >
+          <a
+            href="https://www.youtube.com/channel/UC7QV7uSxlbha-bNPaev5MeQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            >youtube</a
+          >
+          <a
+            href="https://www.instagram.com/jackedaj"
+            target="_blank"
+            rel="noopener noreferrer"
+            >instagram</a
+          >
+          <a
+            href="https://www.linkedin.com/in/jackedaj"
+            target="_blank"
+            rel="noopener noreferrer"
+            >linkedin</a
+          >
+          <a
+            href="https://www.opensox.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            >opensox</a
+          >
+          <a href="contact.html">contact</a>
+        </nav>
+        <p class="copyright">&copy; 2026 jackedAJ</p>
+        <p class="handwritten-note">
+          no AI has been used to write any content on this site.<br />everything
+          is hand-written by jackedAJ
+        </p>
+      </footer>
+    </div>
+    <p class="site-color">#01242e</p>
+    <script src="talk-to-me.js" defer></script>
+  </body>
+</html>
