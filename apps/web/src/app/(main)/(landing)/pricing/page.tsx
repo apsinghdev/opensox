@@ -490,11 +490,15 @@ const PlanColumnHeader = ({
 const MONTHLY_JOIN_COUNT_CLASS =
   "mt-1 font-heading text-base font-semibold tracking-tighter text-success-text";
 
+// temporarily hidden — set to true to show "{n} joined this month so far"
+const SHOW_MONTHLY_JOIN_COUNT = false;
+
 const PlanSectionIntro = () => {
   const { data: monthlyJoinData } = trpc.payment.getMonthlyJoinCount.useQuery(
     undefined,
     {
       staleTime: 5 * 60 * 1000,
+      enabled: SHOW_MONTHLY_JOIN_COUNT,
     },
   );
 
@@ -509,7 +513,8 @@ const PlanSectionIntro = () => {
       <p className="max-w-sm text-sm text-text-muted">
         Go Pro or Pro+ to join the ecosystem.
       </p>
-      {typeof monthlyJoinData?.count === "number" ? (
+      {SHOW_MONTHLY_JOIN_COUNT &&
+      typeof monthlyJoinData?.count === "number" ? (
         <p className={MONTHLY_JOIN_COUNT_CLASS}>
           {monthlyJoinData.count} joined this month so far
         </p>
