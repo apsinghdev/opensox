@@ -1,5 +1,13 @@
+import bcrypt from "bcrypt";
 import { generateToken } from "../utils/auth.js";
 import type { PrismaClient } from "@prisma/client";
+
+const DEFAULT_REVIEW_LOGIN_EMAIL = "opensoxlabs@gmail.com";
+
+const getReviewLoginEmail = (): string =>
+  (process.env.REVIEW_LOGIN_EMAIL || DEFAULT_REVIEW_LOGIN_EMAIL)
+    .toLowerCase()
+    .trim();
 
 interface GoogleAuthInput {
   email: string;
@@ -195,6 +203,59 @@ export const authService = {
         },
       },
     });
+  },
+
+  /**
+   * allowlisted email+password login for the razorpay review account only
+   */
+  async handleReviewLogin(
+    prisma: any,
+    input: { email: string; password: string }
+  ) {
+    const email = input.email.toLowerCase().trim();
+
+    if (email !== getReviewLoginEmail()) {
+      throw new Error("INVALID_CREDENTIALS");
+    }
+
+    const existing = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        passwordHash: true,
+      },
+    });
+
+    if (!existing?.passwordHash) {
+      throw new Error("INVALID_CREDENTIALS");
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      input.password,
+      existing.passwordHash
+    );
+
+    if (!passwordMatches) {
+      throw new Error("INVALID_CREDENTIALS");
+    }
+
+    const user = await prisma.user.update({
+      where: { email },
+      data: { lastLogin: new Date() },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        authMethod: true,
+        createdAt: true,
+        lastLogin: true,
+      },
+    });
+
+    return {
+      user,
+      token: generateToken(user.email),
+    };
   },
 
   /**

@@ -16,6 +16,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.7",
@@ -29,6 +30,7 @@
     "@opensox/shared": "workspace:*",
     "@prisma/client": "^5.22.0",
     "@trpc/server": "^11.7.2",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",

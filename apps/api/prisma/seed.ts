@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 
 const MILLIS_PER_YEAR = 365 * 24 * 60 * 60 * 1000;
@@ -116,6 +117,36 @@ async function main() {
     },
   });
   console.log('✅ Created test payment');
+
+  // razorpay review account: free user so checkout still works
+  const reviewEmail = (
+    process.env.REVIEW_LOGIN_EMAIL || 'opensoxlabs@gmail.com'
+  )
+    .toLowerCase()
+    .trim();
+  const reviewPassword = process.env.REVIEW_LOGIN_PASSWORD;
+
+  if (reviewPassword) {
+    const passwordHash = await bcrypt.hash(reviewPassword, 12);
+    const reviewUser = await prisma.user.upsert({
+      where: { email: reviewEmail },
+      update: {
+        passwordHash,
+        authMethod: 'credentials',
+      },
+      create: {
+        email: reviewEmail,
+        firstName: 'Review User',
+        authMethod: 'credentials',
+        passwordHash,
+      },
+    });
+    console.log('✅ Created/updated review login user:', reviewUser.email);
+  } else {
+    console.log(
+      '⚠️  Skipping review login user (REVIEW_LOGIN_PASSWORD unset)'
+    );
+  }
 
   // Create QueryCount if it doesn't exist
   try {
