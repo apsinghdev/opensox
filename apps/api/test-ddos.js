@@ -2,7 +2,7 @@
 
 /**
  * DDOS Prevention Test Script (Node.js version)
- * Tests rate limiting and IP blocking mechanisms
+ * Tests rate limiting
  */
 
 const API_URL = "http://localhost:4000";
@@ -107,66 +107,6 @@ async function testRateLimiting() {
   console.log("");
 }
 
-async function testIPBlocker() {
-  log.warning("📊 Test 4: Testing IP blocker (100 very rapid requests)...");
-  const results = { success: 0, blocked: 0, ipBlocked: 0 };
-  
-  for (let i = 1; i <= 100; i++) {
-    const result = await makeRequest(`${API_URL}/trpc/hello.test?input=%7B%22name%22%3A%22test%22%7D`, true);
-    
-    if (result.status === 403) {
-      results.ipBlocked++;
-      if (results.ipBlocked === 1) {
-        log.error(`\nIP BLOCKED at request ${i}!`);
-        console.log("Response:", result.data);
-      }
-    } else if (result.status === 429) {
-      results.blocked++;
-    } else if (result.status === 200) {
-      results.success++;
-    }
-    
-    // Show progress every 20 requests
-    if (i % 20 === 0) {
-      console.log(`Progress: ${i}/100 (Success: ${results.success}, Rate Limited: ${results.blocked}, IP Blocked: ${results.ipBlocked})`);
-    }
-    
-    // No delay - testing rapid requests
-  }
-  
-  console.log("");
-  log.success(`✅ Success: ${results.success}`);
-  log.warning(`⚠️  Rate Limited (429): ${results.blocked}`);
-  log.error(`🚫 IP Blocked (403): ${results.ipBlocked}`);
-  console.log("");
-}
-
-async function checkBlockedIPs() {
-  log.warning("📊 Test 5: Checking blocked IPs...");
-  const result = await makeRequest(`${API_URL}/admin/blocked-ips`);
-  
-  if (result.status === 200) {
-    try {
-      const data = JSON.parse(result.data);
-      console.log(JSON.stringify(data, null, 2));
-      
-      if (data.blockedIPs && data.blockedIPs.length > 0) {
-        log.error(`\n🚫 ${data.blockedIPs.length} IP(s) currently blocked`);
-        data.blockedIPs.forEach((ip) => {
-          console.log(`   IP: ${ip.ip}`);
-          console.log(`   Reason: ${ip.reason}`);
-          console.log(`   Blocked until: ${ip.blockedUntil}`);
-        });
-      } else {
-        log.success("✅ No IPs currently blocked");
-      }
-    } catch (e) {
-      console.log(result.data);
-    }
-  }
-  console.log("");
-}
-
 async function main() {
   log.info("🧪 Testing DDOS Prevention Mechanisms");
   console.log("==========================================");
@@ -176,21 +116,10 @@ async function main() {
   await testNormalRequests();
   await testRateLimiting();
   
-  // Wait 1 second before IP blocker test
-  log.warning("⏳ Waiting 1 second before IP blocker test...");
-  await sleep(1000);
-  console.log("");
-  
-  await testIPBlocker();
-  await checkBlockedIPs();
-  
   console.log("==========================================");
   log.info("📝 Expected Behavior:");
-  console.log("  • Express rate limiter: blocks after 30 requests/15min");
-  console.log("  • IP blocker: blocks after 70 requests/1min");
-  console.log("  • Blocked IPs: remain blocked for 24 hours");
-  console.log("");
-  log.success(`🔍 View blocked IPs: ${API_URL}/admin/blocked-ips`);
+  console.log("  • /test and /trpc: 429 after 100 requests / 15 min per client");
+  console.log("  • newsletter subscribe: 429 after 5 requests / 15 min per client");
   console.log("");
 }
 
