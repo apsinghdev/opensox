@@ -109,7 +109,7 @@ function withExternalLinkTargets(html: string): string {
   });
 }
 
-export type BlogTag = "open-source" | "build-in-public" | "learning";
+export type BlogTag = "open-source" | "build-in-public" | "indie-hacking";
 
 export interface BlogFrontmatter {
   title: string;
