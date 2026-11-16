@@ -9,8 +9,8 @@ import cors from "cors";
 import type { CorsOptions as CorsOptionsType } from "cors";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-import ipBlocker from "./middleware/ipBlock.js";
 import crypto from "crypto";
+import { clientIp } from "./utils/client-ip.js";
 import { paymentService } from "./services/payment.service.js";
 import { userService } from "./services/user.service.js";
 import { verifyToken } from "./utils/auth.js";
@@ -40,8 +40,15 @@ const CORS_ORIGINS = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean)
   : ["http://localhost:3000", "http://localhost:5000"];
 
-// Security headers
-app.use(helmet());
+// one hop: railway. the visitor address comes from cf-connecting-ip, not this.
+app.set("trust proxy", 1);
+
+// same-origin corp would hide api responses from www.opensox.ai
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -53,48 +60,7 @@ app.use(
   })
 );
 
-// Apply IP blocking middleware first
-app.use(ipBlocker.middleware);
-
-// Different rate limits for different endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: "Too many login attempts, please try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Too many requests from this IP",
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    console.log(`[RATE LIMIT] IP ${req.ip} hit API rate limit`);
-    res.status(429).json({ error: "Too many requests from this IP" });
-  }
-});
-
-const newsletterSubscribeLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: "Too many subscribe attempts, please try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    console.log(`[RATE LIMIT] IP ${req.ip} hit newsletter subscribe rate limit`);
-    res.status(429).json({ error: "Too many subscribe attempts, please try again later" });
-  },
-});
-
-// Request size limits (except for webhook - needs raw body)
-app.use("/webhook/razorpay", express.raw({ type: "application/json" }));
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ limit: "10kb", extended: true }));
-
-// CORS configuration
+// before rate limits, so a 429 still carries access-control-allow-origin
 const corsOptions: CorsOptionsType = {
   origin: (origin, callback) => {
     if (!origin || CORS_ORIGINS.includes(origin)) {
@@ -111,16 +77,46 @@ const corsOptions: CorsOptionsType = {
 
 app.use(cors(corsOptions));
 
-// Blocked IPs endpoint (admin endpoint)
-app.get("/admin/blocked-ips", (req: Request, res: Response) => {
-  const blockedIPs = ipBlocker.getBlockedIPs();
-  res.json({
-    blockedIPs: blockedIPs.map((ip) => ({
-      ...ip,
-      blockedUntil: new Date(ip.blockedUntil).toISOString(),
-    })),
-  });
+// Different rate limits for different endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: "Too many login attempts, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => clientIp(req),
 });
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP",
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => clientIp(req),
+  handler: (req, res) => {
+    console.log(`[RATE LIMIT] IP ${clientIp(req)} hit API rate limit`);
+    res.status(429).json({ error: "Too many requests from this IP" });
+  }
+});
+
+const newsletterSubscribeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: "Too many subscribe attempts, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => clientIp(req),
+  handler: (req, res) => {
+    console.log(`[RATE LIMIT] IP ${clientIp(req)} hit newsletter subscribe rate limit`);
+    res.status(429).json({ error: "Too many subscribe attempts, please try again later" });
+  },
+});
+
+// Request size limits (except for webhook - needs raw body)
+app.use("/webhook/razorpay", express.raw({ type: "application/json" }));
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ limit: "10kb", extended: true }));
 
 // Test endpoint
 app.get("/test", apiLimiter, (req: Request, res: Response) => {
