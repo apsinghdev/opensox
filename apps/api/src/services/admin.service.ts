@@ -66,48 +66,58 @@ export const adminService = {
     const now = new Date();
 
     try {
-      const [paidUsers, newsletterSubscribers, revenue, latestProSubscription] =
-        await Promise.all([
-          withRetry(
-            () =>
-              db.user.count({
-                where: {
-                  subscriptions: {
-                    some: {},
-                  },
+      const [
+        paidUsers,
+        opensoxNewsletterSubscribers,
+        signedUpUsers,
+        revenue,
+        latestProSubscription,
+      ] = await Promise.all([
+        withRetry(
+          () =>
+            db.user.count({
+              where: {
+                subscriptions: {
+                  some: {},
                 },
-              }),
-            "admin paid user count"
-          ),
-          withRetry(
-            () => newsletterService.adminCount(db),
-            "admin newsletter subscriber count"
-          ),
-          withRetry(
-            () =>
-              db.payment.aggregate({
-                where: { status: PAYMENT_STATUS.CAPTURED },
-                _sum: { amount: true },
-              }),
-            "admin revenue aggregate"
-          ),
-          withRetry(
-            () =>
-              db.subscription.findFirst({
-                where: {
-                  status: SUBSCRIPTION_STATUS.ACTIVE,
-                  endDate: { gte: now },
+              },
+            }),
+          "admin paid user count"
+        ),
+        withRetry(
+          () => newsletterService.adminCount(db, "opensox"),
+          "admin opensox newsletter subscriber count"
+        ),
+        withRetry(() => db.user.count(), "admin signed up user count"),
+        withRetry(
+          () =>
+            db.payment.aggregate({
+              where: { status: PAYMENT_STATUS.CAPTURED },
+              _sum: { amount: true },
+            }),
+          "admin revenue aggregate"
+        ),
+        withRetry(
+          () =>
+            db.subscription.findFirst({
+              where: {
+                status: SUBSCRIPTION_STATUS.ACTIVE,
+                endDate: { gte: now },
+              },
+              orderBy: { startDate: "desc" },
+              select: {
+                user: {
+                  select: { email: true },
                 },
-                orderBy: { startDate: "desc" },
-                select: {
-                  user: {
-                    select: { email: true },
-                  },
-                },
-              }),
-            "admin latest pro member"
-          ),
-        ]);
+              },
+            }),
+          "admin latest pro member"
+        ),
+      ]);
+
+      // newsletter measure = opensox newsletter subscribers + signed-up users
+      const newsletterSubscribers =
+        opensoxNewsletterSubscribers + signedUpUsers;
 
       return {
         paidUsers,

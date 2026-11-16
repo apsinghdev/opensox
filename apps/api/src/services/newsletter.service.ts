@@ -190,9 +190,12 @@ export const newsletterService = {
     return { ok: true };
   },
 
-  async adminCount(db: Db): Promise<number> {
+  async adminCount(db: Db, source?: string): Promise<number> {
     return db.newsletterSubscriber.count({
-      where: { unsubscribedAt: null },
+      where: {
+        unsubscribedAt: null,
+        ...(source ? { source: normalizeSource(source) } : {}),
+      },
     });
   },
 };
