@@ -184,12 +184,12 @@ const Pitch = () => {
                     TA in the middle.
                   </li>
                   <li>
-                    weekly contests. on open source. build in public. first
-                    principles.
+                    weekly contests. on open source. build in public. indie
+                    hacking.
                   </li>
                   <li>
-                    dedicated content. on open source. build in public. first
-                    principles. that you can&apos;t find anywhere else on the
+                    dedicated content. on open source. build in public. indie
+                    hacking. that you can&apos;t find anywhere else on the
                     internet. only for opensox pro members.
                   </li>
                   <li>
@@ -261,17 +261,20 @@ const Pitch = () => {
                 <p className="text-brand-purple-light">30 people. a month. only.</p>
                 <p>but why 30?</p>
                 <p>
-                  as per the calculations on the number of current members in
-                  the opensox pro community,
+                  i let 30 new people in each month so i can still answer you
+                  myself. your access runs the full year on Pro, or four years
+                  on Pro+.
                 </p>
-                <p>10% of the members are highly active.</p>
-                <p>30% are active.</p>
-                <p>40% are occasionally active.</p>
-                <p>and the rest 20% join as a hobby.</p>
-                <p>they&apos;re already professionals in something else.</p>
                 <p>
-                  so 30 is the number i can manage. and give you my personal
-                  attention.
+                  everything you get like weekly sessions, stand-ups, QnAs, etc continue the whole
+                  time.
+                </p>
+                <p>nothing changes in the value you get.</p>
+                <p>
+                  30 ppl/mo is only to avoid accepting the number of people that
+                  i can&apos;t help personally.
+                </p>
+                <p>
                 </p>
               </div>
 

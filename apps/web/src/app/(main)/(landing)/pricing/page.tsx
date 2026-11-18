@@ -232,14 +232,14 @@ const Pricing = () => {
                   rel="noopener noreferrer"
                   className="underline decoration-brand-purple-light decoration-1 underline-offset-4 transition-colors hover:decoration-brand-purple"
                 >
-                  30
+                  limited
                 </a>{" "}
                 people.
               </p>
               <p className="text-lg font-medium tracking-tight sm:text-xl">
                 learning <span className="text-[#a472ea]">Open Source.</span>{" "}
                 <span className="text-[#a472ea]">Build in Public.</span>{" "}
-                <span className="text-[#a472ea]">First Principles.</span>
+                <span className="text-[#a472ea]">Indie Hacking.</span>
               </p>
               <div className="flex flex-col gap-2">
                 <Link

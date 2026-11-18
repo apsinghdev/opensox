@@ -29,10 +29,14 @@ const formatDate = (dateStr: string): string => {
 export default function BlogList({ posts }: { posts: BlogMeta[] }) {
   const [activeFilter, setActiveFilter] = useState<BlogFilter>("open-source");
 
-  const filtered =
+  const filtered = (
     activeFilter === "all"
       ? posts
-      : posts.filter((p) => p.tag === activeFilter);
+      : posts.filter((p) => p.tag === activeFilter)
+  )
+    // pinned posts stay at the top of their category (and of "all")
+    .slice()
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned));
 
   const handleFilterClick = (filter: BlogFilter) => {
     setActiveFilter(filter);

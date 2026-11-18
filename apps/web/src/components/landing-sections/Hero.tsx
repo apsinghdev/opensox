@@ -57,11 +57,11 @@ const Hero = () => {
       <motion.div
         variants={containerVariants}
         animate="visible"
-        className="relative z-20 w-full h-max lg:max-w-3xl space-y-1 text-center"
+        className="relative z-20 w-full max-w-4xl space-y-5 text-center"
       >
         <motion.div
           variants={itemVariants}
-          className="flex items-center justify-center gap-2 mb-4 [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
+          className="flex items-center justify-center gap-2 mb-2 [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
           <Link
             href="/pitch"
@@ -80,9 +80,11 @@ const Hero = () => {
         </motion.div>
         <motion.h1
           variants={itemVariants}
-          className="text-5xl text-[2.8rem] lg:text-7xl lg:text-[6rem] font-medium tracking-tighter [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
+          className="text-[clamp(1.9rem,7.2vw,5.25rem)] font-medium tracking-tighter leading-[1.08] [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
-          Only platform you need to rock Open Source
+          <span className="block whitespace-nowrap">Rock Open Source,</span>
+          <span className="block whitespace-nowrap">Build in Public,</span>
+          <span className="block whitespace-nowrap">Indie Hacking.</span>
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
@@ -93,16 +95,37 @@ const Hero = () => {
             type: "spring",
             delay: 0.1,
           }}
-          className="w-full lg:text-2xl tracking-tight font-light sm:max-w-lg mx-auto lg:max-w-4xl lg:text-balance text-text-secondary"
+          className="w-full text-base sm:text-lg lg:text-xl tracking-tight font-light text-text-secondary flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1"
         >
+          <span>my work in</span>
           <Link
             href="/blog/my-work-so-far"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 border-b border-text-secondary/60 hover:border-text-primary hover:text-text-primary cursor-pointer transition-colors duration-300"
+            className="inline-flex items-center gap-0.5 border-b border-text-secondary/60 hover:border-text-primary hover:text-text-primary transition-colors duration-300"
           >
-            achieve in 1 year what took me 3 years in open source
-            <ArrowUpRight className="w-4 h-4 -rotate-12" />
+            open source
+            <ArrowUpRight className="w-3.5 h-3.5 -rotate-12" />
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link
+            href="/blog/my-work-in-building-in-public"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 border-b border-text-secondary/60 hover:border-text-primary hover:text-text-primary transition-colors duration-300"
+          >
+            build in public
+            <ArrowUpRight className="w-3.5 h-3.5 -rotate-12" />
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link
+            href="/blog/my-work-in-indie-hacking"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 border-b border-text-secondary/60 hover:border-text-primary hover:text-text-primary transition-colors duration-300"
+          >
+            indie hacking
+            <ArrowUpRight className="w-3.5 h-3.5 -rotate-12" />
           </Link>
         </motion.p>
       </motion.div>

@@ -252,6 +252,9 @@ html {
 .blog-page .prose-blog .blog-intro {
   color: var(--blog-accent);
 }
+.blog-page .prose-blog .blog-highlight {
+  color: var(--blog-accent);
+}
 .blog-page .prose-blog strong {
   color: var(--blog-fg);
 }

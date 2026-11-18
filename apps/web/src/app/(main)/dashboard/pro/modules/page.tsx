@@ -90,8 +90,8 @@ const ProModulesPage = (): JSX.Element => {
             Opensox Pro Modules
           </h1>
           <p className="text-text-secondary text-base md:text-lg max-w-2xl mt-3">
-            Focused modules on open source, building in public, and first
-            principles thinking, with the resources to go deeper.
+            Focused modules on open source, building in public, and indie
+            hacking, with the resources to go deeper.
           </p>
         </div>
 
@@ -313,7 +313,7 @@ function LockedContent(): JSX.Element {
             </h2>
             <p className="text-text-secondary text-sm text-center mt-2 leading-relaxed">
               Go Pro to watch every module on open source, building in public,
-              and first principles, with the resources for each.
+              and indie hacking, with the resources for each.
             </p>
 
             <ul className="mt-6 space-y-3">

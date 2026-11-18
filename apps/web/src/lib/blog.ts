@@ -119,6 +119,7 @@ export interface BlogFrontmatter {
   tag: BlogTag;
   tweetUrl?: string;
   draft?: boolean;
+  pinned?: boolean;
 }
 
 export interface BlogMeta extends BlogFrontmatter {
@@ -143,6 +144,7 @@ export function getAllPosts(): BlogMeta[] {
         tag: data.tag,
         tweetUrl: data.tweetUrl,
         draft: data.draft,
+        pinned: data.pinned === true,
       } as BlogMeta;
     })
     .filter((post) => !post.draft);
@@ -167,6 +169,10 @@ export function getPostBySlug(slug: string): { frontmatter: BlogFrontmatter; htm
       ...(sanitizeHtml as any).defaults.allowedAttributes,
       a: ["href", "name", "target", "rel"],
       img: ["src", "alt", "title", "width", "height", "loading", "decoding"],
+      span: ["class"],
+    },
+    allowedClasses: {
+      span: ["blog-highlight"],
     },
   });
   const html = withImageLoadingHints(withExternalLinkTargets(safeHtml));
