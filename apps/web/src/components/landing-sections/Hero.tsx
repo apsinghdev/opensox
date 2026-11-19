@@ -114,7 +114,7 @@ const Hero = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-0.5 border-b border-text-secondary/60 hover:border-text-primary hover:text-text-primary transition-colors duration-300"
           >
-            build in public
+            building in public
             <ArrowUpRight className="w-3.5 h-3.5 -rotate-12" />
           </Link>
           <span aria-hidden="true">·</span>
