@@ -200,7 +200,7 @@ export default function ExploreFeaturesDashboard() {
                   <p className="text-sm font-medium text-text-primary">
                     Explore Features
                   </p>
-                  <p className="text-xs text-text-muted">Opensox Pro</p>
+                  <p className="text-xs text-text-muted">Opensox Pro/Pro+</p>
                 </div>
               </div>
             </div>

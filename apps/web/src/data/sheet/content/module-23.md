@@ -1,15 +1,15 @@
 ---
 id: "module-23"
-name: "How to make impressive contributions part-1?"
+name: "Raise the PR and get it merged"
 videoUrl: ""
 comingSoon: true
 ---
 
-How to make impressive contributions part-1?
+Raise the PR and get it merged
 
-How to make impressive contributions part-1?
+Raise the PR and get it merged
 
-First part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
+Learn the complete process of raising a pull request and getting it successfully merged into the project.
 
-First part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
+Learn the complete process of raising a pull request and getting it successfully merged into the project.
 

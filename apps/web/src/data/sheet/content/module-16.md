@@ -1,15 +1,13 @@
 ---
 id: "module-16"
-name: "How to plan/discuss with maintainers?"
-videoUrl: ""
-comingSoon: true
+name: "if an open-source maintainer is ignoring your PRs, DO THIS."
+videoUrl: "https://youtu.be/rBtxzkUjjv4?si=AAeIy6ILn7hKxLF9"
+comingSoon: false
+isNew: true
 ---
 
-How to plan/discuss with maintainers?
+if an open-source maintainer is ignoring your PRs, DO THIS.
 
-How to plan/discuss with maintainers?
+### todos:
 
-Best practices for communicating and planning with project maintainers before starting work on issues.
-
-Best practices for communicating and planning with project maintainers before starting work on issues.
-
+- [ ] watch [this video](https://youtu.be/rBtxzkUjjv4?si=AAeIy6ILn7hKxLF9)

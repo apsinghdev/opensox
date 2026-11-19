@@ -4,7 +4,7 @@ import type { BlogTag } from "@/lib/blog";
 const TAG_LABELS: Record<BlogTag, string> = {
   "open-source": "Open source",
   "build-in-public": "Build in public",
-  learning: "Learning",
+  "indie-hacking": "Indie hacking",
 };
 
 const XIcon = () => (

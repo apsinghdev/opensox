@@ -1,15 +1,15 @@
 ---
 id: "module-25"
-name: "Get/pick your third issue assigned (medium-hard)"
+name: "How to make impressive contributions part-2?"
 videoUrl: ""
 comingSoon: true
 ---
 
-Get/pick your third issue assigned (medium-hard)
+How to make impressive contributions part-2?
 
-Get/pick your third issue assigned (medium-hard)
+How to make impressive contributions part-2?
 
-Learn how to get your third issue assigned, focusing on medium to hard difficulty issues.
+Second part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
 
-Learn how to get your third issue assigned, focusing on medium to hard difficulty issues.
+Second part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
 

@@ -1,6 +1,7 @@
 export type ModuleCategory =
   | "open_source"
   | "build_in_public"
+  | "indie_hacking"
   | "first_principles";
 
 export interface ModuleLink {
@@ -25,6 +26,7 @@ export interface ProModule {
 export const CATEGORY_LABELS: Record<ModuleCategory, string> = {
   open_source: "Open Source",
   build_in_public: "Build in Public",
+  indie_hacking: "Indie Hacking",
   first_principles: "First Principles",
 };
 
@@ -32,5 +34,6 @@ export const CATEGORY_LABELS: Record<ModuleCategory, string> = {
 export const CATEGORY_ORDER: ModuleCategory[] = [
   "open_source",
   "build_in_public",
+  "indie_hacking",
   "first_principles",
 ];

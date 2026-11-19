@@ -1,10 +1,10 @@
 ---
 id: "module-31"
-name: "How to get jobs/internships through OPEN SOURCE?"
+name: "Raise the PR and get it merged"
 videoUrl: ""
 comingSoon: true
 ---
 
-### How to get jobs/internships through OPEN SOURCE?
+### Raise the PR and get it merged
 
-Learn how to leverage your OPEN SOURCE contributions to land jobs and internships in the tech industry.
+Learn the complete process of raising a pull request for a medium-hard issue and getting it successfully merged.

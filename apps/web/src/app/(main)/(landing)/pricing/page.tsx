@@ -232,14 +232,14 @@ const Pricing = () => {
                   rel="noopener noreferrer"
                   className="underline decoration-brand-purple-light decoration-1 underline-offset-4 transition-colors hover:decoration-brand-purple"
                 >
-                  30
+                  limited
                 </a>{" "}
                 people.
               </p>
               <p className="text-lg font-medium tracking-tight sm:text-xl">
                 learning <span className="text-[#a472ea]">Open Source.</span>{" "}
                 <span className="text-[#a472ea]">Build in Public.</span>{" "}
-                <span className="text-[#a472ea]">First Principles.</span>
+                <span className="text-[#a472ea]">Indie Hacking.</span>
               </p>
               <div className="flex flex-col gap-2">
                 <Link
@@ -249,14 +249,6 @@ const Pricing = () => {
                   className="text-md font-light text-text-muted underline decoration-text-muted/50 underline-offset-4 transition-colors hover:text-text-secondary"
                 >
                   am i ready to join opensox pro?
-                </Link>
-                <Link
-                  href="https://youtu.be/7bvr3-nNttc?si=vJKaaccHzddqfaTJ"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-md font-light text-text-muted underline decoration-text-muted/50 underline-offset-4 transition-colors hover:text-text-secondary"
-                >
-                  want a quick overview?
                 </Link>
               </div>
             </motion.div>
@@ -490,15 +482,11 @@ const PlanColumnHeader = ({
 const MONTHLY_JOIN_COUNT_CLASS =
   "mt-1 font-heading text-base font-semibold tracking-tighter text-success-text";
 
-// temporarily hidden — set to true to show "{n} joined this month so far"
-const SHOW_MONTHLY_JOIN_COUNT = false;
-
 const PlanSectionIntro = () => {
   const { data: monthlyJoinData } = trpc.payment.getMonthlyJoinCount.useQuery(
     undefined,
     {
       staleTime: 5 * 60 * 1000,
-      enabled: SHOW_MONTHLY_JOIN_COUNT,
     },
   );
 
@@ -513,8 +501,7 @@ const PlanSectionIntro = () => {
       <p className="max-w-sm text-sm text-text-muted">
         Go Pro or Pro+ to join the ecosystem.
       </p>
-      {SHOW_MONTHLY_JOIN_COUNT &&
-      typeof monthlyJoinData?.count === "number" ? (
+      {typeof monthlyJoinData?.count === "number" ? (
         <p className={MONTHLY_JOIN_COUNT_CLASS}>
           {monthlyJoinData.count} joined this month so far
         </p>

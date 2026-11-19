@@ -152,7 +152,7 @@ function ProCommunityPageContent() {
                 <div>
                   <p className="text-sm text-text-muted">Discord Community</p>
                   <p className="mt-2 text-sm text-text-primary">
-                    Join the folks nailing OSS, Build in Public and First Principles.
+                    Join the folks nailing OSS, Build in Public and Indie Hacking.
                   </p>
                 </div>
 

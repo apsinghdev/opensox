@@ -1,15 +1,15 @@
 ---
 id: "module-24"
-name: "How to make impressive contributions part-2?"
+name: "How to make impressive contributions part-1?"
 videoUrl: ""
 comingSoon: true
 ---
 
-How to make impressive contributions part-2?
+How to make impressive contributions part-1?
 
-How to make impressive contributions part-2?
+How to make impressive contributions part-1?
 
-Second part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
+First part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
 
-Second part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
+First part of a guide on making standout contributions that get noticed in OPEN SOURCE projects.
 

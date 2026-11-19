@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Accordion,
   AccordionContent,
@@ -5,7 +6,36 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Header from "../ui/header";
-import { faqs } from "./faqData";
+import { faqs, type FAQLink } from "./faqData";
+
+const renderAnswer = (answer: string, links?: FAQLink[]) => {
+  if (!links?.length) return answer;
+
+  const nodes: React.ReactNode[] = [];
+  let remaining = answer;
+
+  links.forEach((link, index) => {
+    const matchIndex = remaining.indexOf(link.text);
+    if (matchIndex === -1) return;
+
+    nodes.push(remaining.slice(0, matchIndex));
+    nodes.push(
+      <Link
+        key={`${link.href}-${index}`}
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-link underline underline-offset-2 transition-colors hover:text-link-hover"
+      >
+        {link.text}
+      </Link>,
+    );
+    remaining = remaining.slice(matchIndex + link.text.length);
+  });
+
+  nodes.push(remaining);
+  return nodes;
+};
 
 export function FaqSection() {
   return (
@@ -50,7 +80,7 @@ export function FaqSection() {
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-4 text-[#d1d1d1] text-sm lg:text-base leading-relaxed">
-                  {faq.answer}
+                  {renderAnswer(faq.answer, faq.links)}
                 </AccordionContent>
               </AccordionItem>
             ))}

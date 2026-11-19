@@ -12,7 +12,7 @@ type BlogFilter = BlogTag | "all";
 const FILTERS: { id: BlogFilter; label: string }[] = [
   { id: "open-source", label: "Open source" },
   { id: "build-in-public", label: "Build in public" },
-  { id: "learning", label: "Learning" },
+  { id: "indie-hacking", label: "Indie hacking" },
   { id: "all", label: "All" },
 ];
 
@@ -29,10 +29,14 @@ const formatDate = (dateStr: string): string => {
 export default function BlogList({ posts }: { posts: BlogMeta[] }) {
   const [activeFilter, setActiveFilter] = useState<BlogFilter>("open-source");
 
-  const filtered =
+  const filtered = (
     activeFilter === "all"
       ? posts
-      : posts.filter((p) => p.tag === activeFilter);
+      : posts.filter((p) => p.tag === activeFilter)
+  )
+    // pinned posts stay at the top of their category (and of "all")
+    .slice()
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned));
 
   const handleFilterClick = (filter: BlogFilter) => {
     setActiveFilter(filter);
@@ -65,7 +69,7 @@ export default function BlogList({ posts }: { posts: BlogMeta[] }) {
             Opensox Blog
           </h1>
           <p className="blog-text-secondary mt-2">
-            Thoughts on open source, startups, and building in public.
+            Thoughts on open source, building in public and indie hacking.
           </p>
         </header>
 

@@ -146,6 +146,7 @@ model SessionTopic {
 enum ModuleCategory {
   open_source
   build_in_public
+  indie_hacking
   first_principles
 }
 

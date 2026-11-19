@@ -121,7 +121,7 @@ export const FEATURES_DATA: FeatureData[] = [
     id: 5,
     title: "Weekly Contests",
     description:
-      "Participate in weekly contests designed around open-source, building in public and mastering first principles.",
+      "Participate in weekly contests designed around open-source, building in public and indie hacking.",
     icon: "Trophy",
     image: FEATURE_IMAGES.weeklyContests,
   },
@@ -129,7 +129,7 @@ export const FEATURES_DATA: FeatureData[] = [
     id: 6,
     title: "Dedicated Pro Content",
     description:
-      "Access dedicated content on open source, building in public, and first principles that you can't find anywhere else on the internet. Exclusive to Opensox Pro members.",
+      "Access dedicated content on open source, building in public, and indie hacking that you can't find anywhere else on the internet. Exclusive to Opensox Pro members.",
     icon: "Lock",
     image: FEATURE_IMAGES.proModules,
   },

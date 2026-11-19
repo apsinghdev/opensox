@@ -10,8 +10,8 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 const CTA = () => {
   const { trackButtonClick, trackLinkClick } = useAnalytics();
 
-  const handleGetStartedClick = () => {
-    trackButtonClick("Get Started", "cta_section");
+  const handleLessgoClick = () => {
+    trackButtonClick("lessgo", "cta_section");
   };
 
   const handleTestimonialsClick = () => {
@@ -28,21 +28,18 @@ const CTA = () => {
         className="absolute inset-0 w-full h-full -z-10 object-cover rounded-3xl"
       />
       <div className="space-y-2">
-        <h2 className="text-4xl text-[40px] w-full lg:text-7xl font-medium text-balance text-center max-w-2xl tracking-tighter">
-          Ready to dive into Open Source?
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl w-full font-medium text-balance text-center max-w-4xl tracking-tighter">
+          Ready to dive into Open Source, Building in Public and Indie Hacking?
         </h2>
-        <p className="text-center tracking-tight lg:text-2xl font-light">
-          Join 10,000+ engineers accelerating in open-source.
-        </p>
       </div>
       <Link
-        href="/dashboard/home"
+        href="/pro"
         className="cursor-pointer z-30"
-        onClick={handleGetStartedClick}
+        onClick={handleLessgoClick}
       >
         <PrimaryButtom>
           <Terminal />
-          Get Started
+          lessgo
         </PrimaryButtom>
       </Link>
       <Link
