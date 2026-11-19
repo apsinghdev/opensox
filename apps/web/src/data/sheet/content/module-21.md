@@ -1,15 +1,15 @@
 ---
 id: "module-21"
-name: "Live fix/implement the issue - 5"
+name: "Live fix/implement the issue - 4"
 videoUrl: ""
 comingSoon: true
 ---
 
-Live fix/implement the issue - 5
+Live fix/implement the issue - 4
 
-Live fix/implement the issue - 5
+Live fix/implement the issue - 4
 
-Fifth live session on fixing and implementing a medium difficulty issue.
+Fourth live session on fixing and implementing a medium difficulty issue.
 
-Fifth live session on fixing and implementing a medium difficulty issue.
+Fourth live session on fixing and implementing a medium difficulty issue.
 

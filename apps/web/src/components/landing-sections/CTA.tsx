@@ -31,10 +31,6 @@ const CTA = () => {
         <h2 className="text-3xl sm:text-4xl lg:text-5xl w-full font-medium text-balance text-center max-w-4xl tracking-tighter">
           Ready to dive into Open Source, Building in Public and Indie Hacking?
         </h2>
-        <p className="text-center tracking-tight lg:text-2xl font-light max-w-3xl mx-auto">
-          Join the limited community accelerating in open-source, building in
-          public and indie hacking.
-        </p>
       </div>
       <Link
         href="/pro"

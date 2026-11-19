@@ -250,14 +250,6 @@ const Pricing = () => {
                 >
                   am i ready to join opensox pro?
                 </Link>
-                <Link
-                  href="https://youtu.be/7bvr3-nNttc?si=vJKaaccHzddqfaTJ"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-md font-light text-text-muted underline decoration-text-muted/50 underline-offset-4 transition-colors hover:text-text-secondary"
-                >
-                  want a quick overview?
-                </Link>
               </div>
             </motion.div>
 

@@ -1,10 +1,10 @@
 ---
 id: "module-30"
-name: "Raise the PR and get it merged"
+name: "Live fix/implement the issue - 4"
 videoUrl: ""
 comingSoon: true
 ---
 
-### Raise the PR and get it merged
+### Live fix/implement the issue - 4
 
-Learn the complete process of raising a pull request for a medium-hard issue and getting it successfully merged.
+Fourth live session on fixing and implementing a medium-hard difficulty issue.

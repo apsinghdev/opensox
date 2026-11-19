@@ -1,15 +1,15 @@
 ---
 id: "module-17"
-name: "Live fix/implement the issue - 1"
+name: "How to plan/discuss with maintainers?"
 videoUrl: ""
 comingSoon: true
 ---
 
-Live fix/implement the issue - 1
+How to plan/discuss with maintainers?
 
-Live fix/implement the issue - 1
+How to plan/discuss with maintainers?
 
-First live session on fixing and implementing a medium difficulty issue.
+Best practices for communicating and planning with project maintainers before starting work on issues.
 
-First live session on fixing and implementing a medium difficulty issue.
+Best practices for communicating and planning with project maintainers before starting work on issues.
 

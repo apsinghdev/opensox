@@ -1,15 +1,15 @@
 ---
 id: "module-26"
-name: "Live fix/implement the issue - 1"
+name: "Get/pick your third issue assigned (medium-hard)"
 videoUrl: ""
 comingSoon: true
 ---
 
-Live fix/implement the issue - 1
+Get/pick your third issue assigned (medium-hard)
 
-Live fix/implement the issue - 1
+Get/pick your third issue assigned (medium-hard)
 
-First live session on fixing and implementing a medium-hard difficulty issue.
+Learn how to get your third issue assigned, focusing on medium to hard difficulty issues.
 
-First live session on fixing and implementing a medium-hard difficulty issue.
+Learn how to get your third issue assigned, focusing on medium to hard difficulty issues.
 

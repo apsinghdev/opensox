@@ -82,8 +82,8 @@ const Hero = () => {
           variants={itemVariants}
           className="text-[clamp(1.9rem,7.2vw,5.25rem)] font-medium tracking-tighter leading-[1.08] [will-change:transform,opacity] motion-reduce:transition-none motion-reduce:transform-none"
         >
-          <span className="block whitespace-nowrap">Rock Open Source,</span>
-          <span className="block whitespace-nowrap">Build in Public,</span>
+          <span className="block whitespace-nowrap">Rock Open Source.</span>
+          <span className="block whitespace-nowrap">Building in Public.</span>
           <span className="block whitespace-nowrap">Indie Hacking.</span>
         </motion.h1>
         <motion.p
