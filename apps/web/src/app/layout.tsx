@@ -33,15 +33,16 @@ const dmMono = localFont({
 const geistSans = GeistSans;
 
 const SITE_NAME = "Opensox";
-const SOCIAL_DESCRIPTION =
-  "achieve in 1 year what took me 3 years in open source.";
+const SOCIAL_TITLE =
+  "join opensox and mog in open source, building in public and indie hacking";
+const SOCIAL_DESCRIPTION = SOCIAL_TITLE;
 const SEO_DESCRIPTION =
   "How to get started with open source and how to contribute. Find projects, tools, and a path to an open source career.";
 const OG_IMAGE = {
-  url: "/images/open-source-tool.png",
-  width: 1024,
-  height: 467,
-  alt: "open source tool",
+  url: "/images/ox-preview-img.png",
+  width: 1654,
+  height: 1072,
+  alt: SOCIAL_TITLE,
 } as const;
 
 export const metadata: Metadata = {
@@ -76,14 +77,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: new URL(SITE_URL),
     siteName: SITE_NAME,
-    title: `${SITE_NAME} | How to get started with open source`,
+    title: SOCIAL_TITLE,
     description: SOCIAL_DESCRIPTION,
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     site: "@opensox",
-    title: `${SITE_NAME} | How to get started with open source`,
+    title: SOCIAL_TITLE,
     description: SOCIAL_DESCRIPTION,
     images: [OG_IMAGE.url],
     creator: "@jackedAJ",

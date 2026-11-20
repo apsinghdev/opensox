@@ -23,7 +23,7 @@ export const faqs: FAQ[] = [
   {
     question: "How does this work?",
     answer:
-      "You subscribe to Opensox Pro or Pro+. You get access to all the benefits of it. You rock in open source, building in public and indie hacking.",
+      "You subscribe to Opensox Pro or Pro+. You get access to all the benefits of it. You mog in open source, building in public and indie hacking.",
     links: [{ text: "all the benefits", href: "/pricing#explore-features" }],
   },
   {

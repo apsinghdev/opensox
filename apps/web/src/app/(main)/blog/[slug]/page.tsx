@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllSlugs, getPostBySlug } from "@/lib/blog";
+import { getAllSlugs, getPostBySlug, type BlogTag } from "@/lib/blog";
 import type { Metadata } from "next";
 import BlogThemeSelector from "../blog-theme";
 import BlogSocials from "../blog-socials";
@@ -39,6 +39,18 @@ const SEO_POSTS: Record<
     ],
   },
 };
+
+const PRO_CTA_BY_TAG: Record<BlogTag, string> = {
+  "open-source":
+    "be the engineer every company dreams of by being goated in Open Source.",
+  "build-in-public":
+    "build an authentic audience by mastering the art of building in public.",
+  "indie-hacking":
+    "make crazy internet dollars by nailing the art of indie hacking.",
+};
+
+const DEFAULT_PRO_CTA =
+  "mog in open source, building in public and indie hacking.";
 
 export async function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
@@ -97,6 +109,11 @@ export default async function BlogPostPage({
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const tag = post.frontmatter.tag;
+  const proCta = Object.prototype.hasOwnProperty.call(PRO_CTA_BY_TAG, tag)
+    ? PRO_CTA_BY_TAG[tag]
+    : DEFAULT_PRO_CTA;
+
   const date = new Date(post.frontmatter.date).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -149,15 +166,14 @@ export default async function BlogPostPage({
 
         <header className="mt-12 pt-8 border-t blog-border">
           <p className="blog-text-secondary text-lg leading-relaxed">
-            be the favorite hire in the uncertain job market by being scary good
-            at open source, check{" "}
+            {proCta}{" "}
             <Link
               href="https://opensox.ai/pro"
               target="_blank"
               rel="noopener noreferrer"
               className="blog-cta-link"
             >
-              opensox
+              join opensox pro
             </Link>
           </p>
         </header>
