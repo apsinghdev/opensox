@@ -4,10 +4,18 @@ import React from "react";
 import Link from "next/link";
 
 import Footer from "@/components/landing-sections/footer";
+import {
+  ReturningMemberOffer,
+  useReturningMemberOffer,
+} from "@/components/payment/ReturningMemberOffer";
 import PrimaryButton from "@/components/ui/custom-button";
 import Header from "@/components/ui/header";
 
 const Pitch = () => {
+  const eligible = useReturningMemberOffer(
+    process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID,
+  );
+
   return (
     <>
       <main className="w-full overflow-hidden flex flex-col items-center justify-center relative pt-24 md:pt-28">
@@ -290,6 +298,11 @@ const Pitch = () => {
                   <h2 className="text-2xl lg:text-3xl font-bold text-brand-purple-light tracking-tight leading-tight [font-family:Helvetica,Arial,sans-serif]">
                     how to invest?
                   </h2>
+                  {eligible ? (
+                    <div className="flex justify-center">
+                      <ReturningMemberOffer />
+                    </div>
+                  ) : null}
                   <div className="flex justify-center">
                     <Link
                       href="/pricing#pro-price-card"

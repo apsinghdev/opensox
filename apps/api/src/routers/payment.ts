@@ -1,7 +1,10 @@
 import { router, protectedProcedure, publicProcedure } from "../trpc.js";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { paymentService } from "../services/payment.service.js";
+import {
+  CheckoutVerificationError,
+  paymentService,
+} from "../services/payment.service.js";
 
 const ALLOWED_NOTE_KEYS = ["plan"] as const;
 const MAX_NOTE_VALUE_LENGTH = 255;
@@ -42,6 +45,36 @@ export const paymentRouter = router({
     const count = await paymentService.countProMembersJoinedThisMonth();
     return { count };
   }),
+
+  checkoutQuote: protectedProcedure
+    .input(z.object({ planId: z.string().min(1, "Plan ID is required") }))
+    .query(async ({ input, ctx }: { input: { planId: string }; ctx: any }) => {
+      const userId = ctx.user?.id;
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
+      }
+
+      const plan = await paymentService.getPlan(input.planId);
+
+      if (!plan) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Plan not found",
+        });
+      }
+
+      if (!plan.price || !plan.currency) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Plan is missing price or currency information",
+        });
+      }
+
+      return paymentService.quotePlanForUser(userId, plan);
+    }),
 
   createOrder: protectedProcedure
     .input(createOrderSchema)
@@ -98,8 +131,10 @@ export const paymentRouter = router({
           sanitizedNotes.user_id = userId;
           sanitizedNotes.plan_id = input.planId;
 
+          const quote = await paymentService.quotePlanForUser(userId, plan);
+
           const result = await paymentService.createOrder({
-            amount: plan.price, // Use price from database
+            amount: quote.amount,
             currency: plan.currency,
             receipt: input.receipt,
             notes: sanitizedNotes,
@@ -183,14 +218,21 @@ export const paymentRouter = router({
             });
           }
 
+          const captured = await paymentService.assertPaymentMatchesOrder({
+            userId,
+            planId: input.planId,
+            orderId: input.razorpay_order_id,
+            paymentId: input.razorpay_payment_id,
+          });
+
           const { payment, subscription } = await paymentService.fulfillPayment({
             userId,
             planId: input.planId,
             paymentData: {
               razorpayPaymentId: input.razorpay_payment_id,
               razorpayOrderId: input.razorpay_order_id,
-              amount: plan.price,
-              currency: plan.currency,
+              amount: captured.amount,
+              currency: captured.currency,
             },
             sendConfirmationEmail: true,
           });
@@ -215,6 +257,13 @@ export const paymentRouter = router({
         } catch (error: any) {
           if (error instanceof TRPCError) {
             throw error;
+          }
+
+          if (error instanceof CheckoutVerificationError) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Payment could not be verified",
+            });
           }
 
           if (process.env.NODE_ENV !== "production") {

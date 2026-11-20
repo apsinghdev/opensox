@@ -6,11 +6,17 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import Features from "@/components/features/features";
 import dynamic from "next/dynamic";
 import { trpc } from "@/lib/trpc";
 import { formatApproxPlanPrice } from "@/lib/format-plan-price";
+import {
+  ReturningMemberDiscountPill,
+  ReturningMemberOffer,
+  useReturningMemberOffer,
+} from "@/components/payment/ReturningMemberOffer";
 import Footer from "@/components/landing-sections/footer";
 import jackedajPortrait from "../../../../../public/assets/jackedaj.jpg";
 
@@ -398,13 +404,28 @@ const PRICING_PLAN_BUTTON_CLASS =
 const PlanColumnHeader = ({
   tier,
   callbackUrl,
+  eligible,
 }: {
   tier: PlanTier;
   callbackUrl: string;
+  eligible: boolean;
 }) => {
   const router = useRouter();
+  const { status: sessionStatus } = useSession();
   const planIdOk = typeof tier.planId === "string" && tier.planId.length > 0;
   const isPaid = tier.key !== "free";
+  const quoteEnabled =
+    isPaid && planIdOk && sessionStatus === "authenticated";
+
+  const { data: quote } = trpc.payment.checkoutQuote.useQuery(
+    { planId: tier.planId as string },
+    {
+      enabled: quoteEnabled,
+      staleTime: 5 * 60 * 1000,
+      retry: false,
+    },
+  );
+  const discounted = quote?.discounted === true;
 
   const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
     { planId: tier.planId as string },
@@ -415,8 +436,13 @@ const PlanColumnHeader = ({
   );
 
   return (
-    <div className="flex h-full w-full flex-col text-center">
+    <div className="flex w-full flex-col text-center">
       <div className="flex flex-col items-center">
+        {eligible ? (
+          <div className="flex h-5 w-full items-center justify-end">
+            {isPaid && discounted ? <ReturningMemberDiscountPill /> : null}
+          </div>
+        ) : null}
         <p
           className={`px-3 py-1.5 text-lg font-medium tracking-wide ${isPaid ? "text-brand-purple-light" : "text-text-muted"}`}
         >
@@ -445,12 +471,37 @@ const PlanColumnHeader = ({
             </span>
           )}
           {isPaid && planIdOk && publicPlan ? (
-            <span className="text-sm font-semibold text-text-primary">
-              {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
-            </span>
+            discounted && quote ? (
+              <span className="flex flex-col items-center">
+                <span className="text-sm font-normal text-text-muted line-through">
+                  {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
+                </span>
+                <span className="text-sm font-semibold text-text-primary">
+                  {formatApproxPlanPrice(quote.amount, quote.currency)}
+                </span>
+              </span>
+            ) : (
+              <span className="flex flex-col items-center">
+                {eligible ? (
+                  <span className="text-sm invisible select-none" aria-hidden>
+                    &nbsp;
+                  </span>
+                ) : null}
+                <span className="text-sm font-semibold text-text-primary">
+                  {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
+                </span>
+              </span>
+            )
           ) : (
-            <span className="text-sm invisible select-none" aria-hidden>
-              &nbsp;
+            <span className="flex flex-col items-center">
+              {eligible ? (
+                <span className="text-sm invisible select-none" aria-hidden>
+                  &nbsp;
+                </span>
+              ) : null}
+              <span className="text-sm invisible select-none" aria-hidden>
+                &nbsp;
+              </span>
             </span>
           )}
         </div>
@@ -468,7 +519,9 @@ const PlanColumnHeader = ({
             planId={planIdOk ? (tier.planId as string) : ""}
             planName={`Opensox ${tier.name}`}
             description={tier.paymentDescription}
-            buttonText={planIdOk ? "Invest" : "Unavailable"}
+            buttonText={
+              planIdOk ? (discounted ? "Rejoin" : "Invest") : "Unavailable"
+            }
             buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
             callbackUrl={callbackUrl}
             buttonLocation="pricing_page"
@@ -482,7 +535,7 @@ const PlanColumnHeader = ({
 const MONTHLY_JOIN_COUNT_CLASS =
   "mt-1 font-heading text-base font-semibold tracking-tighter text-success-text";
 
-const PlanSectionIntro = () => {
+const PlanSectionIntro = ({ eligible }: { eligible: boolean }) => {
   const { data: monthlyJoinData } = trpc.payment.getMonthlyJoinCount.useQuery(
     undefined,
     {
@@ -501,6 +554,7 @@ const PlanSectionIntro = () => {
       <p className="max-w-sm text-sm text-text-muted">
         Go Pro or Pro+ to join the ecosystem.
       </p>
+      {eligible ? <ReturningMemberOffer /> : null}
       {typeof monthlyJoinData?.count === "number" ? (
         <p className={MONTHLY_JOIN_COUNT_CLASS}>
           {monthlyJoinData.count} joined this month so far
@@ -520,29 +574,42 @@ const PricingComparison = ({
   const freeTier = tiers.find((t) => t.key === "free")!;
   const proTier = tiers.find((t) => t.key === "pro1")!;
   const proPlusTier = tiers.find((t) => t.key === "pro4")!;
+  const eligible = useReturningMemberOffer(proTier.planId);
 
   return (
     <div className="flex flex-col gap-6 lg:gap-14">
       <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_1fr] lg:items-stretch lg:gap-6">
         <div className="flex flex-col gap-3 pt-4">
-          <PlanSectionIntro />
+          <PlanSectionIntro eligible={eligible} />
         </div>
 
         <PlanColumns className="h-full items-stretch">
           <PlanColumn className="h-full">
-            <PlanColumnHeader tier={freeTier} callbackUrl={callbackUrl} />
+            <PlanColumnHeader
+              tier={freeTier}
+              callbackUrl={callbackUrl}
+              eligible={eligible}
+            />
           </PlanColumn>
           <PlanColumn className="h-full">
-            <PlanColumnHeader tier={proTier} callbackUrl={callbackUrl} />
+            <PlanColumnHeader
+              tier={proTier}
+              callbackUrl={callbackUrl}
+              eligible={eligible}
+            />
           </PlanColumn>
           <PlanColumn className="h-full">
-            <PlanColumnHeader tier={proPlusTier} callbackUrl={callbackUrl} />
+            <PlanColumnHeader
+              tier={proPlusTier}
+              callbackUrl={callbackUrl}
+              eligible={eligible}
+            />
           </PlanColumn>
         </PlanColumns>
       </div>
 
       <div className="flex flex-col gap-3 pt-4 lg:hidden">
-        <PlanSectionIntro />
+        <PlanSectionIntro eligible={eligible} />
       </div>
 
       <div className={MOBILE_TABLE_SCROLL}>
@@ -551,15 +618,24 @@ const PricingComparison = ({
             <div className={FEATURE_LABEL_WIDTH} aria-hidden />
             <PlanColumns align="start" className="items-stretch">
               <PlanColumn className="h-full">
-                <PlanColumnHeader tier={freeTier} callbackUrl={callbackUrl} />
+                <PlanColumnHeader
+                  tier={freeTier}
+                  callbackUrl={callbackUrl}
+                  eligible={eligible}
+                />
               </PlanColumn>
               <PlanColumn className="h-full">
-                <PlanColumnHeader tier={proTier} callbackUrl={callbackUrl} />
+                <PlanColumnHeader
+                  tier={proTier}
+                  callbackUrl={callbackUrl}
+                  eligible={eligible}
+                />
               </PlanColumn>
               <PlanColumn className="h-full">
                 <PlanColumnHeader
                   tier={proPlusTier}
                   callbackUrl={callbackUrl}
+                  eligible={eligible}
                 />
               </PlanColumn>
             </PlanColumns>

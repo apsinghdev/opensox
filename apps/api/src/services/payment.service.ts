@@ -8,6 +8,11 @@ import {
 } from "../constants/subscription.js";
 import { discordService } from "./discord.service.js";
 import { emailService } from "./email.service.js";
+import {
+  allowedCheckoutAmounts,
+  checkoutAmountForMember,
+  returningMemberFilters,
+} from "../lib/returning-member-price.js";
 
 const { prisma } = prismaModule;
 
@@ -116,6 +121,44 @@ interface FulfillPaymentInput {
   sendConfirmationEmail?: boolean;
 }
 
+export interface CheckoutQuote {
+  amount: number;
+  currency: string;
+  discounted: boolean;
+  listPrice: number;
+}
+
+export class CheckoutVerificationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CheckoutVerificationError";
+  }
+}
+
+const ACCEPTABLE_PAYMENT_STATUSES = new Set(["captured", "authorized"]);
+
+function noteValue(notes: unknown, key: string): string | null {
+  if (!notes || typeof notes !== "object" || Array.isArray(notes)) {
+    return null;
+  }
+
+  const value = (notes as Record<string, unknown>)[key];
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function minorAmount(value: unknown): number | null {
+  const amount = typeof value === "string" ? Number(value) : value;
+  if (typeof amount !== "number" || !Number.isInteger(amount) || amount <= 0) {
+    return null;
+  }
+  return amount;
+}
+
 const DEFAULT_PREMIUM_EMAIL_NAME = "there";
 const IST_OFFSET = "+05:30";
 
@@ -159,6 +202,140 @@ export const paymentService = {
       console.error("Error fetching plan:", error);
       throw new Error("Failed to fetch plan");
     }
+  },
+
+  /**
+   * No current access, and a previous subscription that has ended.
+   */
+  async isReturningMember(userId: string): Promise<boolean> {
+    const { active, prior } = returningMemberFilters(userId);
+    const [live, previous] = await Promise.all([
+      prisma.subscription.findFirst({ where: active, select: { id: true } }),
+      prisma.subscription.findFirst({ where: prior, select: { id: true } }),
+    ]);
+
+    return !live && !!previous;
+  },
+
+  async quotePlanForUser(
+    userId: string,
+    plan: { price: number; currency: string }
+  ): Promise<CheckoutQuote> {
+    const returning = await this.isReturningMember(userId);
+    const quote = checkoutAmountForMember(plan.price, plan.currency, returning);
+    return {
+      amount: quote.amount,
+      currency: plan.currency,
+      discounted: quote.discounted,
+      listPrice: plan.price,
+    };
+  },
+
+  /**
+   * The client chooses which plan id to send with a payment. Bind the captured
+   * payment to the order this server created, and only accept the list price
+   * or the returning-member price for that plan.
+   */
+  async assertPaymentMatchesOrder(input: {
+    userId: string;
+    planId: string;
+    orderId: string;
+    paymentId: string;
+  }): Promise<{ amount: number; currency: string }> {
+    const plan = await prisma.plan.findUnique({
+      where: { id: input.planId },
+    });
+
+    if (!plan?.price || !plan.currency) {
+      throw new CheckoutVerificationError("Plan not found for payment");
+    }
+
+    let order: {
+      id?: string;
+      amount?: number | string;
+      currency?: string;
+      notes?: unknown;
+    };
+    let payment: {
+      order_id?: string;
+      amount?: number | string;
+      currency?: string;
+      status?: string;
+    };
+
+    try {
+      order = await rz_instance.orders.fetch(input.orderId);
+      payment = await rz_instance.payments.fetch(input.paymentId);
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          level: "error",
+          service: "paymentService",
+          event: "razorpay_payment_fetch_failed",
+          timestamp: new Date().toISOString(),
+          userId: input.userId,
+          planId: input.planId,
+          orderId: input.orderId,
+          paymentId: input.paymentId,
+          errorMessage: error instanceof Error ? error.message : String(error),
+        })
+      );
+      throw new Error("Failed to fetch payment from Razorpay");
+    }
+
+    const orderAmount = minorAmount(order?.amount);
+    const paymentAmount = minorAmount(payment?.amount);
+    const allowedAmounts = new Set(
+      allowedCheckoutAmounts(plan.price, plan.currency)
+    );
+    const reasons: string[] = [];
+
+    if (order?.id !== input.orderId || payment?.order_id !== input.orderId) {
+      reasons.push("order_mismatch");
+    }
+    if (
+      orderAmount === null ||
+      paymentAmount === null ||
+      orderAmount !== paymentAmount
+    ) {
+      reasons.push("amount_mismatch");
+    } else if (!allowedAmounts.has(paymentAmount)) {
+      reasons.push("amount_not_allowed");
+    }
+    if (
+      String(order?.currency ?? "").toUpperCase() !==
+      plan.currency.toUpperCase()
+    ) {
+      reasons.push("currency");
+    }
+    if (!ACCEPTABLE_PAYMENT_STATUSES.has(String(payment?.status ?? ""))) {
+      reasons.push("status");
+    }
+    if (noteValue(order?.notes, "user_id") !== input.userId) {
+      reasons.push("user");
+    }
+    if (noteValue(order?.notes, "plan_id") !== input.planId) {
+      reasons.push("plan");
+    }
+
+    if (reasons.length > 0 || paymentAmount === null) {
+      console.error(
+        JSON.stringify({
+          level: "error",
+          service: "paymentService",
+          event: "checkout_payment_rejected",
+          timestamp: new Date().toISOString(),
+          userId: input.userId,
+          planId: input.planId,
+          orderId: input.orderId,
+          paymentId: input.paymentId,
+          reasons,
+        })
+      );
+      throw new CheckoutVerificationError("Payment could not be verified");
+    }
+
+    return { amount: paymentAmount, currency: plan.currency };
   },
 
   /**
