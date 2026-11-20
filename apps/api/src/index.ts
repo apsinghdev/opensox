@@ -11,7 +11,10 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import crypto from "crypto";
 import { clientIp } from "./utils/client-ip.js";
-import { paymentService } from "./services/payment.service.js";
+import {
+  CheckoutVerificationError,
+  paymentService,
+} from "./services/payment.service.js";
 import { userService } from "./services/user.service.js";
 import { verifyToken } from "./utils/auth.js";
 import { SUBSCRIPTION_STATUS } from "./constants/subscription.js";
@@ -483,8 +486,6 @@ app.post("/webhook/razorpay", async (req: Request, res: Response) => {
       // Extract payment details
       const razorpayPaymentId = payment.id;
       const razorpayOrderId = payment.order_id;
-      const amount = payment.amount;
-      const currency = payment.currency;
 
       // Get user ID from order notes (should be stored when creating order)
       const notes = payment.notes || {};
@@ -503,14 +504,21 @@ app.post("/webhook/razorpay", async (req: Request, res: Response) => {
       }
 
       try {
+        const captured = await paymentService.assertPaymentMatchesOrder({
+          userId,
+          planId,
+          orderId: razorpayOrderId,
+          paymentId: razorpayPaymentId,
+        });
+
         await paymentService.fulfillPayment({
           userId,
           planId,
           paymentData: {
             razorpayPaymentId,
             razorpayOrderId,
-            amount,
-            currency,
+            amount: captured.amount,
+            currency: captured.currency,
           },
           sendConfirmationEmail: true,
         });
@@ -520,11 +528,18 @@ app.post("/webhook/razorpay", async (req: Request, res: Response) => {
         );
         return res.status(200).json({ status: "ok" });
       } catch (error: any) {
+        if (error instanceof CheckoutVerificationError) {
+          console.error(
+            `Webhook rejected payment ${razorpayPaymentId}:`,
+            error.message
+          );
+          return res
+            .status(200)
+            .json({ status: "ok", note: "payment rejected" });
+        }
+
         console.error("Webhook payment processing error:", error);
-        // Return 200 to prevent Razorpay retries for application errors
-        return res
-          .status(200)
-          .json({ status: "ok", note: "Already processed" });
+        return res.status(500).json({ error: "Internal server error" });
       }
     }
 
