@@ -20,7 +20,7 @@ import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import { SUBSCRIPTION_STATUS } from "../src/constants/subscription.js";
 import {
-  returningMemberAmount,
+  checkoutAmountForMember,
   returningMemberFilters,
 } from "../src/lib/returning-member-price.js";
 
@@ -54,9 +54,13 @@ async function printQuotes(userId: string): Promise<void> {
   console.log(`returning member: ${returning ? "yes" : "no"}`);
 
   for (const plan of plans) {
-    const charge = returning ? returningMemberAmount(plan.price) : plan.price;
+    const charge = checkoutAmountForMember(
+      plan.price,
+      plan.currency,
+      returning
+    );
     console.log(
-      `${plan.name}: list ${plan.price} → charge ${charge} ${plan.currency}`
+      `${plan.name}: list ${plan.price} → charge ${charge.amount} ${plan.currency}`
     );
   }
 }

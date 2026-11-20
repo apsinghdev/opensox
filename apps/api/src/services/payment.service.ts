@@ -9,7 +9,6 @@ import {
 import { discordService } from "./discord.service.js";
 import { emailService } from "./email.service.js";
 import {
-  allowedCheckoutAmounts,
   checkoutAmountForMember,
   returningMemberFilters,
 } from "../lib/returning-member-price.js";
@@ -233,8 +232,8 @@ export const paymentService = {
 
   /**
    * The client chooses which plan id to send with a payment. Bind the captured
-   * payment to the order this server created, and only accept the list price
-   * or the returning-member price for that plan.
+   * payment to the order this server created. The order amount is that quote
+   * and does not follow a later catalog price change.
    */
   async assertPaymentMatchesOrder(input: {
     userId: string;
@@ -285,9 +284,6 @@ export const paymentService = {
 
     const orderAmount = minorAmount(order?.amount);
     const paymentAmount = minorAmount(payment?.amount);
-    const allowedAmounts = new Set(
-      allowedCheckoutAmounts(plan.price, plan.currency)
-    );
     const reasons: string[] = [];
 
     if (order?.id !== input.orderId || payment?.order_id !== input.orderId) {
@@ -299,8 +295,6 @@ export const paymentService = {
       orderAmount !== paymentAmount
     ) {
       reasons.push("amount_mismatch");
-    } else if (!allowedAmounts.has(paymentAmount)) {
-      reasons.push("amount_not_allowed");
     }
     if (
       String(order?.currency ?? "").toUpperCase() !==
@@ -555,42 +549,51 @@ export const paymentService = {
         endDate.setDate(0);
       }
 
-      // Check if user already has an active subscription for this payment
-      const existingSubscription = await prisma.subscription.findFirst({
-        where: {
-          userId,
-          payments: {
-            some: {
-              id: paymentId,
+      // Creating the subscription and linking the payment must commit together.
+      // The retry lookup finds a subscription through that link, so a failed
+      // link followed by a webhook redelivery would otherwise open a second one.
+      const { subscription, wasCreated } = await prisma.$transaction(
+        async (tx) => {
+          const existingSubscription = await tx.subscription.findFirst({
+            where: {
+              userId,
+              payments: {
+                some: {
+                  id: paymentId,
+                },
+              },
             },
-          },
-        },
-      });
+          });
 
-      if (existingSubscription) {
-        return {
-          subscription: existingSubscription,
-          wasCreated: false,
-        };
-      }
+          if (existingSubscription) {
+            return {
+              subscription: existingSubscription,
+              wasCreated: false,
+            };
+          }
 
-      // Create subscription
-      const subscription = await prisma.subscription.create({
-        data: {
-          userId,
-          planId,
-          status: SUBSCRIPTION_STATUS.ACTIVE,
-          startDate,
-          endDate,
-          autoRenew: true,
-        },
-      });
+          const created = await tx.subscription.create({
+            data: {
+              userId,
+              planId,
+              status: SUBSCRIPTION_STATUS.ACTIVE,
+              startDate,
+              endDate,
+              autoRenew: true,
+            },
+          });
 
-      // Link payment to subscription
-      await prisma.payment.update({
-        where: { id: paymentId },
-        data: { subscriptionId: subscription.id },
-      });
+          await tx.payment.update({
+            where: { id: paymentId },
+            data: { subscriptionId: created.id },
+          });
+
+          return {
+            subscription: created,
+            wasCreated: true,
+          };
+        }
+      );
 
       if (discordService.isAutomationEnabled()) {
         try {
@@ -609,7 +612,7 @@ export const paymentService = {
 
       return {
         subscription,
-        wasCreated: true,
+        wasCreated,
       };
     } catch (error) {
       console.error("Error creating subscription:", error);
