@@ -109,7 +109,10 @@ export default async function BlogPostPage({
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const proCta = PRO_CTA_BY_TAG[post.frontmatter.tag] ?? DEFAULT_PRO_CTA;
+  const tag = post.frontmatter.tag;
+  const proCta = Object.prototype.hasOwnProperty.call(PRO_CTA_BY_TAG, tag)
+    ? PRO_CTA_BY_TAG[tag]
+    : DEFAULT_PRO_CTA;
 
   const date = new Date(post.frontmatter.date).toLocaleDateString("en-US", {
     month: "long",

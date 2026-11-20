@@ -34,7 +34,7 @@ const geistSans = GeistSans;
 
 const SITE_NAME = "Opensox";
 const SOCIAL_TITLE =
-  "join opensox and mogg in open source, building in public and indie hacking";
+  "join opensox and mog in open source, building in public and indie hacking";
 const SOCIAL_DESCRIPTION = SOCIAL_TITLE;
 const SEO_DESCRIPTION =
   "How to get started with open source and how to contribute. Find projects, tools, and a path to an open source career.";
