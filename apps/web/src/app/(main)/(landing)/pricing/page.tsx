@@ -411,28 +411,31 @@ const PlanColumnHeader = ({
   eligible: boolean;
 }) => {
   const router = useRouter();
-  const { status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const planIdOk = typeof tier.planId === "string" && tier.planId.length > 0;
   const isPaid = tier.key !== "free";
-  const quoteEnabled =
-    isPaid && planIdOk && sessionStatus === "authenticated";
+  const signedIn = sessionStatus === "authenticated";
+  const accountKey = signedIn ? (session?.user?.email ?? "") : "";
+  const quoteEnabled = isPaid && planIdOk && signedIn && accountKey.length > 0;
 
   const {
     data: quote,
     isError: quoteError,
   } = trpc.payment.checkoutQuote.useQuery(
-    { planId: tier.planId as string },
+    { planId: tier.planId as string, accountKey },
     {
       enabled: quoteEnabled,
       staleTime: 5 * 60 * 1000,
       retry: false,
     },
   );
-  const quoteSettled = !quoteEnabled || quote !== undefined || quoteError;
+  const quoteForSession = signedIn ? quote : undefined;
+  const quoteSettled = !quoteEnabled || quoteForSession !== undefined || quoteError;
   const returningDiscount =
-    quote?.discounted === true &&
-    (quote.discountReason === "returning" || quote.discountReason == null);
-  const activeMember = quote?.discountReason === "active";
+    quoteForSession?.discounted === true &&
+    (quoteForSession.discountReason === "returning" ||
+      quoteForSession.discountReason == null);
+  const activeMember = signedIn && quoteForSession?.discountReason === "active";
 
   const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
     { planId: tier.planId as string },
@@ -478,13 +481,13 @@ const PlanColumnHeader = ({
             </span>
           )}
           {isPaid && planIdOk && publicPlan ? (
-            returningDiscount && quote ? (
+            returningDiscount && quoteForSession ? (
               <span className="flex flex-col items-center">
                 <span className="text-sm font-normal text-text-muted line-through">
                   {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
                 </span>
                 <span className="text-sm font-semibold text-text-primary">
-                  {formatApproxPlanPrice(quote.amount, quote.currency)}
+                  {formatApproxPlanPrice(quoteForSession.amount, quoteForSession.currency)}
                 </span>
               </span>
             ) : (

@@ -374,10 +374,11 @@ app.post(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
+      const cutoff = new Date();
       const expiredSubscriptions = await prismaModule.prisma.subscription.findMany({
         where: {
           status: SUBSCRIPTION_STATUS.ACTIVE,
-          endDate: { lt: new Date() },
+          endDate: { lt: cutoff },
         },
         include: {
           user: true,
@@ -398,46 +399,74 @@ app.post(
       let failedDiscordRemovals = 0;
       let expiredCount = 0;
 
+      // a renewal can move the end date after this job read the row
+      const expireIfStillDue = async (subscriptionId: string) => {
+        const updated = await prismaModule.prisma.subscription.updateMany({
+          where: {
+            id: subscriptionId,
+            status: SUBSCRIPTION_STATUS.ACTIVE,
+            endDate: { lt: cutoff },
+          },
+          data: { status: SUBSCRIPTION_STATUS.EXPIRED },
+        });
+        return updated.count === 1;
+      };
+
+      const automationEnabled = discordService.isAutomationEnabled();
+      const discordCandidates = expiredSubscriptions.filter((subscription) => {
+        const discordUserId = (subscription.user as { discordUserId?: string | null })
+          .discordUserId;
+        return automationEnabled && Boolean(discordUserId);
+      });
+
       for (const subscription of expiredSubscriptions) {
-        const discordUserId = (subscription.user as any).discordUserId as
-          | string
-          | null
-          | undefined;
+        if (discordCandidates.includes(subscription)) continue;
+        if (await expireIfStillDue(subscription.id)) expiredCount += 1;
+      }
 
-        const anotherLiveSubscription =
-          await prismaModule.prisma.subscription.findFirst({
-            where: {
-              userId: subscription.userId,
-              id: { not: subscription.id },
-              status: SUBSCRIPTION_STATUS.ACTIVE,
-              endDate: { gte: new Date() },
-            },
-            select: { id: true },
-          });
+      const usersWithAnotherLiveSub = new Set<string>();
+      if (discordCandidates.length > 0) {
+        const liveRows = await prismaModule.prisma.subscription.findMany({
+          where: {
+            userId: { in: [...new Set(discordCandidates.map((row) => row.userId))] },
+            id: { notIn: discordCandidates.map((row) => row.id) },
+            status: SUBSCRIPTION_STATUS.ACTIVE,
+            endDate: { gte: cutoff },
+          },
+          select: { userId: true },
+        });
+        for (const row of liveRows) usersWithAnotherLiveSub.add(row.userId);
+      }
 
-        // a higher tier that ends first stays active until its own endDate.
-        // expiring that row must not remove discord while a longer term remains.
-        if (
-          !discordService.isAutomationEnabled() ||
-          !discordUserId ||
-          anotherLiveSubscription
-        ) {
-          await prismaModule.prisma.subscription.update({
-            where: { id: subscription.id },
-            data: { status: SUBSCRIPTION_STATUS.EXPIRED },
-          });
-          expiredCount += 1;
+      for (const subscription of discordCandidates) {
+        const discordUserId = (subscription.user as { discordUserId?: string | null })
+          .discordUserId;
+        if (!discordUserId) continue;
+
+        if (usersWithAnotherLiveSub.has(subscription.userId)) {
+          if (await expireIfStillDue(subscription.id)) expiredCount += 1;
+          continue;
+        }
+
+        // the batch only skips removal. discord is removed only after a fresh read.
+        const stillLive = await prismaModule.prisma.subscription.findFirst({
+          where: {
+            userId: subscription.userId,
+            id: { not: subscription.id },
+            status: SUBSCRIPTION_STATUS.ACTIVE,
+            endDate: { gte: new Date() },
+          },
+          select: { id: true },
+        });
+        if (stillLive) {
+          if (await expireIfStillDue(subscription.id)) expiredCount += 1;
           continue;
         }
 
         try {
           await discordService.removeMemberFromProGuild(discordUserId);
           removedFromDiscordCount += 1;
-          await prismaModule.prisma.subscription.update({
-            where: { id: subscription.id },
-            data: { status: SUBSCRIPTION_STATUS.EXPIRED },
-          });
-          expiredCount += 1;
+          if (await expireIfStillDue(subscription.id)) expiredCount += 1;
         } catch (error) {
           failedDiscordRemovals += 1;
           console.error(

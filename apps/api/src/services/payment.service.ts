@@ -625,7 +625,11 @@ export const paymentService = {
       const fulfillOnce = () =>
         prisma.$transaction(
           async (tx) => {
-            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`;
+            // the lock function returns void, which prisma cannot decode
+            await tx.$queryRaw`
+              SELECT 1 AS locked
+              FROM (SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))) AS acquired
+            `;
 
             const existingSubscription = await tx.subscription.findFirst({
               where: {
