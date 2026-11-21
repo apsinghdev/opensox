@@ -413,6 +413,29 @@ app.post(
         return updated.count === 1;
       };
 
+      const hasLiveMembership = async (userId: string) => {
+        const live = await prismaModule.prisma.subscription.findFirst({
+          where: {
+            userId,
+            status: SUBSCRIPTION_STATUS.ACTIVE,
+            endDate: { gte: new Date() },
+          },
+          select: { id: true },
+        });
+        return Boolean(live);
+      };
+
+      // a removal that finishes after the lock is gone must not leave a paid member out
+      const restoreDiscordIfLive = async (userId: string) => {
+        if (!(await hasLiveMembership(userId))) return;
+        const discordAccount = await discordService.getDiscordAccountForUser(userId);
+        if (!discordAccount?.providerAccountId || !discordAccount.access_token) return;
+        await discordService.addMemberToProGuild(
+          discordAccount.providerAccountId,
+          discordAccount.access_token,
+        );
+      };
+
       const automationEnabled = discordService.isAutomationEnabled();
       const discordCandidates = expiredSubscriptions.filter((subscription) => {
         const discordUserId = (subscription.user as { discordUserId?: string | null })
@@ -448,44 +471,49 @@ app.post(
           continue;
         }
 
+        // the discord call stays outside the membership lock. a transaction timeout
+        // releases that lock while the HTTP request can still complete and remove
+        // someone who renewed. recovery runs only after that request settles.
+        let removal: Promise<void> | null = null;
+        let restoredAfterRemoval = false;
         try {
-          // includes the row being expired, so a renewal of that row is visible.
-          // the lock is held through removal so fulfillment cannot commit in between.
-          const outcome = await prismaModule.prisma.$transaction(
-            async (tx) => {
-              await lockUserMembership(tx, subscription.userId);
-              const liveMembership = await tx.subscription.findFirst({
-                where: {
-                  userId: subscription.userId,
-                  status: SUBSCRIPTION_STATUS.ACTIVE,
-                  endDate: { gte: new Date() },
-                },
-                select: { id: true },
-              });
-              if (liveMembership) return "kept";
+          const shouldRemove = await prismaModule.prisma.$transaction(async (tx) => {
+            await lockUserMembership(tx, subscription.userId);
+            return !(await hasLiveMembership(subscription.userId));
+          });
 
-              await discordService.removeMemberFromProGuild(discordUserId);
-              const updated = await tx.subscription.updateMany({
-                where: {
-                  id: subscription.id,
-                  status: SUBSCRIPTION_STATUS.ACTIVE,
-                  endDate: { lt: cutoff },
-                },
-                data: { status: SUBSCRIPTION_STATUS.EXPIRED },
-              });
-              return updated.count === 1 ? "removed" : "removed-unchanged";
-            },
-            { timeout: 20000 },
-          );
-
-          if (outcome === "removed" || outcome === "removed-unchanged") {
-            removedFromDiscordCount += 1;
+          if (!shouldRemove) {
+            if (await expireIfStillDue(subscription.id)) expiredCount += 1;
+            continue;
           }
-          if (outcome === "removed") expiredCount += 1;
-          if (outcome === "kept" && (await expireIfStillDue(subscription.id))) {
+
+          removal = discordService.removeMemberFromProGuild(discordUserId);
+          try {
+            await removal;
+            removedFromDiscordCount += 1;
+          } finally {
+            await restoreDiscordIfLive(subscription.userId);
+            restoredAfterRemoval = true;
+          }
+
+          if (
+            !(await hasLiveMembership(subscription.userId)) &&
+            (await expireIfStillDue(subscription.id))
+          ) {
             expiredCount += 1;
           }
         } catch (error) {
+          if (removal && !restoredAfterRemoval) {
+            await removal.catch(() => undefined);
+            try {
+              await restoreDiscordIfLive(subscription.userId);
+            } catch (restoreError) {
+              console.error(
+                `Failed to restore Discord user ${discordUserId} after removal:`,
+                restoreError,
+              );
+            }
+          }
           failedDiscordRemovals += 1;
           console.error(
             `Failed to remove Discord user ${discordUserId} for subscription ${subscription.id}:`,
