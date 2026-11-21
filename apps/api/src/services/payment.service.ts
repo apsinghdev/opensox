@@ -14,6 +14,7 @@ import {
   subscriptionIdsToComplete,
   type MembershipAction,
 } from "../lib/membership-term.js";
+import { lockUserMembership } from "../lib/user-membership-lock.js";
 import {
   checkoutAmountForMember,
   memberDiscountReason,
@@ -625,11 +626,7 @@ export const paymentService = {
       const fulfillOnce = () =>
         prisma.$transaction(
           async (tx) => {
-            // the lock function returns void, which prisma cannot decode
-            await tx.$queryRaw`
-              SELECT 1 AS locked
-              FROM (SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))) AS acquired
-            `;
+            await lockUserMembership(tx, userId);
 
             const existingSubscription = await tx.subscription.findFirst({
               where: {

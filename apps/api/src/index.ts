@@ -18,6 +18,7 @@ import {
 import { userService } from "./services/user.service.js";
 import { verifyToken } from "./utils/auth.js";
 import { SUBSCRIPTION_STATUS } from "./constants/subscription.js";
+import { lockUserMembership } from "./lib/user-membership-lock.js";
 import { discordService } from "./services/discord.service.js";
 import {
   createDiscordOAuthState,
@@ -424,18 +425,17 @@ app.post(
         if (await expireIfStillDue(subscription.id)) expiredCount += 1;
       }
 
-      const usersWithAnotherLiveSub = new Set<string>();
+      const usersWithLiveSub = new Set<string>();
       if (discordCandidates.length > 0) {
         const liveRows = await prismaModule.prisma.subscription.findMany({
           where: {
             userId: { in: [...new Set(discordCandidates.map((row) => row.userId))] },
-            id: { notIn: discordCandidates.map((row) => row.id) },
             status: SUBSCRIPTION_STATUS.ACTIVE,
             endDate: { gte: cutoff },
           },
           select: { userId: true },
         });
-        for (const row of liveRows) usersWithAnotherLiveSub.add(row.userId);
+        for (const row of liveRows) usersWithLiveSub.add(row.userId);
       }
 
       for (const subscription of discordCandidates) {
@@ -443,30 +443,48 @@ app.post(
           .discordUserId;
         if (!discordUserId) continue;
 
-        if (usersWithAnotherLiveSub.has(subscription.userId)) {
-          if (await expireIfStillDue(subscription.id)) expiredCount += 1;
-          continue;
-        }
-
-        // the batch only skips removal. discord is removed only after a fresh read.
-        const stillLive = await prismaModule.prisma.subscription.findFirst({
-          where: {
-            userId: subscription.userId,
-            id: { not: subscription.id },
-            status: SUBSCRIPTION_STATUS.ACTIVE,
-            endDate: { gte: new Date() },
-          },
-          select: { id: true },
-        });
-        if (stillLive) {
+        if (usersWithLiveSub.has(subscription.userId)) {
           if (await expireIfStillDue(subscription.id)) expiredCount += 1;
           continue;
         }
 
         try {
-          await discordService.removeMemberFromProGuild(discordUserId);
-          removedFromDiscordCount += 1;
-          if (await expireIfStillDue(subscription.id)) expiredCount += 1;
+          // includes the row being expired, so a renewal of that row is visible.
+          // the lock is held through removal so fulfillment cannot commit in between.
+          const outcome = await prismaModule.prisma.$transaction(
+            async (tx) => {
+              await lockUserMembership(tx, subscription.userId);
+              const liveMembership = await tx.subscription.findFirst({
+                where: {
+                  userId: subscription.userId,
+                  status: SUBSCRIPTION_STATUS.ACTIVE,
+                  endDate: { gte: new Date() },
+                },
+                select: { id: true },
+              });
+              if (liveMembership) return "kept";
+
+              await discordService.removeMemberFromProGuild(discordUserId);
+              const updated = await tx.subscription.updateMany({
+                where: {
+                  id: subscription.id,
+                  status: SUBSCRIPTION_STATUS.ACTIVE,
+                  endDate: { lt: cutoff },
+                },
+                data: { status: SUBSCRIPTION_STATUS.EXPIRED },
+              });
+              return updated.count === 1 ? "removed" : "removed-unchanged";
+            },
+            { timeout: 20000 },
+          );
+
+          if (outcome === "removed" || outcome === "removed-unchanged") {
+            removedFromDiscordCount += 1;
+          }
+          if (outcome === "removed") expiredCount += 1;
+          if (outcome === "kept" && (await expireIfStillDue(subscription.id))) {
+            expiredCount += 1;
+          }
         } catch (error) {
           failedDiscordRemovals += 1;
           console.error(
