@@ -21,8 +21,8 @@ export function useReturningMemberOffer(planId?: string): boolean {
   );
 
   return (
-    data?.discountReason === "returning" ||
-    (data?.discountReason == null && data?.discounted === true)
+    data?.discounted === true &&
+    (data.discountReason === "returning" || data.discountReason == null)
   );
 }
 

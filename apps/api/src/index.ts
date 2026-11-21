@@ -404,7 +404,24 @@ app.post(
           | null
           | undefined;
 
-        if (!discordService.isAutomationEnabled() || !discordUserId) {
+        const anotherLiveSubscription =
+          await prismaModule.prisma.subscription.findFirst({
+            where: {
+              userId: subscription.userId,
+              id: { not: subscription.id },
+              status: SUBSCRIPTION_STATUS.ACTIVE,
+              endDate: { gte: new Date() },
+            },
+            select: { id: true },
+          });
+
+        // a higher tier that ends first stays active until its own endDate.
+        // expiring that row must not remove discord while a longer term remains.
+        if (
+          !discordService.isAutomationEnabled() ||
+          !discordUserId ||
+          anotherLiveSubscription
+        ) {
           await prismaModule.prisma.subscription.update({
             where: { id: subscription.id },
             data: { status: SUBSCRIPTION_STATUS.EXPIRED },

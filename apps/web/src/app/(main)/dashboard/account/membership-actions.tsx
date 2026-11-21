@@ -41,7 +41,7 @@ function offerDetail(
   if (action === "upgrade") {
     return `Adds 4 years to your current duration, plus extra Pro+ features. New expiry will be ${nextEndLabel}.`;
   }
-  return `Adds ${term} after your current duration. New expiry will be ${nextEndLabel}.`;
+  return `Adds ${term} to your current duration. New expiry will be ${nextEndLabel}.`;
 }
 
 function MembershipOffer({

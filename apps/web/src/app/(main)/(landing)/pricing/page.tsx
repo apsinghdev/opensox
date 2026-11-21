@@ -430,8 +430,8 @@ const PlanColumnHeader = ({
   );
   const quoteSettled = !quoteEnabled || quote !== undefined || quoteError;
   const returningDiscount =
-    quote?.discountReason === "returning" ||
-    (quote?.discountReason == null && quote?.discounted === true);
+    quote?.discounted === true &&
+    (quote.discountReason === "returning" || quote.discountReason == null);
   const activeMember = quote?.discountReason === "active";
 
   const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(

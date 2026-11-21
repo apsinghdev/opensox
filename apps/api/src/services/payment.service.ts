@@ -11,6 +11,7 @@ import { emailService } from "./email.service.js";
 import {
   addCalendarMonths,
   membershipChangeForPurchase,
+  subscriptionIdsToComplete,
   type MembershipAction,
 } from "../lib/membership-term.js";
 import {
@@ -64,6 +65,39 @@ function resolvePlanDurationMonths(plan: {
       return 12;
     default:
       return 12;
+  }
+}
+
+/** Thrown when another delivery already claimed this payment. The transaction rolls back. */
+class PaymentAlreadyLinkedError extends Error {
+  constructor() {
+    super("payment already linked to a subscription");
+    this.name = "PaymentAlreadyLinkedError";
+  }
+}
+
+type PaymentClaimClient = {
+  payment: {
+    updateMany: (args: {
+      where: { id: string; subscriptionId: null };
+      data: { subscriptionId: string };
+    }) => Promise<{ count: number }>;
+  };
+};
+
+// one payment may fund only one subscription. a plain update would let two
+// deliveries both create a row and then overwrite the link.
+async function claimPaymentLink(
+  tx: PaymentClaimClient,
+  paymentId: string,
+  subscriptionId: string,
+) {
+  const claimed = await tx.payment.updateMany({
+    where: { id: paymentId, subscriptionId: null },
+    data: { subscriptionId },
+  });
+  if (claimed.count !== 1) {
+    throw new PaymentAlreadyLinkedError();
   }
 }
 
@@ -584,115 +618,135 @@ export const paymentService = {
 
       // Prefer the plan's durationMonths; fall back to the interval string so
       // older plans without a duration still resolve to a sensible length.
-      const startDate = new Date();
       const durationMonths = resolvePlanDurationMonths(plan);
-      const freshEndDate = addCalendarMonths(startDate, durationMonths);
 
-      // Creating or extending the subscription and linking the payment must
-      // commit together. The retry lookup finds a subscription through that
-      // link, so a webhook redelivery must not extend the term a second time.
-      const { subscription, wasCreated } = await prisma.$transaction(
-        async (tx) => {
-          const existingSubscription = await tx.subscription.findFirst({
-            where: {
-              userId,
-              payments: {
-                some: {
-                  id: paymentId,
+      // The lock, the payment-link lookup, and the expiry math run again
+      // together when another delivery claims this payment first.
+      const fulfillOnce = () =>
+        prisma.$transaction(
+          async (tx) => {
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`;
+
+            const existingSubscription = await tx.subscription.findFirst({
+              where: {
+                userId,
+                payments: {
+                  some: {
+                    id: paymentId,
+                  },
                 },
               },
-            },
-          });
+            });
 
-          if (existingSubscription) {
-            return {
-              subscription: existingSubscription,
-              wasCreated: false,
-            };
-          }
+            if (existingSubscription) {
+              return {
+                subscription: existingSubscription,
+                wasCreated: false,
+              };
+            }
 
-          const liveSubscriptions = await tx.subscription.findMany({
-            where: {
-              userId,
-              status: SUBSCRIPTION_STATUS.ACTIVE,
-              endDate: { gte: startDate },
-            },
-            include: { plan: true },
-            orderBy: { endDate: "desc" },
-          });
-
-          const primary = liveSubscriptions[0];
-
-          if (!primary) {
-            const created = await tx.subscription.create({
-              data: {
+            const startDate = new Date();
+            const freshEndDate = addCalendarMonths(startDate, durationMonths);
+            const liveSubscriptions = await tx.subscription.findMany({
+              where: {
                 userId,
-                planId,
                 status: SUBSCRIPTION_STATUS.ACTIVE,
-                startDate,
-                endDate: freshEndDate,
-                autoRenew: true,
+                endDate: { gte: startDate },
+              },
+              include: { plan: true },
+            });
+            const primary = [...liveSubscriptions].sort((a, b) => {
+              const aEnd = a.endDate?.getTime() ?? Number.NEGATIVE_INFINITY;
+              const bEnd = b.endDate?.getTime() ?? Number.NEGATIVE_INFINITY;
+              return bEnd - aEnd;
+            })[0];
+
+            if (!primary) {
+              const created = await tx.subscription.create({
+                data: {
+                  userId,
+                  planId,
+                  status: SUBSCRIPTION_STATUS.ACTIVE,
+                  startDate,
+                  endDate: freshEndDate,
+                  autoRenew: true,
+                },
+              });
+
+              await claimPaymentLink(tx, paymentId, created.id);
+
+              return {
+                subscription: created,
+                wasCreated: true,
+              };
+            }
+
+            const change = membershipChangeForPurchase({
+              now: startDate,
+              currentEnd: primary.endDate,
+              currentDurationMonths: resolvePlanDurationMonths(primary.plan),
+              purchasedDurationMonths: durationMonths,
+            });
+
+            // a captured payment for a shorter plan still buys time. checkout
+            // refuses that order, so this only covers a payment already taken.
+            const keepLongerPlan = change.action !== "upgrade";
+            const endDate =
+              change.action === "blocked"
+                ? addCalendarMonths(primary.endDate ?? startDate, durationMonths)
+                : change.action === "join"
+                  ? freshEndDate
+                  : change.endDate;
+
+            const updated = await tx.subscription.update({
+              where: { id: primary.id },
+              data: {
+                planId: keepLongerPlan ? primary.planId : planId,
+                endDate,
+                status: SUBSCRIPTION_STATUS.ACTIVE,
               },
             });
 
-            await tx.payment.update({
-              where: { id: paymentId },
-              data: { subscriptionId: created.id },
-            });
+            const extraIds = subscriptionIdsToComplete(
+              liveSubscriptions.map((row) => ({
+                id: row.id,
+                endDate: row.endDate,
+                durationMonths: resolvePlanDurationMonths(row.plan),
+              })),
+            );
+            if (extraIds.length > 0) {
+              await tx.subscription.updateMany({
+                where: { id: { in: extraIds } },
+                data: { status: SUBSCRIPTION_STATUS.COMPLETED },
+              });
+            }
+
+            await claimPaymentLink(tx, paymentId, updated.id);
 
             return {
-              subscription: created,
-              wasCreated: true,
+              subscription: updated,
+              wasCreated: false,
             };
+          },
+          { timeout: 15000 },
+        );
+
+      let subscriptionResult: Awaited<ReturnType<typeof fulfillOnce>> | undefined;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          subscriptionResult = await fulfillOnce();
+          break;
+        } catch (error) {
+          if (error instanceof PaymentAlreadyLinkedError && attempt < 3) {
+            continue;
           }
-
-          const change = membershipChangeForPurchase({
-            now: startDate,
-            currentEnd: primary.endDate,
-            currentDurationMonths: resolvePlanDurationMonths(primary.plan),
-            purchasedDurationMonths: durationMonths,
-          });
-
-          // a captured payment for a shorter plan still buys time. checkout
-          // refuses that order, so this only covers a payment already taken.
-          const keepLongerPlan = change.action !== "upgrade";
-          const endDate =
-            change.action === "blocked"
-              ? addCalendarMonths(primary.endDate ?? startDate, durationMonths)
-              : change.action === "join"
-                ? freshEndDate
-                : change.endDate;
-
-          const updated = await tx.subscription.update({
-            where: { id: primary.id },
-            data: {
-              planId: keepLongerPlan ? primary.planId : planId,
-              endDate,
-              status: SUBSCRIPTION_STATUS.ACTIVE,
-            },
-          });
-
-          // one live row, so an older term expiring later cannot remove them
-          // from the pro discord while this membership is still active
-          const extraIds = liveSubscriptions.slice(1).map((row) => row.id);
-          if (extraIds.length > 0) {
-            await tx.subscription.updateMany({
-              where: { id: { in: extraIds } },
-              data: { status: SUBSCRIPTION_STATUS.COMPLETED },
-            });
-          }
-
-          await tx.payment.update({
-            where: { id: paymentId },
-            data: { subscriptionId: updated.id },
-          });
-
-          return {
-            subscription: updated,
-            wasCreated: false,
-          };
+          throw error;
         }
-      );
+      }
+      if (!subscriptionResult) {
+        throw new Error("Failed to create subscription");
+      }
+      const { subscription, wasCreated } = subscriptionResult;
 
       if (discordService.isAutomationEnabled()) {
         try {

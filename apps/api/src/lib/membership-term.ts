@@ -60,3 +60,37 @@ export function membershipChangeForPurchase(input: {
     endDate: addCalendarMonths(currentEnd, purchasedDurationMonths),
   };
 }
+
+export type ConsolidatableSubscription = {
+  id: string;
+  endDate: Date | null;
+  durationMonths: number;
+};
+
+/**
+ * A purchase is applied to the live row that ends latest.
+ * Same-or-lower tiers that end sooner are completed, so that earlier expiry
+ * cannot remove Discord while the longer row is still active.
+ * A higher tier that ends sooner stays live through its own endDate.
+ * Completing it now would drop benefits that were paid for until then.
+ * The expire job must leave Discord in place when another live row remains.
+ */
+export function subscriptionIdsToComplete(
+  rows: ConsolidatableSubscription[],
+): string[] {
+  if (rows.length <= 1) return [];
+
+  const surviving = rows.reduce((latest, row) => {
+    const latestEnd = latest.endDate?.getTime() ?? Number.NEGATIVE_INFINITY;
+    const rowEnd = row.endDate?.getTime() ?? Number.NEGATIVE_INFINITY;
+    return rowEnd > latestEnd ? row : latest;
+  });
+
+  return rows
+    .filter(
+      (row) =>
+        row.id !== surviving.id &&
+        row.durationMonths <= surviving.durationMonths,
+    )
+    .map((row) => row.id);
+}
