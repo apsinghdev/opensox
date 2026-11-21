@@ -5,14 +5,17 @@ const OFFER_PILL_CLASS =
   "inline-flex items-center rounded-md border border-info-border bg-info-bg px-1.5 py-0.5 text-[10px] font-semibold leading-none text-info-text";
 
 export function useReturningMemberOffer(planId?: string): boolean {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+  const signedIn = status === "authenticated";
+  const accountKey = signedIn ? (session?.user?.email ?? "") : "";
   const enabled =
-    status === "authenticated" &&
+    signedIn &&
+    accountKey.length > 0 &&
     typeof planId === "string" &&
     planId.length > 0;
 
   const { data } = trpc.payment.checkoutQuote.useQuery(
-    { planId: planId ?? "" },
+    { planId: planId ?? "", accountKey },
     {
       enabled,
       staleTime: 5 * 60 * 1000,
@@ -20,7 +23,11 @@ export function useReturningMemberOffer(planId?: string): boolean {
     },
   );
 
-  return data?.discounted === true;
+  return (
+    signedIn &&
+    data?.discounted === true &&
+    (data.discountReason === "returning" || data.discountReason == null)
+  );
 }
 
 export function ReturningMemberOffer() {

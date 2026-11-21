@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { memo, useMemo } from "react";
 import { ActiveTag } from "@/components/ui/ActiveTag";
 import { formatSubscriptionPlanLabel } from "@/lib/format-subscription-plan-label";
+import { MembershipActions } from "./membership-actions";
 
 const AccountPageContent = memo(function AccountPageContent({
   isPaidUser,
@@ -81,6 +82,9 @@ const AccountPageContent = memo(function AccountPageContent({
                 </label>
                 <p className="text-text-primary text-sm font-medium">{expiresOn}</p>
               </div>
+              {subscription ? (
+                <MembershipActions subscription={subscription} />
+              ) : null}
             </>
           )}
           {!isPaidUser && (

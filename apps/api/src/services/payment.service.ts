@@ -9,8 +9,16 @@ import {
 import { discordService } from "./discord.service.js";
 import { emailService } from "./email.service.js";
 import {
+  addCalendarMonths,
+  membershipChangeForPurchase,
+  subscriptionIdsToComplete,
+  type MembershipAction,
+} from "../lib/membership-term.js";
+import {
   checkoutAmountForMember,
+  memberDiscountReason,
   returningMemberFilters,
+  type MemberDiscountReason,
 } from "../lib/returning-member-price.js";
 
 const { prisma } = prismaModule;
@@ -57,6 +65,39 @@ function resolvePlanDurationMonths(plan: {
       return 12;
     default:
       return 12;
+  }
+}
+
+/** Thrown when another delivery already claimed this payment. The transaction rolls back. */
+class PaymentAlreadyLinkedError extends Error {
+  constructor() {
+    super("payment already linked to a subscription");
+    this.name = "PaymentAlreadyLinkedError";
+  }
+}
+
+type PaymentClaimClient = {
+  payment: {
+    updateMany: (args: {
+      where: { id: string; subscriptionId: null };
+      data: { subscriptionId: string };
+    }) => Promise<{ count: number }>;
+  };
+};
+
+// one payment may fund only one subscription. a plain update would let two
+// deliveries both create a row and then overwrite the link.
+async function claimPaymentLink(
+  tx: PaymentClaimClient,
+  paymentId: string,
+  subscriptionId: string,
+) {
+  const claimed = await tx.payment.updateMany({
+    where: { id: paymentId, subscriptionId: null },
+    data: { subscriptionId },
+  });
+  if (claimed.count !== 1) {
+    throw new PaymentAlreadyLinkedError();
   }
 }
 
@@ -125,6 +166,12 @@ export interface CheckoutQuote {
   currency: string;
   discounted: boolean;
   listPrice: number;
+  discountReason: MemberDiscountReason;
+  action: MembershipAction;
+  /** false when the plan is shorter than the live membership */
+  available: boolean;
+  /** resulting expiry when the purchase is allowed */
+  nextEndDate: string | null;
 }
 
 export class CheckoutVerificationError extends Error {
@@ -204,29 +251,68 @@ export const paymentService = {
   },
 
   /**
-   * No current access, and a previous subscription that has ended.
+   * Live membership qualifies for the extend/upgrade price. A lapsed one
+   * qualifies for the rejoin price. Never subscribed is full price.
    */
-  async isReturningMember(userId: string): Promise<boolean> {
+  async resolveMemberDiscount(userId: string): Promise<{
+    reason: MemberDiscountReason;
+    live: {
+      endDate: Date | null;
+      plan: { durationMonths?: number | null; interval?: string | null };
+    } | null;
+  }> {
     const { active, prior } = returningMemberFilters(userId);
     const [live, previous] = await Promise.all([
-      prisma.subscription.findFirst({ where: active, select: { id: true } }),
+      prisma.subscription.findFirst({
+        where: active,
+        include: { plan: true },
+        orderBy: { endDate: "desc" },
+      }),
       prisma.subscription.findFirst({ where: prior, select: { id: true } }),
     ]);
 
-    return !live && !!previous;
+    return {
+      reason: memberDiscountReason(Boolean(live), Boolean(previous)),
+      live: live
+        ? { endDate: live.endDate, plan: live.plan }
+        : null,
+    };
   },
 
   async quotePlanForUser(
     userId: string,
-    plan: { price: number; currency: string }
+    plan: {
+      price: number;
+      currency: string;
+      durationMonths?: number | null;
+      interval?: string | null;
+    }
   ): Promise<CheckoutQuote> {
-    const returning = await this.isReturningMember(userId);
-    const quote = checkoutAmountForMember(plan.price, plan.currency, returning);
+    const pricing = await this.resolveMemberDiscount(userId);
+    const quote = checkoutAmountForMember(
+      plan.price,
+      plan.currency,
+      pricing.reason !== "none"
+    );
+    const change = membershipChangeForPurchase({
+      now: new Date(),
+      currentEnd: pricing.live?.endDate ?? null,
+      currentDurationMonths: pricing.live
+        ? resolvePlanDurationMonths(pricing.live.plan)
+        : null,
+      purchasedDurationMonths: resolvePlanDurationMonths(plan),
+    });
+    const available = change.action !== "blocked";
+
     return {
       amount: quote.amount,
       currency: plan.currency,
       discounted: quote.discounted,
       listPrice: plan.price,
+      discountReason: pricing.reason,
+      action: change.action,
+      available,
+      nextEndDate: available ? change.endDate.toISOString() : null,
     };
   },
 
@@ -530,70 +616,141 @@ export const paymentService = {
         throw new Error("Plan not found");
       }
 
-      // Calculate end date from the plan's duration. Prefer the explicit
-      // durationMonths field; fall back to interpreting the interval string so
+      // Prefer the plan's durationMonths; fall back to the interval string so
       // older plans without a duration still resolve to a sensible length.
-      const startDate = new Date();
-      const endDate = new Date(startDate);
-
       const durationMonths = resolvePlanDurationMonths(plan);
-      // Add months with year wraparound, clamping to the last valid day of the
-      // target month so month-end start dates (e.g. Jan 31, or Feb 29 on a leap
-      // year) don't overflow into the following month.
-      const monthsFromYearStart = endDate.getMonth() + durationMonths;
-      const targetYear =
-        endDate.getFullYear() + Math.floor(monthsFromYearStart / 12);
-      const targetMonth = ((monthsFromYearStart % 12) + 12) % 12;
-      endDate.setFullYear(targetYear, targetMonth, endDate.getDate());
-      if (endDate.getMonth() !== targetMonth) {
-        endDate.setDate(0);
-      }
 
-      // Creating the subscription and linking the payment must commit together.
-      // The retry lookup finds a subscription through that link, so a failed
-      // link followed by a webhook redelivery would otherwise open a second one.
-      const { subscription, wasCreated } = await prisma.$transaction(
-        async (tx) => {
-          const existingSubscription = await tx.subscription.findFirst({
-            where: {
-              userId,
-              payments: {
-                some: {
-                  id: paymentId,
+      // The lock, the payment-link lookup, and the expiry math run again
+      // together when another delivery claims this payment first.
+      const fulfillOnce = () =>
+        prisma.$transaction(
+          async (tx) => {
+            // the lock function returns void, which prisma cannot decode
+            await tx.$queryRaw`
+              SELECT 1 AS locked
+              FROM (SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))) AS acquired
+            `;
+
+            const existingSubscription = await tx.subscription.findFirst({
+              where: {
+                userId,
+                payments: {
+                  some: {
+                    id: paymentId,
+                  },
                 },
               },
-            },
-          });
+            });
 
-          if (existingSubscription) {
+            if (existingSubscription) {
+              return {
+                subscription: existingSubscription,
+                wasCreated: false,
+              };
+            }
+
+            const startDate = new Date();
+            const freshEndDate = addCalendarMonths(startDate, durationMonths);
+            const liveSubscriptions = await tx.subscription.findMany({
+              where: {
+                userId,
+                status: SUBSCRIPTION_STATUS.ACTIVE,
+                endDate: { gte: startDate },
+              },
+              include: { plan: true },
+            });
+            const primary = [...liveSubscriptions].sort((a, b) => {
+              const aEnd = a.endDate?.getTime() ?? Number.NEGATIVE_INFINITY;
+              const bEnd = b.endDate?.getTime() ?? Number.NEGATIVE_INFINITY;
+              return bEnd - aEnd;
+            })[0];
+
+            if (!primary) {
+              const created = await tx.subscription.create({
+                data: {
+                  userId,
+                  planId,
+                  status: SUBSCRIPTION_STATUS.ACTIVE,
+                  startDate,
+                  endDate: freshEndDate,
+                  autoRenew: true,
+                },
+              });
+
+              await claimPaymentLink(tx, paymentId, created.id);
+
+              return {
+                subscription: created,
+                wasCreated: true,
+              };
+            }
+
+            const change = membershipChangeForPurchase({
+              now: startDate,
+              currentEnd: primary.endDate,
+              currentDurationMonths: resolvePlanDurationMonths(primary.plan),
+              purchasedDurationMonths: durationMonths,
+            });
+
+            // a captured payment for a shorter plan still buys time. checkout
+            // refuses that order, so this only covers a payment already taken.
+            const keepLongerPlan = change.action !== "upgrade";
+            const endDate =
+              change.action === "blocked"
+                ? addCalendarMonths(primary.endDate ?? startDate, durationMonths)
+                : change.action === "join"
+                  ? freshEndDate
+                  : change.endDate;
+
+            const updated = await tx.subscription.update({
+              where: { id: primary.id },
+              data: {
+                planId: keepLongerPlan ? primary.planId : planId,
+                endDate,
+                status: SUBSCRIPTION_STATUS.ACTIVE,
+              },
+            });
+
+            const extraIds = subscriptionIdsToComplete(
+              liveSubscriptions.map((row) => ({
+                id: row.id,
+                endDate: row.endDate,
+                durationMonths: resolvePlanDurationMonths(row.plan),
+              })),
+            );
+            if (extraIds.length > 0) {
+              await tx.subscription.updateMany({
+                where: { id: { in: extraIds } },
+                data: { status: SUBSCRIPTION_STATUS.COMPLETED },
+              });
+            }
+
+            await claimPaymentLink(tx, paymentId, updated.id);
+
             return {
-              subscription: existingSubscription,
+              subscription: updated,
               wasCreated: false,
             };
+          },
+          { timeout: 15000 },
+        );
+
+      let subscriptionResult: Awaited<ReturnType<typeof fulfillOnce>> | undefined;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          subscriptionResult = await fulfillOnce();
+          break;
+        } catch (error) {
+          if (error instanceof PaymentAlreadyLinkedError && attempt < 3) {
+            continue;
           }
-
-          const created = await tx.subscription.create({
-            data: {
-              userId,
-              planId,
-              status: SUBSCRIPTION_STATUS.ACTIVE,
-              startDate,
-              endDate,
-              autoRenew: true,
-            },
-          });
-
-          await tx.payment.update({
-            where: { id: paymentId },
-            data: { subscriptionId: created.id },
-          });
-
-          return {
-            subscription: created,
-            wasCreated: true,
-          };
+          throw error;
         }
-      );
+      }
+      if (!subscriptionResult) {
+        throw new Error("Failed to create subscription");
+      }
+      const { subscription, wasCreated } = subscriptionResult;
 
       if (discordService.isAutomationEnabled()) {
         try {
@@ -627,14 +784,14 @@ export const paymentService = {
   }> {
     const { userId, planId, paymentData, sendConfirmationEmail = true } = input;
 
-    const { payment, wasCreated: paymentWasCreated } =
-      await this.createPaymentRecord(userId, paymentData);
+    const { payment } = await this.createPaymentRecord(userId, paymentData);
     const { subscription, wasCreated: subscriptionWasCreated } =
       await this.createSubscription(userId, planId, payment.id);
 
     let emailSent = false;
 
-    if (sendConfirmationEmail && (paymentWasCreated || subscriptionWasCreated)) {
+    // the onboarding email asks them to book a first call, so only a new membership sends it
+    if (sendConfirmationEmail && subscriptionWasCreated) {
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },

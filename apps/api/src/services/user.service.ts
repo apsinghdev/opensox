@@ -21,7 +21,7 @@ export const userService = {
     prisma: ExtendedPrismaClient | PrismaClient,
     userId: string
   ) {
-    const subscription = await prisma.subscription.findFirst({
+    const subscriptions = await prisma.subscription.findMany({
       where: {
         userId,
         status: SUBSCRIPTION_STATUS.ACTIVE,
@@ -32,10 +32,17 @@ export const userService = {
       include: {
         plan: true,
       },
-      orderBy: {
-        startDate: "desc",
-      },
     });
+
+    // the highest tier still inside its paid window wins, even when a lower
+    // tier ends later. one row is unchanged by the sort.
+    const subscription =
+      [...subscriptions].sort((a, b) => {
+        const tierDelta =
+          (b.plan?.durationMonths ?? 0) - (a.plan?.durationMonths ?? 0);
+        if (tierDelta !== 0) return tierDelta;
+        return (b.endDate?.getTime() ?? 0) - (a.endDate?.getTime() ?? 0);
+      })[0] ?? null;
 
     return {
       isPaidUser: !!subscription,
