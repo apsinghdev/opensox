@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { redirect } from "next/navigation";
 import CheckoutConfirmation from "./checkout-confirmation";
 
-export default function CheckoutWrapper() {
+export default function CheckoutWrapper({
+  confirmation,
+}: {
+  confirmation?: ReactNode;
+}) {
   const { isPaidUser, isLoading, isFetching, refetch } = useSubscription();
   const [retryCount, setRetryCount] = useState(0);
 
@@ -34,5 +38,5 @@ export default function CheckoutWrapper() {
     redirect("/pricing");
   }
 
-  return <CheckoutConfirmation />;
+  return confirmation ?? <CheckoutConfirmation />;
 }

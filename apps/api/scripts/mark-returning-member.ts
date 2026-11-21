@@ -13,14 +13,16 @@
  * they have never subscribed). Log in as that user and open /pricing: Pro and
  * Pro+ show "10% off" and the button says Rejoin.
  *
- * --active turns their latest subscription back on for one year, which hides
- * the discounted price again.
+ * --active turns their latest subscription back on for one year. The rejoin
+ * price on /pricing goes away. Extend and upgrade on /dashboard/account
+ * still include the 10% member discount.
  */
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import { SUBSCRIPTION_STATUS } from "../src/constants/subscription.js";
 import {
   checkoutAmountForMember,
+  memberDiscountReason,
   returningMemberFilters,
 } from "../src/lib/returning-member-price.js";
 
@@ -49,15 +51,20 @@ async function isReturning(userId: string): Promise<boolean> {
 
 async function printQuotes(userId: string): Promise<void> {
   const plans = await prisma.plan.findMany({ orderBy: { price: "asc" } });
-  const returning = await isReturning(userId);
+  const { active, prior } = returningMemberFilters(userId);
+  const [live, previous] = await Promise.all([
+    prisma.subscription.findFirst({ where: active, select: { id: true } }),
+    prisma.subscription.findFirst({ where: prior, select: { id: true } }),
+  ]);
+  const reason = memberDiscountReason(Boolean(live), Boolean(previous));
 
-  console.log(`returning member: ${returning ? "yes" : "no"}`);
+  console.log(`member discount: ${reason}`);
 
   for (const plan of plans) {
     const charge = checkoutAmountForMember(
       plan.price,
       plan.currency,
-      returning
+      reason !== "none"
     );
     console.log(
       `${plan.name}: list ${plan.price} → charge ${charge.amount} ${plan.currency}`

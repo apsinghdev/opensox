@@ -20,7 +20,10 @@ export function useReturningMemberOffer(planId?: string): boolean {
     },
   );
 
-  return data?.discounted === true;
+  return (
+    data?.discountReason === "returning" ||
+    (data?.discountReason == null && data?.discounted === true)
+  );
 }
 
 export function ReturningMemberOffer() {

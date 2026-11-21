@@ -29,6 +29,7 @@ interface PaymentFlowProps {
   buttonText?: string;
   buttonClassName?: string;
   callbackUrl?: string;
+  successPath?: string;
   buttonLocation?: string; // Location for analytics tracking (e.g., "pricing_page", "pitch_page")
 }
 
@@ -58,6 +59,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
   buttonText = "Invest",
   buttonClassName,
   callbackUrl,
+  successPath = "/checkout",
   buttonLocation = "payment_flow", // Default location if not specified
 }) => {
   const { data: session, status: sessionStatus } = useSession();
@@ -111,6 +113,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
         (async () => {
           try {
             await (utils.user as any).subscriptionStatus.invalidate();
+            await utils.payment.checkoutQuote.invalidate();
             await Promise.race([
               (utils.user as any).subscriptionStatus.fetch(undefined),
               new Promise((resolve) => setTimeout(resolve, 3000)), // 3s timeout
@@ -125,7 +128,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
 
         // redirect immediately after successful verification
         // checkout page will refetch subscription status if cache refresh failed
-        router.push("/checkout");
+        router.push(successPath);
       } catch (error) {
         console.error("Verification failed:", error);
         // Track payment verification failure
@@ -272,10 +275,16 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
         return;
       }
 
-      // Track non-auth order creation failure
+      const isRejectedOrder =
+        error instanceof TRPCClientError && error.data?.code === "BAD_REQUEST";
+
       trackPaymentFailed(planId, "order_creation_failed", errorMessage);
       setIsProcessing(false);
-      alert("Unable to start payment right now. Please try again.");
+      alert(
+        isRejectedOrder && errorMessage
+          ? errorMessage
+          : "Unable to start payment right now. Please try again.",
+      );
     }
   };
 

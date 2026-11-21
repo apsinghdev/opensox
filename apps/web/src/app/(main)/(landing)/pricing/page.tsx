@@ -417,7 +417,10 @@ const PlanColumnHeader = ({
   const quoteEnabled =
     isPaid && planIdOk && sessionStatus === "authenticated";
 
-  const { data: quote } = trpc.payment.checkoutQuote.useQuery(
+  const {
+    data: quote,
+    isError: quoteError,
+  } = trpc.payment.checkoutQuote.useQuery(
     { planId: tier.planId as string },
     {
       enabled: quoteEnabled,
@@ -425,7 +428,11 @@ const PlanColumnHeader = ({
       retry: false,
     },
   );
-  const discounted = quote?.discounted === true;
+  const quoteSettled = !quoteEnabled || quote !== undefined || quoteError;
+  const returningDiscount =
+    quote?.discountReason === "returning" ||
+    (quote?.discountReason == null && quote?.discounted === true);
+  const activeMember = quote?.discountReason === "active";
 
   const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
     { planId: tier.planId as string },
@@ -440,7 +447,7 @@ const PlanColumnHeader = ({
       <div className="flex flex-col items-center">
         {eligible ? (
           <div className="flex h-5 w-full items-center justify-end">
-            {isPaid && discounted ? <ReturningMemberDiscountPill /> : null}
+            {isPaid && returningDiscount ? <ReturningMemberDiscountPill /> : null}
           </div>
         ) : null}
         <p
@@ -471,7 +478,7 @@ const PlanColumnHeader = ({
             </span>
           )}
           {isPaid && planIdOk && publicPlan ? (
-            discounted && quote ? (
+            returningDiscount && quote ? (
               <span className="flex flex-col items-center">
                 <span className="text-sm font-normal text-text-muted line-through">
                   {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
@@ -514,13 +521,26 @@ const PlanColumnHeader = ({
           >
             Start free
           </PrimaryButton>
+        ) : !quoteSettled ? (
+          <PrimaryButton
+            classname={`${PRICING_PLAN_BUTTON_CLASS} opacity-60 pointer-events-none`}
+          >
+            Loading...
+          </PrimaryButton>
+        ) : activeMember ? (
+          <PrimaryButton
+            classname={PRICING_PLAN_BUTTON_CLASS}
+            onClick={() => router.push("/dashboard/account")}
+          >
+            Manage plan
+          </PrimaryButton>
         ) : (
           <PaymentFlow
             planId={planIdOk ? (tier.planId as string) : ""}
             planName={`Opensox ${tier.name}`}
             description={tier.paymentDescription}
             buttonText={
-              planIdOk ? (discounted ? "Rejoin" : "Invest") : "Unavailable"
+              planIdOk ? (returningDiscount ? "Rejoin" : "Invest") : "Unavailable"
             }
             buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
             callbackUrl={callbackUrl}

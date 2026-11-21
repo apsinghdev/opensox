@@ -133,6 +133,14 @@ export const paymentRouter = router({
 
           const quote = await paymentService.quotePlanForUser(userId, plan);
 
+          if (!quote.available) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "Extend your current membership from your account. This plan is shorter than the one you already have.",
+            });
+          }
+
           const result = await paymentService.createOrder({
             amount: quote.amount,
             currency: plan.currency,
