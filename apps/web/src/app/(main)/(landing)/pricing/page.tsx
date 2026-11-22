@@ -535,7 +535,7 @@ const PlanColumnHeader = ({
             classname={PRICING_PLAN_BUTTON_CLASS}
             onClick={() => router.push("/dashboard/account")}
           >
-            Manage plan
+            Manage
           </PrimaryButton>
         ) : (
           <PaymentFlow
