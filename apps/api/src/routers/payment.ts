@@ -47,7 +47,14 @@ export const paymentRouter = router({
   }),
 
   checkoutQuote: protectedProcedure
-    .input(z.object({ planId: z.string().min(1, "Plan ID is required") }))
+    .input(
+      z.object({
+        planId: z.string().min(1, "Plan ID is required"),
+        // ignored by the server. the client puts it in the query key so one
+        // account's quote is not reused for another account.
+        accountKey: z.string().optional(),
+      }),
+    )
     .query(async ({ input, ctx }: { input: { planId: string }; ctx: any }) => {
       const userId = ctx.user?.id;
       if (!userId) {
@@ -132,6 +139,14 @@ export const paymentRouter = router({
           sanitizedNotes.plan_id = input.planId;
 
           const quote = await paymentService.quotePlanForUser(userId, plan);
+
+          if (!quote.available) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "Extend your current membership from your account. This plan is shorter than the one you already have.",
+            });
+          }
 
           const result = await paymentService.createOrder({
             amount: quote.amount,

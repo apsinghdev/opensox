@@ -2,6 +2,22 @@ import { SUBSCRIPTION_STATUS } from "../constants/subscription.js";
 
 export const RETURNING_MEMBER_DISCOUNT_PERCENT = 10;
 
+/** Why a checkout is or isn't at the member price. */
+export type MemberDiscountReason = "none" | "returning" | "active";
+
+/**
+ * Active members (extend or upgrade) and lapsed members (rejoin) both qualify.
+ * Someone who has never subscribed pays the list price.
+ */
+export function memberDiscountReason(
+  hasLiveSubscription: boolean,
+  hasPriorSubscription: boolean
+): MemberDiscountReason {
+  if (hasLiveSubscription) return "active";
+  if (hasPriorSubscription) return "returning";
+  return "none";
+}
+
 /** Razorpay rejects orders below these amounts, in minor units. */
 const RAZORPAY_MINIMUM_MINOR_UNITS: Record<string, number> = {
   INR: 100,
@@ -12,16 +28,16 @@ export function minimumCheckoutAmount(currency: string): number {
 }
 
 /**
- * Returning members pay 10% less, unless that would fall under the gateway
- * minimum. The ₹1 test plan is the case that hits the floor: 90 paise is
- * rejected, so the list price is charged instead.
+ * Member price is 10% off, unless that would fall under the gateway minimum.
+ * The ₹1 test plan is the case that hits the floor: 90 paise is rejected, so
+ * the list price is charged instead.
  */
 export function checkoutAmountForMember(
   listPrice: number,
   currency: string,
-  returning: boolean
+  memberDiscount: boolean
 ): { amount: number; discounted: boolean } {
-  if (!returning) {
+  if (!memberDiscount) {
     return { amount: listPrice, discounted: false };
   }
 

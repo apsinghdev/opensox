@@ -206,6 +206,62 @@ export const discordService = {
     });
   },
 
+  async getDiscordCredentialsForGuildJoin(userId: string) {
+    const account = await discordService.getDiscordAccountForUser(userId);
+    if (!account?.providerAccountId) return null;
+
+    let accessToken = account.access_token;
+    if (
+      account.expires_at !== null &&
+      account.expires_at <= Math.floor(Date.now() / 1000)
+    ) {
+      if (!account.refresh_token) {
+        throw new Error("Expired Discord credentials have no refresh token");
+      }
+
+      const response = await discordFetch(`${DISCORD_API_BASE}/oauth2/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: getRequiredEnv("DISCORD_CLIENT_ID"),
+          client_secret: getRequiredEnv("DISCORD_CLIENT_SECRET"),
+          grant_type: "refresh_token",
+          refresh_token: account.refresh_token,
+        }).toString(),
+      });
+      if (!response.ok) {
+        throw new Error(`Discord token refresh failed: ${response.status}`);
+      }
+
+      const token = (await response.json()) as DiscordTokenResponse;
+      if (
+        !token.access_token ||
+        !Number.isInteger(token.expires_in) ||
+        token.expires_in <= 0
+      ) {
+        throw new Error("Discord token refresh returned unusable credentials");
+      }
+
+      await prismaModule.prisma.account.update({
+        where: { id: account.id },
+        data: {
+          access_token: token.access_token,
+          expires_at: Math.floor(Date.now() / 1000) + token.expires_in,
+          token_type: token.token_type,
+          ...(token.refresh_token !== undefined && {
+            refresh_token: token.refresh_token,
+          }),
+          ...(token.scope !== undefined && { scope: token.scope }),
+        },
+      });
+      accessToken = token.access_token;
+    }
+
+    return accessToken
+      ? { discordUserId: account.providerAccountId, accessToken }
+      : null;
+  },
+
   async addMemberToProGuild(discordUserId: string, userAccessToken: string) {
     const botToken = getRequiredEnv("DISCORD_BOT_TOKEN");
     const guildId = getRequiredEnv("DISCORD_PRO_GUILD_ID");

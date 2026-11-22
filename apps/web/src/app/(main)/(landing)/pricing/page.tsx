@@ -411,21 +411,31 @@ const PlanColumnHeader = ({
   eligible: boolean;
 }) => {
   const router = useRouter();
-  const { status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const planIdOk = typeof tier.planId === "string" && tier.planId.length > 0;
   const isPaid = tier.key !== "free";
-  const quoteEnabled =
-    isPaid && planIdOk && sessionStatus === "authenticated";
+  const signedIn = sessionStatus === "authenticated";
+  const accountKey = signedIn ? (session?.user?.email ?? "") : "";
+  const quoteEnabled = isPaid && planIdOk && signedIn && accountKey.length > 0;
 
-  const { data: quote } = trpc.payment.checkoutQuote.useQuery(
-    { planId: tier.planId as string },
+  const {
+    data: quote,
+    isError: quoteError,
+  } = trpc.payment.checkoutQuote.useQuery(
+    { planId: tier.planId as string, accountKey },
     {
       enabled: quoteEnabled,
       staleTime: 5 * 60 * 1000,
       retry: false,
     },
   );
-  const discounted = quote?.discounted === true;
+  const quoteForSession = signedIn ? quote : undefined;
+  const quoteSettled = !quoteEnabled || quoteForSession !== undefined || quoteError;
+  const returningDiscount =
+    quoteForSession?.discounted === true &&
+    (quoteForSession.discountReason === "returning" ||
+      quoteForSession.discountReason == null);
+  const activeMember = signedIn && quoteForSession?.discountReason === "active";
 
   const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
     { planId: tier.planId as string },
@@ -440,7 +450,7 @@ const PlanColumnHeader = ({
       <div className="flex flex-col items-center">
         {eligible ? (
           <div className="flex h-5 w-full items-center justify-end">
-            {isPaid && discounted ? <ReturningMemberDiscountPill /> : null}
+            {isPaid && returningDiscount ? <ReturningMemberDiscountPill /> : null}
           </div>
         ) : null}
         <p
@@ -471,13 +481,13 @@ const PlanColumnHeader = ({
             </span>
           )}
           {isPaid && planIdOk && publicPlan ? (
-            discounted && quote ? (
+            returningDiscount && quoteForSession ? (
               <span className="flex flex-col items-center">
                 <span className="text-sm font-normal text-text-muted line-through">
                   {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
                 </span>
                 <span className="text-sm font-semibold text-text-primary">
-                  {formatApproxPlanPrice(quote.amount, quote.currency)}
+                  {formatApproxPlanPrice(quoteForSession.amount, quoteForSession.currency)}
                 </span>
               </span>
             ) : (
@@ -514,13 +524,26 @@ const PlanColumnHeader = ({
           >
             Start free
           </PrimaryButton>
+        ) : !quoteSettled ? (
+          <PrimaryButton
+            classname={`${PRICING_PLAN_BUTTON_CLASS} opacity-60 pointer-events-none`}
+          >
+            Loading...
+          </PrimaryButton>
+        ) : activeMember ? (
+          <PrimaryButton
+            classname={PRICING_PLAN_BUTTON_CLASS}
+            onClick={() => router.push("/dashboard/account")}
+          >
+            Manage plan
+          </PrimaryButton>
         ) : (
           <PaymentFlow
             planId={planIdOk ? (tier.planId as string) : ""}
             planName={`Opensox ${tier.name}`}
             description={tier.paymentDescription}
             buttonText={
-              planIdOk ? (discounted ? "Rejoin" : "Invest") : "Unavailable"
+              planIdOk ? (returningDiscount ? "Rejoin" : "Invest") : "Unavailable"
             }
             buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
             callbackUrl={callbackUrl}
