@@ -413,8 +413,11 @@ app.post(
         return updated.count === 1;
       };
 
-      const hasLiveMembership = async (userId: string) => {
-        const live = await prismaModule.prisma.subscription.findFirst({
+      const hasLiveMembership = async (
+        userId: string,
+        db: Pick<typeof prismaModule.prisma, "subscription"> = prismaModule.prisma,
+      ) => {
+        const live = await db.subscription.findFirst({
           where: {
             userId,
             status: SUBSCRIPTION_STATUS.ACTIVE,
@@ -428,11 +431,12 @@ app.post(
       // a removal that finishes after the lock is gone must not leave a paid member out
       const restoreDiscordIfLive = async (userId: string) => {
         if (!(await hasLiveMembership(userId))) return;
-        const discordAccount = await discordService.getDiscordAccountForUser(userId);
-        if (!discordAccount?.providerAccountId || !discordAccount.access_token) return;
+        const discordAccount =
+          await discordService.getDiscordCredentialsForGuildJoin(userId);
+        if (!discordAccount) return;
         await discordService.addMemberToProGuild(
-          discordAccount.providerAccountId,
-          discordAccount.access_token,
+          discordAccount.discordUserId,
+          discordAccount.accessToken,
         );
       };
 
@@ -479,7 +483,7 @@ app.post(
         try {
           const shouldRemove = await prismaModule.prisma.$transaction(async (tx) => {
             await lockUserMembership(tx, subscription.userId);
-            return !(await hasLiveMembership(subscription.userId));
+            return !(await hasLiveMembership(subscription.userId, tx));
           });
 
           if (!shouldRemove) {
