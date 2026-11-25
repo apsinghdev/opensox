@@ -99,7 +99,7 @@ const comparisonFeatures: ComparisonFeature[] = [
   { name: "Daily stand-ups", free: false, pro: true, proPlus: true },
   { name: "Pro References", free: false, pro: true, proPlus: true },
   {
-    name: "Build in Public Tool (worth $39)",
+    name: "Build in Public Tool/Playbook (worth $39)",
     upcoming: true,
     free: false,
     pro: false,
