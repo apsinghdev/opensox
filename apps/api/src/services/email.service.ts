@@ -178,6 +178,118 @@ Ajeet from Opensox.ai`;
     });
   },
 
+  /**
+   * Sent when an existing member extends the current plan.
+   * New joiners keep the meeting email instead.
+   */
+  async sendMembershipExtendedEmail(
+    email: string,
+    firstName: string
+  ): Promise<boolean> {
+    const safeFirstName = escapeHtml(firstName);
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Hi ${safeFirstName},
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Thanks for extending your duration in the Opensox Pro community!
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Throughout your stay in the Opensox Pro community, I'll make sure you get the best value of your time, efforts and money.
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Forever grateful to you!
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px; margin-top: 30px;">
+          Best,<br/>
+          Ajeet from Opensox.ai
+        </p>
+      </div>
+    `;
+
+    const textBody = `Hi ${firstName},
+
+Thanks for extending your duration in the Opensox Pro community!
+
+Throughout your stay in the Opensox Pro community, I'll make sure you get the best value of your time, efforts and money.
+
+Forever grateful to you!
+
+Best,
+Ajeet from Opensox.ai`;
+
+    return this.sendEmail({
+      to: [{ address: email, name: safeFirstName }],
+      subject: "Thanks for extending your Opensox Pro membership",
+      htmlBody,
+      textBody,
+    });
+  },
+
+  /**
+   * Sent when an existing member upgrades to Pro+.
+   * New joiners keep the meeting email instead.
+   */
+  async sendMembershipUpgradedEmail(
+    email: string,
+    firstName: string
+  ): Promise<boolean> {
+    const safeFirstName = escapeHtml(firstName);
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Hi ${safeFirstName},
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Thanks for upgrading your plan to Opensox Pro+!
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          All the Pro and Pro+ features (upcoming twitter tool/playbook, 4 year duration, merch discounts, etc) are unlocked for you.
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Throughout your stay in the Opensox Pro community, I'll make sure you get the best value of your time, efforts and money.
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px;">
+          Forever grateful to you!
+        </p>
+
+        <p style="color: #333; line-height: 1.8; font-size: 16px; margin-top: 30px;">
+          Best,<br/>
+          Ajeet from Opensox.ai
+        </p>
+      </div>
+    `;
+
+    const textBody = `Hi ${firstName},
+
+Thanks for upgrading your plan to Opensox Pro+!
+
+All the Pro and Pro+ features (upcoming twitter tool/playbook, 4 year duration, merch discounts, etc) are unlocked for you.
+
+Throughout your stay in the Opensox Pro community, I'll make sure you get the best value of your time, efforts and money.
+
+Forever grateful to you!
+
+Best,
+Ajeet from Opensox.ai`;
+
+    return this.sendEmail({
+      to: [{ address: email, name: safeFirstName }],
+      subject: "Thanks for upgrading to Opensox Pro+",
+      htmlBody,
+      textBody,
+    });
+  },
+
   async sendNewsletterConfirmEmail(
     email: string,
     confirmUrl: string
