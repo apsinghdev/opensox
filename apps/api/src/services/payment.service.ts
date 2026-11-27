@@ -153,6 +153,7 @@ interface PaymentRecordResult {
 interface SubscriptionResult {
   subscription: any;
   wasCreated: boolean;
+  membershipAction: MembershipAction | null;
 }
 
 interface FulfillPaymentInput {
@@ -645,6 +646,7 @@ export const paymentService = {
               return {
                 subscription: existingSubscription,
                 wasCreated: false,
+                membershipAction: null,
               };
             }
 
@@ -681,6 +683,7 @@ export const paymentService = {
               return {
                 subscription: created,
                 wasCreated: true,
+                membershipAction: "join" as const,
               };
             }
 
@@ -729,6 +732,10 @@ export const paymentService = {
             return {
               subscription: updated,
               wasCreated: false,
+              // a shorter plan is refused at checkout, but a payment already
+              // taken still appends time, so the member gets the extend note
+              membershipAction:
+                change.action === "blocked" ? "extend" : change.action,
             };
           },
           { timeout: 15000 },
@@ -749,7 +756,7 @@ export const paymentService = {
       if (!subscriptionResult) {
         throw new Error("Failed to create subscription");
       }
-      const { subscription, wasCreated } = subscriptionResult;
+      const { subscription, wasCreated, membershipAction } = subscriptionResult;
 
       if (discordService.isAutomationEnabled()) {
         try {
@@ -769,6 +776,7 @@ export const paymentService = {
       return {
         subscription,
         wasCreated,
+        membershipAction,
       };
     } catch (error) {
       console.error("Error creating subscription:", error);
@@ -784,13 +792,26 @@ export const paymentService = {
     const { userId, planId, paymentData, sendConfirmationEmail = true } = input;
 
     const { payment } = await this.createPaymentRecord(userId, paymentData);
-    const { subscription, wasCreated: subscriptionWasCreated } =
-      await this.createSubscription(userId, planId, payment.id);
+    const {
+      subscription,
+      wasCreated: subscriptionWasCreated,
+      membershipAction,
+    } = await this.createSubscription(userId, planId, payment.id);
 
     let emailSent = false;
 
-    // the onboarding email asks them to book a first call, so only a new membership sends it
-    if (sendConfirmationEmail && subscriptionWasCreated) {
+    const emailKind =
+      membershipAction === "join" && subscriptionWasCreated
+        ? "join"
+        : membershipAction === "extend"
+          ? "extend"
+          : membershipAction === "upgrade"
+            ? "upgrade"
+            : null;
+
+    // the meeting email is only for a brand-new membership. extend and upgrade
+    // get their own note, and a replayed payment does not send another email.
+    if (sendConfirmationEmail && emailKind) {
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
@@ -801,10 +822,22 @@ export const paymentService = {
           const firstName =
             user.firstName?.trim() || DEFAULT_PREMIUM_EMAIL_NAME;
 
-          emailSent = await emailService.sendPremiumSubscriptionEmail(
-            user.email,
-            firstName
-          );
+          if (emailKind === "extend") {
+            emailSent = await emailService.sendMembershipExtendedEmail(
+              user.email,
+              firstName
+            );
+          } else if (emailKind === "upgrade") {
+            emailSent = await emailService.sendMembershipUpgradedEmail(
+              user.email,
+              firstName
+            );
+          } else {
+            emailSent = await emailService.sendPremiumSubscriptionEmail(
+              user.email,
+              firstName
+            );
+          }
         } else {
           console.warn(
             JSON.stringify({
