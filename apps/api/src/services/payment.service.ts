@@ -420,7 +420,8 @@ export const paymentService = {
   },
 
   /**
-   * distinct users who started a pro subscription in the current calendar month (ist)
+   * distinct users who paid for pro this calendar month (ist) — new joins,
+   * extensions, and upgrades all create a captured payment
    */
   async countProMembersJoinedThisMonth(): Promise<number> {
     const { start, end } = getCurrentMonthBoundsIst();
@@ -431,9 +432,10 @@ export const paymentService = {
       try {
         return await prisma.user.count({
           where: {
-            subscriptions: {
+            payments: {
               some: {
-                startDate: {
+                status: PAYMENT_STATUS.CAPTURED,
+                createdAt: {
                   gte: start,
                   lt: end,
                 },
