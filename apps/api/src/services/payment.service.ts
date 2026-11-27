@@ -732,7 +732,10 @@ export const paymentService = {
             return {
               subscription: updated,
               wasCreated: false,
-              membershipAction: change.action,
+              // a shorter plan is refused at checkout, but a payment already
+              // taken still appends time, so the member gets the extend note
+              membershipAction:
+                change.action === "blocked" ? "extend" : change.action,
             };
           },
           { timeout: 15000 },
